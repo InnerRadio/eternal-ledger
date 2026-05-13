@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PurPaws.ca | Companion Memorial Archives</title>
+  <meta name="description" content="PurPaws creates permanent companion animal memorial archives powered by Eternal Ledger and the XRP Ledger.">
+
+  <style>
+    :root {
+      --bg: #120812;
+      --panel: #1d0f1d;
+      --panel2: #281428;
+      --text: #f8eef8;
+      --muted: #c9aeca;
+      --soft: rgba(255,255,255,0.12);
+      --gold: #d4af37;
+      --pink: #ff9fdc;
+      --purple: #9c6cff;
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(156,108,255,0.22), transparent 32%),
+        radial-gradient(circle at top right, rgba(255,159,220,0.18), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .wrap {
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(18px);
+      background: rgba(18,8,18,0.78);
+      border-bottom: 1px solid var(--soft);
+    }
+
+    .nav {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      margin-top: 3px;
+      font-weight: 400;
+    }
+
+    .navlinks {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .pill {
+      border: 1px solid rgba(212,175,55,0.45);
+      color: var(--gold);
+      padding: 10px 14px;
+      border-radius: 999px;
+    }
+
+    .hero {
+      min-height: calc(100vh - 72px);
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 42px;
+      align-items: center;
+      padding: 72px 0;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 12px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(42px, 7vw, 86px);
+      line-height: 0.96;
+      margin: 0 0 24px;
+      letter-spacing: -0.06em;
+    }
+
+    .lead {
+      max-width: 680px;
+      font-size: clamp(18px, 2vw, 23px);
+      color: var(--muted);
+      margin-bottom: 30px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 14px 18px;
+      border: 1px solid var(--soft);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      color: #160816;
+      border: none;
+      font-weight: 800;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      border: 1px solid var(--soft);
+      border-radius: var(--radius);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    .memorial-card {
+      padding: 22px;
+    }
+
+    .pet-photo {
+      height: 330px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: #2a152a;
+      position: relative;
+    }
+    
+    .pet-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+        
+    .pet-name {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .pet-name h2 {
+      margin: 0;
+      font-size: 34px;
+      letter-spacing: -0.04em;
+    }
+
+    .dates {
+      color: var(--gold);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .story {
+      color: var(--muted);
+      margin-top: 14px;
+      font-size: 15px;
+    }
+
+    section {
+      padding: 72px 0;
+      border-top: 1px solid var(--soft);
+    }
+
+    .section-title {
+      font-size: clamp(30px, 4vw, 54px);
+      line-height: 1;
+      letter-spacing: -0.05em;
+      margin: 0 0 18px;
+    }
+
+    .section-lead {
+      color: var(--muted);
+      max-width: 760px;
+      font-size: 18px;
+      margin-bottom: 30px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .feature {
+      padding: 24px;
+      min-height: 190px;
+    }
+
+    .feature h3 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      color: var(--gold);
+    }
+
+    .feature p {
+      color: var(--muted);
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .architecture {
+      padding: 26px;
+      font-family: "Courier New", monospace;
+      color: #f8eef8;
+      overflow-x: auto;
+      white-space: pre;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .form-mock {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 24px;
+    }
+
+    .field {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--soft);
+      border-radius: 16px;
+      padding: 14px;
+      color: var(--muted);
+      min-height: 54px;
+    }
+
+    .field.wide {
+      grid-column: 1 / -1;
+      min-height: 110px;
+    }
+
+    .footer {
+      padding: 44px 0;
+      color: var(--muted);
+      font-size: 13px;
+      border-top: 1px solid var(--soft);
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 48px 0;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-mock {
+        grid-template-columns: 1fr;
+      }
+
+      .navlinks {
+        display: none;
+      }
+
+      .pet-photo {
+        height: 260px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="#">
+        PurPaws.ca
+        <span>Companion Memorial Archives</span>
+      </a>
+
+      <nav class="navlinks">
+        <a href="#how">How It Works</a>
+        <a href="#xrpl">XRPL</a>
+        <a class="pill" href="#beta">Join Beta</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap hero">
+      <div>
+        <div class="eyebrow">Powered by Eternal Ledger + XRPL</div>
+        <h1>Permanent memorial pages for beloved companions.</h1>
+        <p class="lead">
+          PurPaws helps families preserve the stories, photos, videos, and memories of companion animals through beautiful digital memorial archives with future XRPL-backed NFT verification.
+        </p>
+
+        <div class="actions">
+          <a class="btn primary" href="#beta">Join the Beta</a>
+          <a class="btn" href="#xrpl">View Grant Concept</a>
+        </div>
+      </div>
+
+      <article class="card memorial-card">
+        <div class="pet-photo">
+          <img src="/assets/bailey.jpg" alt="Bailey">
+        </div>
+        <div class="pet-name">
+          <h2>Bailey</h2>
+          <div class="dates">2012 — 2026</div>
+        </div>
+        <p class="story">
+          Loyal friend, gentle spirit, guardian of the home, and forever part of the family story.
+        </p>
+      </article>
+    </div>
+
+    <section id="how">
+      <div class="wrap">
+        <h2 class="section-title">A softer first step into digital legacy infrastructure.</h2>
+        <p class="section-lead">
+          PurPaws is the first public deployment layer of Eternal Ledger: an accessible, emotional, real-world use case for immutable digital continuity on the XRP Ledger.
+        </p>
+
+        <div class="grid">
+          <div class="card feature">
+            <h3>Create a Memorial</h3>
+            <p>Families create a companion archive with name, dates, story, photos, and meaningful moments.</p>
+          </div>
+
+          <div class="card feature">
+            <h3>Preserve the Record</h3>
+            <p>The memorial becomes a permanent digital archive page designed for sharing and remembrance.</p>
+          </div>
+
+          <div class="card feature">
+            <h3>Anchor to XRPL</h3>
+            <p>The next phase mints an XRPL NFT as an immutable certificate of existence and intent.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="xrpl">
+      <div class="wrap">
+        <h2 class="section-title">Grant-ready architecture.</h2>
+        <p class="section-lead">
+          Eternal Ledger provides the infrastructure layer. PurPaws provides the first clear public use case.
+        </p>
+
+        <div class="card architecture">PurPaws Frontend
+        ↓
+Eternal Ledger Infrastructure Layer
+        ↓
+FastAPI Backend
+        ↓
+XRPL SDK Integration
+        ↓
+Wallet Authentication
+        ↓
+NFT Minting + Metadata Anchoring
+        ↓
+Immutable XRPL Records</div>
+      </div>
+    </section>
+
+    <section id="beta">
+      <div class="wrap">
+        <h2 class="section-title">Join the early memorial archive beta.</h2>
+        <p class="section-lead">
+          This form is currently a prototype placeholder. The first build milestone is a working memorial archive flow, followed by XRPL testnet minting.
+        </p>
+
+        <div class="card form-mock">
+          <div class="field">Pet name</div>
+          <div class="field">Years / dates</div>
+          <div class="field wide">Short memorial story</div>
+          <div class="field wide">Photo or video upload placeholder</div>
+          <a class="btn primary" href="mailto:ravipersaud9@gmail.com?subject=PurPaws%20Beta%20Interest">Email Beta Interest</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      PurPaws.ca — Companion Memorial Archives. Powered by Eternal Ledger infrastructure and designed for future XRP Ledger NFT verification.
+    </div>
+  </footer>
+</body>
+</html>

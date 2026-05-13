@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bailey Memorial | PurPaws.ca</title>
+
+  <style>
+    :root {
+      --bg:#120812;
+      --panel:#1d0f1d;
+      --text:#f8eef8;
+      --muted:#c9aeca;
+      --gold:#d4af37;
+      --line:rgba(255,255,255,0.12);
+      --pink:#ff9fdc;
+      --purple:#9c6cff;
+      --radius:26px;
+    }
+
+    * { box-sizing:border-box; }
+
+    body {
+      margin:0;
+      background:
+        radial-gradient(circle at top left, rgba(156,108,255,0.24), transparent 32%),
+        radial-gradient(circle at top right, rgba(255,159,220,0.18), transparent 28%),
+        var(--bg);
+      color:var(--text);
+      font-family:Arial, Helvetica, sans-serif;
+      line-height:1.5;
+    }
+
+    .wrap {
+      width:min(960px, calc(100% - 36px));
+      margin:0 auto;
+    }
+
+    header {
+      padding:28px 0;
+      border-bottom:1px solid var(--line);
+    }
+
+    a {
+      color:inherit;
+      text-decoration:none;
+    }
+
+    .brand {
+      text-transform:uppercase;
+      letter-spacing:0.14em;
+      font-size:13px;
+      color:var(--gold);
+    }
+
+    main {
+      padding:64px 0;
+    }
+
+    .card {
+      background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      overflow:hidden;
+      box-shadow:0 28px 90px rgba(0,0,0,0.36);
+    }
+
+    .hero {
+      padding:28px;
+    }
+
+    .photo {
+      height:420px;
+      border-radius:22px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.14);
+      background:
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,0.22), transparent 20%),
+        linear-gradient(135deg, rgba(156,108,255,0.65), rgba(255,159,220,0.55));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      color:white;
+      text-transform:uppercase;
+      letter-spacing:0.16em;
+      font-size:12px;
+    }
+
+    h1 {
+      font-size:clamp(48px, 8vw, 92px);
+      line-height:0.92;
+      letter-spacing:-0.07em;
+      margin:28px 0 10px;
+    }
+
+    .dates {
+      color:var(--gold);
+      text-transform:uppercase;
+      letter-spacing:0.18em;
+      font-size:13px;
+      margin-bottom:28px;
+    }
+
+    .story {
+      color:var(--muted);
+      font-size:20px;
+      max-width:760px;
+      margin-bottom:34px;
+    }
+
+    .proof {
+      padding:26px;
+      border-top:1px solid var(--line);
+      background:rgba(0,0,0,0.18);
+    }
+
+    .proof h2 {
+      margin:0 0 18px;
+      font-size:26px;
+      letter-spacing:-0.04em;
+    }
+
+    .row {
+      display:grid;
+      grid-template-columns:190px 1fr;
+      gap:16px;
+      padding:12px 0;
+      border-top:1px solid rgba(255,255,255,0.08);
+      font-size:14px;
+    }
+
+    .label {
+      color:var(--gold);
+      text-transform:uppercase;
+      letter-spacing:0.12em;
+      font-size:11px;
+    }
+
+    .value {
+      color:var(--muted);
+      word-break:break-all;
+      font-family:"Courier New", monospace;
+    }
+
+    .footer {
+      padding:34px 0;
+      color:var(--muted);
+      font-size:13px;
+      text-align:center;
+    }
+
+    @media(max-width:720px) {
+      .photo { height:300px; }
+
+      .row {
+        grid-template-columns:1fr;
+        gap:4px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap">
+      <a class="brand" href="/">PurPaws.ca — Companion Memorial Archives</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <article class="card hero">
+        <div class="photo">Bailey Memorial Image</div>
+
+        <h1>Bailey</h1>
+        <div class="dates">2012 — 2026</div>
+
+        <p class="story">
+          Loyal friend, gentle spirit, guardian of the home, and forever part of the family story.
+          This memorial archive represents the first PurPaws companion remembrance prototype
+          connected to Eternal Ledger infrastructure and XRPL testnet NFT verification.
+        </p>
+
+        <section class="proof">
+          <h2>XRPL Testnet Memorial Proof</h2>
+
+          <div class="row">
+            <div class="label">Network</div>
+            <div class="value">XRPL Testnet</div>
+          </div>
+
+          <div class="row">
+            <div class="label">Result</div>
+            <div class="value">tesSUCCESS</div>
+          </div>
+
+          <div class="row">
+            <div class="label">Transaction Hash</div>
+            <div class="value">66FD6F45DB8D7C3C99AC6D27AB9D20EF1E4AB3F4900A58EAC789BFC9C0CFF7AD</div>
+          </div>
+
+          <div class="row">
+            <div class="label">NFTokenID</div>
+            <div class="value">000800009C76C4919DC627213924BBCB2CE7CA5159F0DE062296BCA401085A09</div>
+          </div>
+
+          <div class="row">
+            <div class="label">Ledger Index</div>
+            <div class="value">17324767</div>
+          </div>
+
+          <div class="row">
+            <div class="label">Referenced URI</div>
+            <div class="value">https://purpaws.ca/memorial/bailey</div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    PurPaws memorial prototype — Powered by Eternal Ledger and XRPL testnet infrastructure.
+  </footer>
+</body>
+</html>
