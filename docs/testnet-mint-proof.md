@@ -1,43 +1,88 @@
-# XRPL Testnet Mint Proof
+# XRPL Testnet NFT Mint Proof
 
 ## Project
 
-Eternal Ledger / PurPaws
+Eternal Ledger
 
-## Mint Type
+First public deployment layer:
 
-Companion Memorial NFT Prototype
+PurPaws.ca
 
-## Network
+---
 
-XRPL Testnet
+## Purpose
 
-## Result
+This document records the first successful XRPL Testnet NFT mint completed for the Eternal Ledger infrastructure prototype.
 
-Successful NFT mint transaction.
+The NFT represents a prototype companion memorial archive flow using:
 
-## Transaction Hash
+- XRPL Testnet
+- xrpl-py
+- metadata anchoring
+- public memorial infrastructure
+- decentralized continuity architecture
 
-66FD6F45DB8D7C3C99AC6D27AB9D20EF1E4AB3F4900A58EAC789BFC9C0CFF7AD
+---
 
-## NFTokenID
+## Public Endpoints
 
-000800009C76C4919DC627213924BBCB2CE7CA5159F0DE062296BCA401085A09
+PurPaws Public Site:
 
-## Referenced URI
+https://purpaws.ca
+
+Bailey Memorial Page:
 
 https://purpaws.ca/memorial/bailey
 
-## Transaction Result
+Metadata JSON Endpoint:
+
+https://purpaws.ca/metadata/bailey.json
+
+Eternal Ledger Infrastructure Site:
+
+https://eternalledger.com
+
+GitHub Repository:
+
+https://github.com/InnerRadio/eternal-ledger
+
+---
+
+## XRPL Testnet Mint
+
+Transaction Hash:
+
+020D65F45D3484DC12C0042B5D4EC10BDBFED3935E8F1D197B537B52A0A6337A
+
+NFTokenID:
+
+000800009C76C4919DC627213924BBCB2CE7CA5159F0DE06397C8DA501085A0A
+
+Ledger Index:
+
+17328756
+
+Network:
+
+XRPL Testnet
+
+Result:
 
 tesSUCCESS
 
-## Ledger Index
+---
 
-17324767
+## NFT Metadata Architecture
 
-## Prototype Significance
+The NFT URI points to a structured metadata endpoint instead of directly to a webpage.
 
-This confirms that Eternal Ledger infrastructure can successfully connect to the XRPL testnet and mint an NFT representing a companion memorial archive.
+Architecture:
 
-This is the first working XRPL-native proof-of-concept for the PurPaws deployment layer.
+```text
+XRPL NFT
+    ↓
+Metadata JSON
+    ↓
+Public Memorial Page
+    ↓
+Human-readable archive
