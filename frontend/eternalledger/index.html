@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Eternal Ledger | XRPL Digital Continuity Infrastructure</title>
+
+<meta name="description" content="Immutable digital continuity infrastructure built on XRPL. Eternal Ledger preserves memory, provenance, creator attribution, and memorial archives through decentralized infrastructure.">
+
+<style>
+
+:root{
+  --bg:#060606;
+  --panel:#101010;
+  --panel2:#161616;
+  --text:#f5f5f5;
+  --muted:#9f9f9f;
+  --gold:#d4af37;
+  --line:rgba(255,255,255,0.08);
+  --purple:#8e6bff;
+  --radius:28px;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at top left, rgba(142,107,255,0.12), transparent 28%),
+    radial-gradient(circle at top right, rgba(212,175,55,0.08), transparent 24%),
+    var(--bg);
+  color:var(--text);
+  font-family:Arial, Helvetica, sans-serif;
+  line-height:1.5;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.wrap{
+  width:min(1180px, calc(100% - 40px));
+  margin:0 auto;
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  backdrop-filter:blur(18px);
+  background:rgba(6,6,6,0.82);
+  border-bottom:1px solid var(--line);
+}
+
+.nav{
+  height:74px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.brand{
+  display:flex;
+  flex-direction:column;
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+  font-size:13px;
+  font-weight:700;
+}
+
+.brand span{
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:0.18em;
+  margin-top:3px;
+  font-weight:400;
+}
+
+.navlinks{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  color:var(--muted);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+}
+
+.pill{
+  border:1px solid rgba(212,175,55,0.35);
+  border-radius:999px;
+  padding:10px 16px;
+  color:var(--gold);
+}
+
+.hero{
+  min-height:calc(100vh - 74px);
+  display:grid;
+  grid-template-columns:1.1fr 0.9fr;
+  align-items:center;
+  gap:42px;
+  padding:72px 0;
+}
+
+.eyebrow{
+  color:var(--gold);
+  text-transform:uppercase;
+  letter-spacing:0.22em;
+  font-size:12px;
+  margin-bottom:18px;
+}
+
+h1{
+  margin:0 0 24px;
+  font-size:clamp(52px, 7vw, 92px);
+  line-height:0.92;
+  letter-spacing:-0.06em;
+}
+
+.lead{
+  font-size:clamp(18px, 2vw, 23px);
+  color:var(--muted);
+  max-width:700px;
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  margin-top:34px;
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  padding:15px 20px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--line);
+  color:var(--text);
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  font-size:12px;
+}
+
+.btn.primary{
+  background:linear-gradient(135deg, var(--purple), var(--gold));
+  color:#111;
+  border:none;
+  font-weight:800;
+}
+
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:0 30px 90px rgba(0,0,0,0.35);
+}
+
+.hero-panel{
+  padding:28px;
+}
+
+.hero-image{
+  height:360px;
+  border-radius:22px;
+  overflow:hidden;
+  position:relative;
+  border:1px solid rgba(255,255,255,0.08);
+  background:
+    radial-gradient(circle at top left, rgba(142,107,255,0.25), transparent 30%),
+    linear-gradient(135deg, #151515, #222);
+}
+
+.hero-image::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size:32px 32px;
+}
+
+.hero-caption{
+  margin-top:24px;
+}
+
+.hero-caption h2{
+  margin:0 0 10px;
+  font-size:36px;
+  letter-spacing:-0.05em;
+}
+
+.hero-caption p{
+  margin:0;
+  color:var(--muted);
+  font-size:16px;
+}
+
+section{
+  padding:84px 0;
+  border-top:1px solid var(--line);
+}
+
+.section-title{
+  font-size:clamp(34px, 4vw, 60px);
+  line-height:1;
+  letter-spacing:-0.05em;
+  margin:0 0 20px;
+}
+
+.section-lead{
+  color:var(--muted);
+  font-size:19px;
+  max-width:760px;
+  margin-bottom:36px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:18px;
+}
+
+.feature{
+  padding:28px;
+  min-height:220px;
+}
+
+.feature h3{
+  margin:0 0 14px;
+  color:var(--gold);
+  font-size:18px;
+}
+
+.feature p{
+  margin:0;
+  color:var(--muted);
+  font-size:15px;
+}
+
+.architecture{
+  padding:28px;
+  overflow-x:auto;
+  font-family:"Courier New", monospace;
+  white-space:pre;
+  line-height:1.8;
+  font-size:14px;
+  color:#ececec;
+}
+
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+}
+
+.metric{
+  padding:28px;
+  text-align:center;
+}
+
+.metric strong{
+  display:block;
+  font-size:42px;
+  letter-spacing:-0.04em;
+  margin-bottom:10px;
+}
+
+.metric span{
+  color:var(--muted);
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+}
+
+.footer{
+  padding:44px 0;
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font-size:13px;
+}
+
+@media(max-width:920px){
+
+  .hero{
+    grid-template-columns:1fr;
+    padding:48px 0;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .metrics{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .navlinks{
+    display:none;
+  }
+
+}
+
+@media(max-width:640px){
+
+  .metrics{
+    grid-template-columns:1fr;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="wrap nav">
+
+    <a class="brand" href="#">
+      Eternal Ledger
+      <span>XRPL Digital Continuity Infrastructure</span>
+    </a>
+
+    <nav class="navlinks">
+      <a href="#architecture">Architecture</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="https://purpaws.ca">PurPaws</a>
+      <a class="pill" href="#grant">XRPL Grant</a>
+    </nav>
+
+  </div>
+</header>
+
+<main>
+
+<div class="wrap hero">
+
+  <div>
+
+    <div class="eyebrow">
+      Built on XRPL
+    </div>
+
+    <h1>
+      Immutable digital continuity infrastructure.
+    </h1>
+
+    <p class="lead">
+      Eternal Ledger is a decentralized infrastructure framework for preserving memory, provenance, creator attribution, and collaborative memorial archives through XRPL-native NFT systems.
+    </p>
+
+    <div class="actions">
+      <a class="btn primary" href="https://purpaws.ca">
+        View PurPaws Deployment
+      </a>
+
+      <a class="btn" href="#architecture">
+        Explore Architecture
+      </a>
+    </div>
+
+  </div>
+
+  <div class="card hero-panel">
+
+    <div class="hero-image"></div>
+
+    <div class="hero-caption">
+      <h2>PurPaws.ca</h2>
+
+      <p>
+        The first public-facing deployment of Eternal Ledger infrastructure focused on companion memorial archives and future XRPL-backed NFT verification.
+      </p>
+    </div>
+
+  </div>
+
+</div>
+
+<section>
+
+  <div class="wrap">
+
+    <h2 class="section-title">
+      Digital continuity is broken.
+    </h2>
+
+    <p class="section-lead">
+      Modern life creates enormous emotional and cultural data, yet most digital memory systems remain centralized, impermanent, fragmented, and unverifiable.
+    </p>
+
+    <div class="grid">
+
+      <div class="card feature">
+        <h3>Memory Decays</h3>
+        <p>
+          Photos, stories, and archives disappear through platform loss, fragmented storage, and time.
+        </p>
+      </div>
+
+      <div class="card feature">
+        <h3>Creator Provenance</h3>
+        <p>
+          Artists and creators lack permanent decentralized attribution systems for cultural continuity.
+        </p>
+      </div>
+
+      <div class="card feature">
+        <h3>Legacy Fragmentation</h3>
+        <p>
+          Human continuity systems were never designed for long-term collaborative digital remembrance.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section id="architecture">
+
+  <div class="wrap">
+
+    <h2 class="section-title">
+      XRPL-native infrastructure architecture.
+    </h2>
+
+    <p class="section-lead">
+      Eternal Ledger uses lightweight scalable infrastructure designed for public onboarding and future NFT permanence.
+    </p>
+
+    <div class="card architecture">Frontend Deployment Layer
+        ↓
+Eternal Ledger Infrastructure Layer
+        ↓
+FastAPI Backend Architecture
+        ↓
+XRPL SDK Integration
+        ↓
+Wallet Authentication
+        ↓
+NFT Minting + Metadata Anchoring
+        ↓
+Immutable XRPL Records</div>
+
+  </div>
+
+</section>
+
+<section id="roadmap">
+
+  <div class="wrap">
+
+    <h2 class="section-title">
+      Initial roadmap.
+    </h2>
+
+    <p class="section-lead">
+      The first deployment layer focuses on companion memorial archives before expanding into broader digital continuity infrastructure.
+    </p>
+
+    <div class="grid">
+
+      <div class="card feature">
+        <h3>Phase 1 — PurPaws MVP</h3>
+        <p>
+          Public memorial archive pages, onboarding flow, XRPL testnet integration, NFT mint prototype.
+        </p>
+      </div>
+
+      <div class="card feature">
+        <h3>Phase 2 — Public Beta</h3>
+        <p>
+          Collaborative archives, creator participation, metadata systems, QR memorial integrations.
+        </p>
+      </div>
+
+      <div class="card feature">
+        <h3>Phase 3 — Infrastructure Expansion</h3>
+        <p>
+          Creator provenance systems, cultural archives, memorial infrastructure, digital continuity tools.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section>
+
+  <div class="wrap">
+
+    <h2 class="section-title">
+      XRPL ecosystem impact.
+    </h2>
+
+    <p class="section-lead">
+      Eternal Ledger introduces emotionally meaningful NFT utility while onboarding new public-facing XRPL users.
+    </p>
+
+    <div class="metrics">
+
+      <div class="card metric">
+        <strong>5K</strong>
+        <span>Wallet Onboarding Goal</span>
+      </div>
+
+      <div class="card metric">
+        <strong>20K</strong>
+        <span>Projected NFT Mints</span>
+      </div>
+
+      <div class="card metric">
+        <strong>1K</strong>
+        <span>Memorial Archives</span>
+      </div>
+
+      <div class="card metric">
+        <strong>XRPL</strong>
+        <span>Native Infrastructure</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section id="grant">
+
+  <div class="wrap">
+
+    <h2 class="section-title">
+      XRPL grant initiative.
+    </h2>
+
+    <p class="section-lead">
+      Eternal Ledger seeks support for MVP deployment, XRPL integration, onboarding infrastructure, NFT systems, and public beta development beginning with PurPaws.ca.
+    </p>
+
+    <div class="actions">
+      <a class="btn primary" href="https://purpaws.ca">
+        View Public Deployment
+      </a>
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+
+<footer class="footer">
+
+  <div class="wrap">
+    Eternal Ledger — Immutable Digital Continuity Infrastructure built on XRPL.
+  </div>
+
+</footer>
+
+</body>
+</html>
