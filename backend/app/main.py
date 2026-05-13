@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from backend.app.models import MemorialCreate
 
 app = FastAPI()
 
@@ -19,4 +20,11 @@ def bailey_memorial():
         "type": "Companion Memorial",
         "project": "PurPaws",
         "ledger": "XRPL Testnet"
+    }
+
+@app.post("/create-memorial")
+def create_memorial(memorial: MemorialCreate):
+    return {
+        "status": "memorial received",
+        "data": memorial.dict()
     }
