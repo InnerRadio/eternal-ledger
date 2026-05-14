@@ -1,12 +1,13 @@
 import json
 import re
 from pathlib import Path
+from sqlalchemy.orm import Session
 from backend.app.cms.auth import router as auth_router
 from backend.app.cms.dashboard import router as dashboard_router
 
-from fastapi import FastAPI
-from backend.app.database import Base, engine
-from backend.app.models import MemorialCreate
+from fastapi import Depends, FastAPI
+from backend.app.database import Base, engine, get_db
+from backend.app.models import MemorialCreate, Memorial
 from backend.app.cms.memorials import router as memorials_router
 
 Base.metadata.create_all(bind=engine)
@@ -97,8 +98,21 @@ def bailey_memorial():
 
 
 @app.post("/create-memorial")
-def create_memorial(memorial: MemorialCreate):
+def create_memorial(memorial: MemorialCreate, db: Session = Depends(get_db)):
     slug = slugify(memorial.companion_name)
+
+    db_memorial = Memorial(
+        companion_name=memorial.companion_name,
+        years=memorial.years,
+        story=memorial.story,
+        archive_type=memorial.archive_type,
+        project=memorial.project,
+        status="published"
+    )
+
+    db.add(db_memorial)
+    db.commit()
+    db.refresh(db_memorial)
 
     metadata = {
         "name": f"{memorial.companion_name} Memorial Archive",
@@ -144,6 +158,7 @@ def create_memorial(memorial: MemorialCreate):
 
     return {
         "status": "memorial and metadata created",
+        "database_id": db_memorial.id,
         "slug": slug,
         "metadata_url": f"https://purpaws.ca/metadata/{slug}.json",
         "memorial_url": f"https://purpaws.ca/memorial/{slug}",
