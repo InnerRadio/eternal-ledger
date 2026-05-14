@@ -29,7 +29,7 @@ class MemorialUpdate(BaseModel):
     project: str | None = None
     status: str | None = None
 
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, DateTime
 
 from backend.app.database import Base
 
@@ -70,3 +70,20 @@ class User(Base):
 
     role = Column(String, default="admin")
     status = Column(String, default="active")
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(Integer, nullable=True)
+    user_email = Column(String, nullable=True)
+    user_role = Column(String, nullable=True)
+
+    action = Column(String, nullable=False)
+    target_type = Column(String, nullable=True)
+    target_id = Column(Integer, nullable=True)
+
+    details = Column(Text, nullable=True)
+    created_at = Column(DateTime, nullable=False)

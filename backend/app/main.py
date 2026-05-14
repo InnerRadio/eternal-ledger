@@ -9,6 +9,7 @@ from fastapi import Depends, FastAPI
 from backend.app.database import Base, engine, get_db
 from backend.app.models import MemorialCreate, Memorial
 from backend.app.cms.memorials import router as memorials_router
+from backend.app.cms.audit_routes import router as audit_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -16,6 +17,7 @@ app = FastAPI()
 app.include_router(auth_router)
 app.include_router(dashboard_router)
 app.include_router(memorials_router)
+app.include_router(audit_router)
 
 METADATA_DIR = Path("/var/www/purpaws.ca/metadata")
 MEMORIAL_DIR = Path("/var/www/purpaws.ca/memorial")

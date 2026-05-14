@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
 from backend.app.cms.security import require_roles
+from backend.app.cms.audit import write_audit_log
 from backend.app.models import Memorial, MemorialUpdate
 
 router = APIRouter(prefix="/cms/memorials", tags=["CMS Memorials"])
@@ -80,6 +81,15 @@ def update_memorial(
 
     db.commit()
     db.refresh(memorial)
+
+    write_audit_log(
+        db=db,
+        action="update_memorial",
+        current_user=current_user,
+        target_type="memorial",
+        target_id=memorial.id,
+        details=f"Updated memorial record {memorial.id}"
+    )
 
     return {
         "status": "updated",
