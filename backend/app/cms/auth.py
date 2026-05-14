@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from backend.app.database import get_db
 from backend.app.models import User, UserCreate, UserLogin
 from backend.app.cms.security import (
+    require_roles,
     create_access_token,
     get_password_hash,
     verify_password,
@@ -13,7 +14,7 @@ router = APIRouter(prefix="/cms", tags=["CMS Auth"])
 
 
 @router.post("/register")
-def cms_register(user: UserCreate, db: Session = Depends(get_db)):
+def cms_register(user: UserCreate, db: Session = Depends(get_db), current_user: dict = Depends(require_roles('super_admin', 'admin'))):
     existing_user = db.query(User).filter(
         User.email == user.email
     ).first()
