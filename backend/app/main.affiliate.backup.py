@@ -14,9 +14,7 @@ from backend.app.cms.audit_routes import router as audit_router
 from backend.app.cms.media import router as media_router
 from backend.app.cms.contributions import router as contributions_router
 from backend.app.cms.reports import router as reports_router
-from backend.app.cms.affiliates import router as affiliates_router
 from backend.app.public_api import router as public_router
-from backend.app.partner_inquiries import router as partner_inquiry_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -28,9 +26,7 @@ app.include_router(audit_router)
 app.include_router(media_router)
 app.include_router(contributions_router)
 app.include_router(reports_router)
-app.include_router(affiliates_router)
 app.include_router(public_router)
-app.include_router(partner_inquiry_router)
 
 app.mount("/uploads", StaticFiles(directory="/var/www/eternal-ledger-github/uploads"), name="uploads")
 app.mount("/admin", StaticFiles(directory="/var/www/eternal-ledger-github/frontend/admin", html=True), name="admin")

@@ -34,18 +34,8 @@ class ContributionCreate(BaseModel):
 class UserCreate(BaseModel):
     email: str
     password: str
-    role: str = "free"
-    referring_affiliate_id: int | None = None
+    role: str = "admin"
 
-
-
-
-class PartnerInquiryCreate(BaseModel):
-    name: str
-    email: str
-    interest_type: str = "affiliate"
-    organization: str | None = None
-    message: str | None = None
 
 class UserLogin(BaseModel):
     email: str
@@ -114,10 +104,6 @@ class User(Base):
     role = Column(String, default="admin")
     status = Column(String, default="active")
 
-    affiliate_id = Column(String, unique=True, index=True, nullable=True)
-    referral_code = Column(String, unique=True, index=True, nullable=True)
-    referring_affiliate_id = Column(Integer, nullable=True)
-
 
 class AuditLog(Base):
     __tablename__ = "audit_logs"
@@ -173,61 +159,5 @@ class Contribution(Base):
 
     ipfs_cid = Column(String, nullable=True)
     xrpl_tx_hash = Column(String, nullable=True)
-
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-
-
-class AffiliateClick(Base):
-    __tablename__ = "affiliate_clicks"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    affiliate_id = Column(String, nullable=True)
-    referral_code = Column(String, nullable=True)
-
-    campaign_id = Column(String, nullable=True)
-    ad_id = Column(String, nullable=True)
-
-    source_url = Column(String, nullable=True)
-    destination_url = Column(String, nullable=True)
-
-    ip_address = Column(String, nullable=True)
-    user_agent = Column(String, nullable=True)
-
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-
-
-class AffiliateConversion(Base):
-    __tablename__ = "affiliate_conversions"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    affiliate_id = Column(String, nullable=True)
-    referral_code = Column(String, nullable=True)
-
-    conversion_type = Column(String, default="signup")
-    target_type = Column(String, nullable=True)
-    target_id = Column(Integer, nullable=True)
-
-    status = Column(String, default="pending")
-
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-
-
-class PartnerInquiry(Base):
-    __tablename__ = "partner_inquiries"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    name = Column(String, nullable=False)
-    email = Column(String, nullable=False)
-
-    interest_type = Column(String, default="affiliate")
-
-    organization = Column(String, nullable=True)
-
-    message = Column(Text, nullable=True)
-
-    status = Column(String, default="new")
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

@@ -72,7 +72,3 @@ def require_roles(*allowed_roles):
         return current_user
 
     return role_checker
-
-
-def require_minimum_role(*allowed_roles):
-    return require_roles(*allowed_roles)

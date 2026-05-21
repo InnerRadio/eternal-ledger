@@ -24,9 +24,7 @@ def list_memorials(db: Session = Depends(get_db), current_user: dict = Depends(r
                 "years": memorial.years,
                 "archive_type": memorial.archive_type,
                 "project": memorial.project,
-                "status": memorial.status,
-                "environment_theme": memorial.environment_theme,
-                "atmosphere_intensity": memorial.atmosphere_intensity
+                "status": memorial.status
             }
             for memorial in memorials
         ]
@@ -51,9 +49,7 @@ def list_deleted_memorials(
                 "years": memorial.years,
                 "archive_type": memorial.archive_type,
                 "project": memorial.project,
-                "status": memorial.status,
-                "environment_theme": memorial.environment_theme,
-                "atmosphere_intensity": memorial.atmosphere_intensity
+                "status": memorial.status
             }
             for memorial in memorials
         ]
@@ -81,9 +77,7 @@ def get_memorial(memorial_id: int, db: Session = Depends(get_db), current_user: 
             "story": memorial.story,
             "archive_type": memorial.archive_type,
             "project": memorial.project,
-            "status": memorial.status,
-                "environment_theme": memorial.environment_theme,
-                "atmosphere_intensity": memorial.atmosphere_intensity
+            "status": memorial.status
         }
     }
 
@@ -131,9 +125,7 @@ def update_memorial(
             "story": memorial.story,
             "archive_type": memorial.archive_type,
             "project": memorial.project,
-            "status": memorial.status,
-                "environment_theme": memorial.environment_theme,
-                "atmosphere_intensity": memorial.atmosphere_intensity
+            "status": memorial.status
         }
     }
 
@@ -174,9 +166,7 @@ def create_memorial_cms(
             "years": memorial.years,
             "archive_type": memorial.archive_type,
             "project": memorial.project,
-            "status": memorial.status,
-                "environment_theme": memorial.environment_theme,
-                "atmosphere_intensity": memorial.atmosphere_intensity
+            "status": memorial.status
         }
     }
 
@@ -211,9 +201,7 @@ def delete_memorial(
         "record": {
             "id": memorial.id,
             "companion_name": memorial.companion_name,
-            "status": memorial.status,
-                "environment_theme": memorial.environment_theme,
-                "atmosphere_intensity": memorial.atmosphere_intensity
+            "status": memorial.status
         }
     }
 
@@ -248,9 +236,7 @@ def restore_memorial(
         "record": {
             "id": memorial.id,
             "companion_name": memorial.companion_name,
-            "status": memorial.status,
-                "environment_theme": memorial.environment_theme,
-                "atmosphere_intensity": memorial.atmosphere_intensity
+            "status": memorial.status
         }
     }
 
@@ -285,8 +271,6 @@ def review_memorial(
         "record": {
             "id": memorial.id,
             "companion_name": memorial.companion_name,
-            "status": memorial.status,
-                "environment_theme": memorial.environment_theme,
-                "atmosphere_intensity": memorial.atmosphere_intensity
+            "status": memorial.status
         }
     }

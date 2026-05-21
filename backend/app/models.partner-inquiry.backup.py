@@ -34,18 +34,9 @@ class ContributionCreate(BaseModel):
 class UserCreate(BaseModel):
     email: str
     password: str
-    role: str = "free"
+    role: str = "admin"
     referring_affiliate_id: int | None = None
 
-
-
-
-class PartnerInquiryCreate(BaseModel):
-    name: str
-    email: str
-    interest_type: str = "affiliate"
-    organization: str | None = None
-    message: str | None = None
 
 class UserLogin(BaseModel):
     email: str
@@ -210,24 +201,5 @@ class AffiliateConversion(Base):
     target_id = Column(Integer, nullable=True)
 
     status = Column(String, default="pending")
-
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-
-
-class PartnerInquiry(Base):
-    __tablename__ = "partner_inquiries"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    name = Column(String, nullable=False)
-    email = Column(String, nullable=False)
-
-    interest_type = Column(String, default="affiliate")
-
-    organization = Column(String, nullable=True)
-
-    message = Column(Text, nullable=True)
-
-    status = Column(String, default="new")
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PurPaws | Continuity Network</title>
+
+<style>
+
+:root{
+    --bg:#050505;
+    --panel:#101010;
+    --gold:#D4AF37;
+    --fg:#F5F5F5;
+    --muted:#888;
+    --line:rgba(255,255,255,0.08);
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    background:
+        radial-gradient(circle at top, rgba(212,175,55,0.08), transparent 28%),
+        #050505;
+    color:var(--fg);
+    font-family:Arial, Helvetica, sans-serif;
+    line-height:1.5;
+}
+
+.container{
+    width:min(1180px,92%);
+    margin:auto;
+}
+
+.hero{
+    min-height:78vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:120px 0 80px;
+}
+
+.hero h1{
+    font-size:clamp(3rem,8vw,7rem);
+    letter-spacing:0.08em;
+    margin-bottom:24px;
+}
+
+.hero p{
+    max-width:820px;
+    margin:auto;
+    color:#CCC;
+    font-size:1.1rem;
+}
+
+.hero-buttons{
+    margin-top:42px;
+    display:flex;
+    gap:18px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+.button{
+    border:1px solid rgba(212,175,55,0.35);
+    padding:16px 28px;
+    text-decoration:none;
+    color:white;
+    background:rgba(255,255,255,0.03);
+    backdrop-filter:blur(10px);
+    transition:0.25s ease;
+}
+
+.button:hover{
+    transform:translateY(-2px);
+    border-color:var(--gold);
+    background:rgba(212,175,55,0.08);
+}
+
+.section{
+    padding:88px 0;
+    border-top:1px solid var(--line);
+}
+
+.section h2{
+    font-size:2rem;
+    margin-bottom:18px;
+}
+
+.section p{
+    max-width:760px;
+    color:#BDBDBD;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:22px;
+    margin-top:42px;
+}
+
+.card{
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--line);
+    padding:28px;
+    min-height:240px;
+}
+
+.card h3{
+    margin-bottom:12px;
+    color:var(--gold);
+}
+
+.card p{
+    color:#B9B9B9;
+    font-size:0.96rem;
+}
+
+.logos{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:18px;
+    margin-top:40px;
+}
+
+.logo{
+    border:1px solid var(--line);
+    min-height:100px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#999;
+    background:rgba(255,255,255,0.02);
+}
+
+.form-wrap{
+    margin-top:42px;
+    max-width:720px;
+}
+
+form{
+    display:grid;
+    gap:16px;
+}
+
+input, textarea, select{
+    width:100%;
+    background:#0F0F0F;
+    border:1px solid rgba(255,255,255,0.08);
+    color:white;
+    padding:16px;
+}
+
+textarea{
+    min-height:160px;
+    resize:vertical;
+}
+
+.submit{
+    background:var(--gold);
+    color:black;
+    border:none;
+    padding:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.footer{
+    padding:48px 0 90px;
+    text-align:center;
+    color:#777;
+    border-top:1px solid var(--line);
+}
+
+</style>
+</head>
+
+<body>
+
+<section class="hero">
+<div class="container">
+
+<h1>PURPAWS</h1>
+
+<p>
+A continuity network for memorials, creators, families,
+musicians, shelters, florists, veterinary offices,
+pet communities, and local partnerships.
+</p>
+
+<div class="hero-buttons">
+<a class="button" href="#memorials">Create Memorial</a>
+<a class="button" href="#partners">Partner With Us</a>
+<a class="button" href="#advertise">Advertise</a>
+<a class="button" href="#support">Support</a>
+</div>
+
+</div>
+</section>
+
+<section class="section" id="memorials">
+<div class="container">
+
+<h2>Create a Memorial</h2>
+
+<p>
+Preserve memory, atmosphere, photographs, music,
+stories, and continuity experiences for beloved companions,
+families, creators, and loved ones.
+</p>
+
+<div class="grid">
+
+<div class="card">
+<h3>Companion Memorials</h3>
+<p>Dogs, cats, beloved animals, remembrance archives, shared memories, photos, atmosphere environments, and continuity storytelling.</p>
+</div>
+
+<div class="card">
+<h3>Creator Continuity</h3>
+<p>Musicians, artists, photographers, filmmakers, and local creators preserving archives, stories, and public memory.</p>
+</div>
+
+<div class="card">
+<h3>Ceremonial Spaces</h3>
+<p>Atmosphere archetypes including candlelight, forest night, snowfall vigil, and ocean memory environments.</p>
+</div>
+
+</div>
+
+</div>
+</section>
+
+<section class="section" id="partners">
+<div class="container">
+
+<h2>Partner With Us</h2>
+
+<p>
+We are building local continuity partnerships with veterinary offices,
+florists, shelters, groomers, musicians, photographers,
+pet stores, creators, and community organizations.
+</p>
+
+<div class="grid">
+
+<div class="card">
+<h3>Veterinary Offices</h3>
+<p>Offer memorial continuity services for families and beloved companions.</p>
+</div>
+
+<div class="card">
+<h3>Florists & Ceremonies</h3>
+<p>Connect remembrance flowers, ceremonies, anniversaries, and continuity experiences.</p>
+</div>
+
+<div class="card">
+<h3>Musicians & Creators</h3>
+<p>Provide atmosphere playlists, creator archives, memorial-safe music, and emotional continuity experiences.</p>
+</div>
+
+</div>
+
+<div class="form-wrap">
+
+<form id="partnerForm">
+
+<input type="text" name="name" placeholder="Name" required>
+<input type="email" name="email" placeholder="Email" required>
+
+<select name="interest_type">
+<option value="affiliate">Affiliate Partner</option>
+<option value="advertiser">Advertiser</option>
+<option value="musician">Musician / Creator</option>
+<option value="charity">Charity / Shelter</option>
+<option value="sponsor">Sponsor</option>
+</select>
+
+<textarea name="message" placeholder="Tell us about your organization or interest."></textarea>
+
+<button class="submit" type="submit">
+Submit Partnership Inquiry
+</button>
+
+</form>
+
+</div>
+
+</div>
+</section>
+
+<section class="section" id="advertise">
+<div class="container">
+
+<h2>Advertise & Sponsor</h2>
+
+<p>
+Support remembrance infrastructure, local creators,
+pet communities, memorial continuity, and charitable initiatives.
+</p>
+
+<div class="logos">
+<div class="logo">Sponsor Logo</div>
+<div class="logo">Shelter Partner</div>
+<div class="logo">Creator Partner</div>
+<div class="logo">Florist Partner</div>
+<div class="logo">Community Sponsor</div>
+<div class="logo">Veterinary Partner</div>
+</div>
+
+</div>
+</section>
+
+<section class="section" id="support">
+<div class="container">
+
+<h2>Support the Continuity Network</h2>
+
+<p>
+Help support memorial preservation, continuity infrastructure,
+creator remembrance, local shelters, and emotional support systems.
+</p>
+
+</div>
+</section>
+
+<footer class="footer">
+<div class="container">
+PURPAWS • CONTINUITY NETWORK • ETERNAL LEDGER
+</div>
+</footer>
+
+<script>
+
+const form = document.getElementById('partnerForm');
+
+form.addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+
+    const payload = {
+        name: form.name.value,
+        email: form.email.value,
+        interest_type: form.interest_type.value,
+        message: form.message.value
+    };
+
+    try{
+
+        const response = await fetch('/public/partner-inquiry', {
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        alert('Inquiry Submitted');
+
+        console.log(data);
+
+        form.reset();
+
+    }catch(err){
+
+        console.log(err);
+
+        alert('Submission failed');
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>

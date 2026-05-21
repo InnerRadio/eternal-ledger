@@ -34,7 +34,7 @@ class ContributionCreate(BaseModel):
 class UserCreate(BaseModel):
     email: str
     password: str
-    role: str = "free"
+    role: str = "admin"
     referring_affiliate_id: int | None = None
 
 
