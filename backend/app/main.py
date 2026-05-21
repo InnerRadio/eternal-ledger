@@ -6,10 +6,13 @@ from backend.app.cms.auth import router as auth_router
 from backend.app.cms.dashboard import router as dashboard_router
 
 from fastapi import Depends, FastAPI
+from fastapi.staticfiles import StaticFiles
 from backend.app.database import Base, engine, get_db
 from backend.app.models import MemorialCreate, Memorial
 from backend.app.cms.memorials import router as memorials_router
 from backend.app.cms.audit_routes import router as audit_router
+from backend.app.cms.media import router as media_router
+from backend.app.public_api import router as public_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -18,6 +21,11 @@ app.include_router(auth_router)
 app.include_router(dashboard_router)
 app.include_router(memorials_router)
 app.include_router(audit_router)
+app.include_router(media_router)
+app.include_router(public_router)
+
+app.mount("/uploads", StaticFiles(directory="/var/www/eternal-ledger-github/uploads"), name="uploads")
+app.mount("/admin", StaticFiles(directory="/var/www/eternal-ledger-github/frontend/admin", html=True), name="admin")
 
 METADATA_DIR = Path("/var/www/purpaws.ca/metadata")
 MEMORIAL_DIR = Path("/var/www/purpaws.ca/memorial")

@@ -36,3 +36,4 @@ uvicorn==0.46.0
 websockets==16.0
 wrapt==2.1.2
 xrpl-py==4.5.0
+pillow==12.2.0

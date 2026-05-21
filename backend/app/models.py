@@ -11,6 +11,15 @@ class MemorialCreate(BaseModel):
 
 
 
+
+
+class MediaAssetCreate(BaseModel):
+    memorial_id: int | None = None
+    file_path: str
+    original_filename: str | None = None
+    media_type: str
+    status: str = "draft"
+
 class UserCreate(BaseModel):
     email: str
     password: str
@@ -30,6 +39,7 @@ class MemorialUpdate(BaseModel):
     status: str | None = None
 
 from sqlalchemy import Column, Integer, String, Text, DateTime
+from datetime import datetime
 
 from backend.app.database import Base
 
@@ -86,4 +96,24 @@ class AuditLog(Base):
     target_id = Column(Integer, nullable=True)
 
     details = Column(Text, nullable=True)
-    created_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class MediaAsset(Base):
+    __tablename__ = "media_assets"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    memorial_id = Column(Integer, nullable=True)
+
+    file_path = Column(String, nullable=False)
+    original_filename = Column(String, nullable=True)
+    media_type = Column(String, nullable=False)
+
+    status = Column(String, default="draft")
+    uploaded_by_user_id = Column(Integer, nullable=True)
+
+    ipfs_cid = Column(String, nullable=True)
+    xrpl_tx_hash = Column(String, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

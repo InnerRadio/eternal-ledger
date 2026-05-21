@@ -342,13 +342,13 @@
 
       <article class="card memorial-card">
         <div class="pet-photo">
-          <img id="livePetImage" src="/assets/bailey.jpg" alt="Bailey">
+          <img src="/assets/bailey.jpg" alt="Bailey">
         </div>
         <div class="pet-name">
-          <h2 id="livePetName">Bailey</h2>
-          <div class="dates" id="livePetYears">2012 — 2026</div>
+          <h2>Bailey</h2>
+          <div class="dates">2012 — 2026</div>
         </div>
-        <p class="story" id="livePetStory">
+        <p class="story">
           Loyal friend, gentle spirit, guardian of the home, and forever part of the family story.
         </p>
       </article>
@@ -426,32 +426,5 @@ Immutable XRPL Records</div>
       PurPaws.ca — Companion Memorial Archives. Powered by Eternal Ledger infrastructure and designed for future XRP Ledger NFT verification.
     </div>
   </footer>
-
-<script>
-async function loadFeaturedMemorial() {
-  try {
-    const response = await fetch('/public/memorials');
-    const data = await response.json();
-
-    if (!data.records || !data.records.length) return;
-
-    const memorial = data.records[0];
-
-    document.getElementById('livePetName').textContent = memorial.companion_name;
-    document.getElementById('livePetYears').textContent = memorial.years;
-    document.getElementById('livePetStory').textContent = memorial.story;
-
-    if (memorial.primary_media) {
-      document.getElementById('livePetImage').src = memorial.primary_media;
-      document.getElementById('livePetImage').alt = memorial.companion_name;
-    }
-  } catch (error) {
-    console.log('Live memorial data unavailable.', error);
-  }
-}
-
-loadFeaturedMemorial();
-</script>
-
 </body>
 </html>

@@ -1,11 +1,18 @@
+import os
+from dotenv import load_dotenv
+from pathlib import Path
+
 from xrpl.clients import JsonRpcClient
 from xrpl.wallet import Wallet
 from xrpl.models.transactions import NFTokenMint
 from xrpl.transaction import submit_and_wait
 
-JSON_RPC_URL = "https://s.altnet.rippletest.net:51234/"
+ENV_PATH = Path("/var/www/eternal-ledger-github/.env")
+load_dotenv(dotenv_path=ENV_PATH)
 
-WALLET_SEED = "sEdSQnpFZdXPaaFtGSvo6zZRvoHFuxQ"
+JSON_RPC_URL = os.getenv("XRPL_JSON_RPC_URL")
+
+WALLET_SEED = os.getenv("XRPL_WALLET_SEED")
 
 client = JsonRpcClient(JSON_RPC_URL)
 

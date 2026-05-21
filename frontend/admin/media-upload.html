@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Eternal Ledger CMS — Media Upload</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body style="margin:0;background:#080808;color:#f4f4f4;font-family:Arial,sans-serif;padding:32px;">
+  <main style="max-width:720px;margin:0 auto;">
+    <h1>Eternal Ledger CMS</h1>
+    <h2>Media Upload</h2>
+
+    <section style="padding:20px;border:1px solid #333;border-radius:16px;margin-bottom:20px;">
+      <label>Bearer Token</label><br>
+      <textarea id="token" rows="4" style="width:100%;margin-top:8px;"></textarea>
+    </section>
+
+    <section style="padding:20px;border:1px solid #333;border-radius:16px;">
+      <label>Memorial ID</label><br>
+      <input id="memorialId" type="number" value="1" style="width:100%;margin:8px 0 16px;">
+
+      <label>Media Type</label><br>
+      <input id="mediaType" value="image" style="width:100%;margin:8px 0 16px;">
+
+      <label>Status</label><br>
+      <input id="status" value="draft" style="width:100%;margin:8px 0 16px;">
+
+      <label>File</label><br>
+      <input id="file" type="file" style="margin:8px 0 16px;">
+
+      <button onclick="uploadMedia()" style="padding:12px 18px;border-radius:10px;border:0;cursor:pointer;">
+        Upload Media
+      </button>
+    </section>
+
+    <pre id="result" style="white-space:pre-wrap;background:#111;border:1px solid #333;border-radius:16px;padding:20px;margin-top:20px;"></pre>
+  </main>
+
+<script>
+async function uploadMedia() {
+  const token = document.getElementById('token').value.trim();
+  const file = document.getElementById('file').files[0];
+  const memorialId = document.getElementById('memorialId').value;
+  const mediaType = document.getElementById('mediaType').value;
+  const status = document.getElementById('status').value;
+  const result = document.getElementById('result');
+
+  if (!token) {
+    result.textContent = 'Missing bearer token.';
+    return;
+  }
+
+  if (!file) {
+    result.textContent = 'Please choose a file.';
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('memorial_id', memorialId);
+  formData.append('media_type', mediaType);
+  formData.append('status', status);
+
+  const response = await fetch('/cms/media/upload', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + token
+    },
+    body: formData
+  });
+
+  const data = await response.json();
+  result.textContent = JSON.stringify(data, null, 2);
+}
+</script>
+</body>
+</html>

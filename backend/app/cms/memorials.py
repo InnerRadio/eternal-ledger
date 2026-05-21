@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from backend.app.database import get_db
 from backend.app.cms.security import require_roles
 from backend.app.cms.audit import write_audit_log
-from backend.app.models import Memorial, MemorialUpdate
+from backend.app.models import Memorial, MemorialCreate, MemorialUpdate
 
 router = APIRouter(prefix="/cms/memorials", tags=["CMS Memorials"])
 
@@ -130,12 +130,44 @@ def update_memorial(
     }
 
 
-@router.get("/create")
-def create_memorial_cms():
+@router.post("/create")
+def create_memorial_cms(
+    memorial_data: MemorialCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles('super_admin', 'admin', 'editor'))
+):
+    memorial = Memorial(
+        companion_name=memorial_data.companion_name,
+        years=memorial_data.years,
+        story=memorial_data.story,
+        archive_type=memorial_data.archive_type,
+        project=memorial_data.project,
+        status="draft"
+    )
+
+    db.add(memorial)
+    db.commit()
+    db.refresh(memorial)
+
+    write_audit_log(
+        db=db,
+        action="create_memorial",
+        current_user=current_user,
+        target_type="memorial",
+        target_id=memorial.id,
+        details=f"Created memorial record {memorial.id}"
+    )
+
     return {
-        "module": "CMS Memorials",
-        "status": "placeholder",
-        "message": "CMS memorial creation workflow planned."
+        "status": "created",
+        "record": {
+            "id": memorial.id,
+            "companion_name": memorial.companion_name,
+            "years": memorial.years,
+            "archive_type": memorial.archive_type,
+            "project": memorial.project,
+            "status": memorial.status
+        }
     }
 
 
@@ -201,6 +233,41 @@ def restore_memorial(
 
     return {
         "status": "restored",
+        "record": {
+            "id": memorial.id,
+            "companion_name": memorial.companion_name,
+            "status": memorial.status
+        }
+    }
+
+
+@router.post("/{memorial_id}/review")
+def review_memorial(
+    memorial_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles('super_admin', 'admin', 'reviewer'))
+):
+    memorial = db.query(Memorial).filter(Memorial.id == memorial_id).first()
+
+    if not memorial:
+        raise HTTPException(status_code=404, detail="Memorial not found.")
+
+    memorial.status = "reviewed"
+
+    db.commit()
+    db.refresh(memorial)
+
+    write_audit_log(
+        db=db,
+        action="review_memorial",
+        current_user=current_user,
+        target_type="memorial",
+        target_id=memorial.id,
+        details=f"Reviewed memorial record {memorial.id}"
+    )
+
+    return {
+        "status": "reviewed",
         "record": {
             "id": memorial.id,
             "companion_name": memorial.companion_name,
