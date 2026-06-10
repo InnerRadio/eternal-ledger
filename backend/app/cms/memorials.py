@@ -229,7 +229,7 @@ def restore_memorial(
     if not memorial:
         raise HTTPException(status_code=404, detail="Memorial not found.")
 
-    memorial.status = "reviewed"
+    memorial.status = "published"
 
     db.commit()
     db.refresh(memorial)
@@ -255,38 +255,118 @@ def restore_memorial(
     }
 
 
-@router.post("/{memorial_id}/review")
-def review_memorial(
+def change_memorial_status(
     memorial_id: int,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(require_roles('super_admin', 'admin', 'reviewer'))
+    next_status: str,
+    allowed_current_statuses: list[str],
+    action: str,
+    details: str,
+    db: Session,
+    current_user: dict
 ):
     memorial = db.query(Memorial).filter(Memorial.id == memorial_id).first()
 
     if not memorial:
         raise HTTPException(status_code=404, detail="Memorial not found.")
 
-    memorial.status = "reviewed"
+    if memorial.status not in allowed_current_statuses:
+        return {
+            "status": "error",
+            "message": "Invalid status transition.",
+            "current_status": memorial.status,
+            "allowed_current_statuses": allowed_current_statuses,
+            "next_status": next_status
+        }
+
+    memorial.status = next_status
 
     db.commit()
     db.refresh(memorial)
 
     write_audit_log(
         db=db,
-        action="review_memorial",
+        action=action,
         current_user=current_user,
         target_type="memorial",
         target_id=memorial.id,
-        details=f"Reviewed memorial record {memorial.id}"
+        details=details
     )
 
     return {
-        "status": "reviewed",
+        "status": next_status,
         "record": {
             "id": memorial.id,
             "companion_name": memorial.companion_name,
             "status": memorial.status,
-                "environment_theme": memorial.environment_theme,
-                "atmosphere_intensity": memorial.atmosphere_intensity
+            "environment_theme": memorial.environment_theme,
+            "atmosphere_intensity": memorial.atmosphere_intensity
         }
     }
+
+
+@router.post("/{memorial_id}/start-review")
+def start_memorial_review(
+    memorial_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles('super_admin', 'admin', 'reviewer'))
+):
+    return change_memorial_status(
+        memorial_id=memorial_id,
+        next_status="in_review",
+        allowed_current_statuses=["submitted"],
+        action="start_memorial_review",
+        details=f"Started review for memorial record {memorial_id}",
+        db=db,
+        current_user=current_user
+    )
+
+
+@router.post("/{memorial_id}/request-changes")
+def request_memorial_changes(
+    memorial_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles('super_admin', 'admin', 'reviewer'))
+):
+    return change_memorial_status(
+        memorial_id=memorial_id,
+        next_status="changes_requested",
+        allowed_current_statuses=["in_review"],
+        action="request_memorial_changes",
+        details=f"Requested changes for memorial record {memorial_id}",
+        db=db,
+        current_user=current_user
+    )
+
+
+@router.post("/{memorial_id}/approve")
+def approve_memorial(
+    memorial_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles('super_admin', 'admin', 'reviewer'))
+):
+    return change_memorial_status(
+        memorial_id=memorial_id,
+        next_status="approved",
+        allowed_current_statuses=["in_review"],
+        action="approve_memorial",
+        details=f"Approved memorial record {memorial_id}",
+        db=db,
+        current_user=current_user
+    )
+
+
+@router.post("/{memorial_id}/publish")
+def publish_memorial(
+    memorial_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles('super_admin', 'admin'))
+):
+    return change_memorial_status(
+        memorial_id=memorial_id,
+        next_status="published",
+        allowed_current_statuses=["approved"],
+        action="publish_memorial",
+        details=f"Published memorial record {memorial_id}",
+        db=db,
+        current_user=current_user
+    )

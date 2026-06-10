@@ -102,6 +102,8 @@ class Memorial(Base):
         default="draft"
     )
 
+    created_by_user_id = Column(Integer, nullable=True)
+
 
 class User(Base):
     __tablename__ = "users"
@@ -169,6 +171,8 @@ class Contribution(Base):
 
     media_asset_id = Column(Integer, nullable=True)
 
+    created_by_user_id = Column(Integer, nullable=True)
+
     status = Column(String, default="draft")
 
     ipfs_cid = Column(String, nullable=True)
@@ -231,3 +235,54 @@ class PartnerInquiry(Base):
     status = Column(String, default="new")
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class AccountSecurityEvent(Base):
+    __tablename__ = "account_security_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(Integer, nullable=True)
+    email = Column(String, nullable=True)
+
+    event_type = Column(String, nullable=False)
+    status = Column(String, nullable=False)
+
+    ip_address = Column(String, nullable=True)
+    user_agent = Column(String, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class RescueProfile(Base):
+    __tablename__ = "rescue_profiles"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    organization_name = Column(String, nullable=False)
+    location = Column(String, nullable=True)
+    contact_email = Column(String, nullable=True)
+
+    story = Column(Text, nullable=True)
+
+    status = Column(String, default="active")
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class RescueAnimal(Base):
+    __tablename__ = "rescue_animals"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    rescue_profile_id = Column(Integer, nullable=True)
+
+    animal_name = Column(String, nullable=False)
+
+    species = Column(String, default="dog")
+
+    story = Column(Text, nullable=True)
+
+    adoption_status = Column(String, default="available")
+
+    created_at = Column(DateTime, default=datetime.utcnow)

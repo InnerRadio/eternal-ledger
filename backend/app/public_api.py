@@ -13,7 +13,7 @@ def public_memorials(
     db: Session = Depends(get_db)
 ):
     memorials = db.query(Memorial).filter(
-        Memorial.status == "reviewed"
+        Memorial.status == "published"
     ).all()
 
     records = []
@@ -21,7 +21,7 @@ def public_memorials(
     for memorial in memorials:
         media = db.query(MediaAsset).filter(
             MediaAsset.memorial_id == memorial.id,
-            MediaAsset.status.in_(["reviewed", "published"])
+            MediaAsset.status == "published"
         ).first()
 
         records.append({
@@ -52,7 +52,7 @@ def public_memorial_detail(
 ):
     memorial = db.query(Memorial).filter(
         Memorial.id == memorial_id,
-        Memorial.status == "reviewed"
+        Memorial.status == "published"
     ).first()
 
     if not memorial:
@@ -86,7 +86,7 @@ def public_memorial_media(
 ):
     assets = db.query(MediaAsset).filter(
         MediaAsset.memorial_id == memorial_id,
-        MediaAsset.status.in_(["reviewed", "published"])
+        MediaAsset.status == "published"
     ).all()
 
     return {
@@ -117,7 +117,7 @@ def public_memorial_contributions(
 ):
     contributions = db.query(Contribution).filter(
         Contribution.memorial_id == memorial_id,
-        Contribution.status.in_(["reviewed", "published"])
+        Contribution.status == "published"
     ).all()
 
     return {
@@ -150,3 +150,73 @@ def public_environment_themes():
         "count": len(ENVIRONMENT_THEMES),
         "records": ENVIRONMENT_THEMES
     }
+
+
+@router.get("/pulse")
+def public_network_pulse(
+    db: Session = Depends(get_db)
+):
+    memorial_count = db.query(Memorial).filter(
+        Memorial.status == "published"
+    ).count()
+
+    media_count = db.query(MediaAsset).filter(
+        MediaAsset.status == "published"
+    ).count()
+
+    contribution_count = db.query(Contribution).filter(
+        Contribution.status == "published"
+    ).count()
+
+    return {
+        "module": "PurPaws Continuity Pulse",
+        "status": "active",
+        "network": "PurPaws Continuity Network",
+
+        "metrics": {
+            "published_memorials": memorial_count,
+            "published_media_assets": media_count,
+            "published_contributions": contribution_count
+        },
+
+        "systems": {
+            "xrpl": "connected",
+            "eternal_ledger": "active",
+            "continuity_layer": "operational"
+        }
+    }
+
+
+@router.get("/trails")
+def public_trails(db: Session = Depends(get_db)):
+    contributions = db.query(Contribution).filter(
+        Contribution.status == "published"
+    ).order_by(Contribution.created_at.desc()).limit(12).all()
+
+    records = []
+
+    for contribution in contributions:
+        memorial = db.query(Memorial).filter(
+            Memorial.id == contribution.memorial_id
+        ).first()
+
+        records.append({
+            "id": contribution.id,
+            "title": memorial.companion_name if memorial else "PurPaws Trail Note",
+            "trail_type": contribution.contribution_type,
+            "content": contribution.content,
+            "memorial_id": contribution.memorial_id,
+            "media_asset_id": contribution.media_asset_id,
+            "status": contribution.status,
+            "ipfs_cid": contribution.ipfs_cid,
+            "xrpl_tx_hash": contribution.xrpl_tx_hash,
+            "created_at": contribution.created_at,
+        })
+
+    return {
+        "module": "PurPaws Trails",
+        "status": "active",
+        "count": len(records),
+        "records": records
+    }
+

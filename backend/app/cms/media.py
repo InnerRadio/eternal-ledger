@@ -244,6 +244,99 @@ def delete_media_asset(
     }
 
 
+def change_media_asset_status(
+    asset_id: int,
+    next_status: str,
+    allowed_current_statuses: list[str],
+    db: Session
+):
+    asset = db.query(MediaAsset).filter(MediaAsset.id == asset_id).first()
+
+    if not asset:
+        return {
+            "module": "CMS Media",
+            "status": "error",
+            "message": "Media asset not found."
+        }
+
+    if asset.status not in allowed_current_statuses:
+        return {
+            "module": "CMS Media",
+            "status": "error",
+            "message": "Invalid status transition.",
+            "current_status": asset.status,
+            "allowed_current_statuses": allowed_current_statuses,
+            "next_status": next_status
+        }
+
+    asset.status = next_status
+
+    db.commit()
+    db.refresh(asset)
+
+    return {
+        "module": "CMS Media",
+        "status": next_status,
+        "record": serialize_media_asset(asset)
+    }
+
+
+@router.post("/{asset_id}/start-review")
+def start_media_review(
+    asset_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "reviewer"))
+):
+    return change_media_asset_status(
+        asset_id=asset_id,
+        next_status="in_review",
+        allowed_current_statuses=["submitted"],
+        db=db
+    )
+
+
+@router.post("/{asset_id}/request-changes")
+def request_media_changes(
+    asset_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "reviewer"))
+):
+    return change_media_asset_status(
+        asset_id=asset_id,
+        next_status="changes_requested",
+        allowed_current_statuses=["in_review"],
+        db=db
+    )
+
+
+@router.post("/{asset_id}/approve")
+def approve_media(
+    asset_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "reviewer"))
+):
+    return change_media_asset_status(
+        asset_id=asset_id,
+        next_status="approved",
+        allowed_current_statuses=["in_review"],
+        db=db
+    )
+
+
+@router.post("/{asset_id}/publish")
+def publish_media(
+    asset_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin"))
+):
+    return change_media_asset_status(
+        asset_id=asset_id,
+        next_status="published",
+        allowed_current_statuses=["approved"],
+        db=db
+    )
+
+
 @router.patch("/{asset_id}/status")
 def update_media_asset_status(
     asset_id: int,
@@ -260,7 +353,7 @@ def update_media_asset_status(
             "message": "Media asset not found."
         }
 
-    allowed_statuses = ["draft", "reviewed", "published", "archived"]
+    allowed_statuses = ["draft", "submitted", "in_review", "changes_requested", "approved", "published", "archived", "deleted"]
 
     if status not in allowed_statuses:
         return {

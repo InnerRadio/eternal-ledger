@@ -76,3 +76,27 @@ def require_roles(*allowed_roles):
 
 def require_minimum_role(*allowed_roles):
     return require_roles(*allowed_roles)
+
+
+def require_active_account(
+    current_user = Depends(get_current_user)
+):
+    from backend.app.database import SessionLocal
+    from backend.app.models import User
+
+    db = SessionLocal()
+
+    try:
+        user = db.query(User).filter(
+            User.id == current_user.get("user_id")
+        ).first()
+
+        if not user:
+            raise HTTPException(status_code=401, detail="Account not found.")
+
+        if user.status != "active":
+            raise HTTPException(status_code=403, detail="Account is not active.")
+
+        return current_user
+    finally:
+        db.close()
