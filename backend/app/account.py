@@ -36,36 +36,50 @@ MEDIA_TIER_LIMITS = {
         "max_file_size": 5 * 1024 * 1024,
         "allowed_media_types": ["image"],
         "max_per_memorial": 3,
+        "max_assets_per_account": 10,
+        "max_storage_bytes": 25 * 1024 * 1024,
     },
     "member": {
         "max_file_size": 25 * 1024 * 1024,
         "allowed_media_types": ["image", "audio"],
         "max_per_memorial": 20,
+        "max_assets_per_account": 100,
+        "max_storage_bytes": 500 * 1024 * 1024,
     },
     "creator": {
         "max_file_size": 50 * 1024 * 1024,
         "allowed_media_types": ["image", "audio", "video"],
         "max_per_memorial": 50,
+        "max_assets_per_account": 500,
+        "max_storage_bytes": 5 * 1024 * 1024 * 1024,
     },
     "rescue": {
         "max_file_size": 50 * 1024 * 1024,
         "allowed_media_types": ["image", "audio", "video"],
         "max_per_memorial": 50,
+        "max_assets_per_account": 1000,
+        "max_storage_bytes": 10 * 1024 * 1024 * 1024,
     },
     "affiliate": {
         "max_file_size": 25 * 1024 * 1024,
         "allowed_media_types": ["image", "audio"],
         "max_per_memorial": 20,
+        "max_assets_per_account": 100,
+        "max_storage_bytes": 500 * 1024 * 1024,
     },
     "admin": {
         "max_file_size": 50 * 1024 * 1024,
         "allowed_media_types": ["image", "audio", "video"],
         "max_per_memorial": 100,
+        "max_assets_per_account": None,
+        "max_storage_bytes": None,
     },
     "super_admin": {
         "max_file_size": 50 * 1024 * 1024,
         "allowed_media_types": ["image", "audio", "video"],
         "max_per_memorial": 100,
+        "max_assets_per_account": None,
+        "max_storage_bytes": None,
     },
 }
 
@@ -79,6 +93,45 @@ MEDIA_EXTENSIONS = {
 
 def media_tier_limits_for_role(role: str):
     return MEDIA_TIER_LIMITS.get(role, MEDIA_TIER_LIMITS["free"])
+
+
+def account_media_usage(db: Session, user_id: int):
+    assets = db.query(MediaAsset).filter(
+        MediaAsset.uploaded_by_user_id == user_id,
+        MediaAsset.status != "deleted"
+    ).all()
+
+    total_assets = len(assets)
+    total_storage_bytes = sum(asset.file_size_bytes or 0 for asset in assets)
+
+    return {
+        "total_assets": total_assets,
+        "total_storage_bytes": total_storage_bytes,
+    }
+
+
+def account_media_quota(db: Session, user_id: int, role: str):
+    limits = media_tier_limits_for_role(role)
+    usage = account_media_usage(db=db, user_id=user_id)
+
+    max_assets = limits.get("max_assets_per_account")
+    max_storage = limits.get("max_storage_bytes")
+
+    return {
+        "role": role,
+        "usage": usage,
+        "limits": {
+            "max_assets_per_account": max_assets,
+            "max_storage_bytes": max_storage,
+            "max_file_size": limits.get("max_file_size"),
+            "max_per_memorial": limits.get("max_per_memorial"),
+            "allowed_media_types": limits.get("allowed_media_types"),
+        },
+        "remaining": {
+            "assets": None if max_assets is None else max(max_assets - usage["total_assets"], 0),
+            "storage_bytes": None if max_storage is None else max(max_storage - usage["total_storage_bytes"], 0),
+        }
+    }
 
 
 def serialize_media(asset: MediaAsset):
@@ -612,6 +665,7 @@ def account_media(
     db: Session = Depends(get_db)
 ):
     user_id = current_user.get("user_id")
+    role = current_user.get("role") or "free"
 
     assets = db.query(MediaAsset).filter(
         MediaAsset.uploaded_by_user_id == user_id
@@ -621,6 +675,7 @@ def account_media(
         "module": "Account Media",
         "status": "active",
         "count": len(assets),
+        "quota": account_media_quota(db=db, user_id=user_id, role=role),
         "records": [
             serialize_media(asset)
             for asset in assets
@@ -701,6 +756,29 @@ async def account_upload_media(
             "received_size_bytes": len(content)
         }
 
+    quota = account_media_quota(db=db, user_id=user_id, role=role)
+    max_assets = quota["limits"]["max_assets_per_account"]
+    max_storage = quota["limits"]["max_storage_bytes"]
+
+    if max_assets is not None and quota["usage"]["total_assets"] >= max_assets:
+        return {
+            "module": "Account Media",
+            "status": "error",
+            "message": "Account media asset quota reached.",
+            "quota": quota,
+            "upgrade_hint": "Upgrade your account to add more media assets."
+        }
+
+    if max_storage is not None and quota["usage"]["total_storage_bytes"] + len(content) > max_storage:
+        return {
+            "module": "Account Media",
+            "status": "error",
+            "message": "Account storage quota exceeded.",
+            "quota": quota,
+            "incoming_file_size_bytes": len(content),
+            "upgrade_hint": "Upgrade your account to increase storage."
+        }
+
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
     stored_filename = f"{uuid4().hex}{extension}"
@@ -716,6 +794,7 @@ async def account_upload_media(
         media_type=media_type,
         status="draft",
         uploaded_by_user_id=user_id,
+        file_size_bytes=len(content),
     )
 
     db.add(asset)

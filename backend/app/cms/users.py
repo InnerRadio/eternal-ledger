@@ -9,6 +9,80 @@ from backend.app.cms.security import require_roles
 router = APIRouter(prefix="/cms/users", tags=["CMS Users"])
 
 
+ACCOUNT_ROLES = [
+    "free",
+    "member",
+    "creator",
+    "rescue",
+    "affiliate",
+    "admin",
+    "super_admin",
+]
+
+ADMIN_ASSIGNABLE_ROLES = [
+    "free",
+    "member",
+    "creator",
+    "rescue",
+    "affiliate",
+]
+
+
+def change_user_role(
+    user_id: int,
+    role: str,
+    db: Session,
+    current_user: dict
+):
+    current_role = current_user.get("role")
+
+    if role not in ACCOUNT_ROLES:
+        return {
+            "module": "CMS Users",
+            "status": "error",
+            "message": "Invalid user role.",
+            "allowed_roles": ACCOUNT_ROLES,
+        }
+
+    if current_role == "admin" and role not in ADMIN_ASSIGNABLE_ROLES:
+        return {
+            "module": "CMS Users",
+            "status": "error",
+            "message": "Admin users cannot assign elevated CMS roles.",
+            "allowed_roles": ADMIN_ASSIGNABLE_ROLES,
+        }
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return {
+            "module": "CMS Users",
+            "status": "error",
+            "message": "User not found.",
+        }
+
+    if user.role in ["admin", "super_admin"] and current_role != "super_admin":
+        return {
+            "module": "CMS Users",
+            "status": "error",
+            "message": "Only super_admin can change CMS administrator roles.",
+        }
+
+    old_role = user.role
+    user.role = role
+
+    db.commit()
+    db.refresh(user)
+
+    return {
+        "module": "CMS Users",
+        "status": "role_updated",
+        "old_role": old_role,
+        "new_role": user.role,
+        "record": serialize_user(user)
+    }
+
+
 USER_STATUSES = [
     "active",
     "suspended",
@@ -89,6 +163,21 @@ def list_users(
             for user in users
         ]
     }
+
+
+@router.post("/{user_id}/role")
+def update_user_role(
+    user_id: int,
+    role: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin"))
+):
+    return change_user_role(
+        user_id=user_id,
+        role=role,
+        db=db,
+        current_user=current_user
+    )
 
 
 @router.post("/{user_id}/block")

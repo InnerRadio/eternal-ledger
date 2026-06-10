@@ -152,6 +152,8 @@ class MediaAsset(Base):
     status = Column(String, default="draft")
     uploaded_by_user_id = Column(Integer, nullable=True)
 
+    file_size_bytes = Column(Integer, default=0)
+
     ipfs_cid = Column(String, nullable=True)
     xrpl_tx_hash = Column(String, nullable=True)
 
