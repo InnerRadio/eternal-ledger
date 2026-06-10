@@ -7,7 +7,7 @@ import secrets
 import string
 
 from backend.app.database import get_db
-from backend.app.models import User, UserCreate, UserLogin, MemorialCreate, ContributionCreate, Memorial, Contribution, MediaAsset, AccountSecurityEvent
+from backend.app.models import User, UserCreate, UserLogin, MemorialCreate, ContributionCreate, Memorial, Contribution, MediaAsset, AccountSecurityEvent, AffiliateConversion
 from backend.app.cms.security import (
     create_access_token,
     get_current_user,
@@ -220,6 +220,54 @@ def write_account_security_event(
     db.commit()
     return event
 
+def resolve_referring_affiliate(
+    db: Session,
+    referring_affiliate_id: int | None = None,
+    referral_code: str | None = None
+):
+    if referral_code:
+        referrer = db.query(User).filter(
+            User.referral_code == referral_code
+        ).first()
+
+        if referrer:
+            return referrer
+
+    if referring_affiliate_id:
+        referrer = db.query(User).filter(
+            User.id == referring_affiliate_id
+        ).first()
+
+        if referrer:
+            return referrer
+
+    return None
+
+
+def log_signup_conversion(
+    db: Session,
+    referrer: User | None,
+    new_user: User
+):
+    if not referrer:
+        return None
+
+    conversion = AffiliateConversion(
+        affiliate_id=referrer.affiliate_id,
+        referral_code=referrer.referral_code,
+        conversion_type="signup",
+        target_type="user",
+        target_id=new_user.id,
+        status="pending"
+    )
+
+    db.add(conversion)
+    db.commit()
+    db.refresh(conversion)
+
+    return conversion
+
+
 def serialize_user(user: User):
     return {
         "id": user.id,
@@ -262,6 +310,12 @@ def account_register(user: UserCreate, request: Request, db: Session = Depends(g
 
     role = user.role if user.role in ACCOUNT_ALLOWED_ROLES else "free"
 
+    referrer = resolve_referring_affiliate(
+        db=db,
+        referring_affiliate_id=user.referring_affiliate_id,
+        referral_code=user.referral_code
+    )
+
     db_user = User(
         email=user.email,
         hashed_password=get_password_hash(user.password),
@@ -269,12 +323,18 @@ def account_register(user: UserCreate, request: Request, db: Session = Depends(g
         status="active",
         affiliate_id=generate_affiliate_id(),
         referral_code=generate_referral_code(),
-        referring_affiliate_id=user.referring_affiliate_id
+        referring_affiliate_id=referrer.id if referrer else None
     )
 
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+
+    signup_conversion = log_signup_conversion(
+        db=db,
+        referrer=referrer,
+        new_user=db_user
+    )
 
     write_account_security_event(
         db=db,
@@ -296,7 +356,12 @@ def account_register(user: UserCreate, request: Request, db: Session = Depends(g
         "status": "registered",
         "access_token": token,
         "token_type": "bearer",
-        "user": serialize_user(db_user)
+        "user": serialize_user(db_user),
+        "referral": {
+            "referred_by_user_id": referrer.id if referrer else None,
+            "conversion_id": signup_conversion.id if signup_conversion else None,
+            "status": signup_conversion.status if signup_conversion else None
+        }
     }
 
 

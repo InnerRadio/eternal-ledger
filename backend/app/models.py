@@ -36,6 +36,7 @@ class UserCreate(BaseModel):
     password: str
     role: str = "free"
     referring_affiliate_id: int | None = None
+    referral_code: str | None = None
 
 
 
