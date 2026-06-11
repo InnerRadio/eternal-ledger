@@ -9,6 +9,7 @@ from backend.app.models import (
     Contribution,
     AffiliateClick,
     AffiliateConversion,
+    AccountSecurityEvent,
     AffiliateCommission,
 )
 from backend.app.cms.security import require_roles
@@ -172,6 +173,123 @@ def serialize_session_summary(session_id, events):
         "scroll_events": len(scroll_events),
         "started_at": start_time,
         "ended_at": end_time,
+    }
+
+
+def serialize_account_security_event(event: AccountSecurityEvent):
+    return {
+        "id": event.id,
+        "user_id": event.user_id,
+        "email": event.email,
+        "event_type": event.event_type,
+        "status": event.status,
+        "ip_address": event.ip_address,
+        "user_agent": event.user_agent,
+        "created_at": event.created_at,
+    }
+
+
+@router.get("/security/events")
+def cms_security_events_report(
+    event_type: str | None = None,
+    status: str | None = None,
+    email: str | None = None,
+    ip_address: str | None = None,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    query = db.query(AccountSecurityEvent)
+
+    if event_type:
+        query = query.filter(AccountSecurityEvent.event_type == event_type)
+
+    if status:
+        query = query.filter(AccountSecurityEvent.status == status)
+
+    if email:
+        query = query.filter(AccountSecurityEvent.email == email)
+
+    if ip_address:
+        query = query.filter(AccountSecurityEvent.ip_address == ip_address)
+
+    records = query.order_by(AccountSecurityEvent.created_at.desc()).limit(limit).all()
+
+    return {
+        "module": "CMS Security Events",
+        "status": "active",
+        "count": len(records),
+        "filters": {
+            "event_type": event_type,
+            "status": status,
+            "email": email,
+            "ip_address": ip_address,
+            "limit": limit,
+        },
+        "records": [
+            serialize_account_security_event(event)
+            for event in records
+        ]
+    }
+
+
+@router.get("/security/summary")
+def cms_security_summary_report(
+    limit: int = 1000,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    records = db.query(AccountSecurityEvent).order_by(
+        AccountSecurityEvent.created_at.desc()
+    ).limit(limit).all()
+
+    return {
+        "module": "CMS Security Summary",
+        "status": "active",
+        "count": len(records),
+        "filters": {
+            "limit": limit,
+        },
+        "summary": {
+            "by_event_type": metric_count_by_field(records, "event_type"),
+            "by_status": metric_count_by_field(records, "status"),
+            "by_ip_address": metric_count_by_field(records, "ip_address"),
+            "by_email": metric_count_by_field(records, "email"),
+        }
+    }
+
+
+@router.get("/security/intelligence")
+def cms_security_intelligence_report(
+    limit: int = 1000,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    records = db.query(AccountSecurityEvent).order_by(
+        AccountSecurityEvent.created_at.desc()
+    ).limit(limit).all()
+
+    failed_login_records = [
+        record
+        for record in records
+        if record.event_type in ["login_failed", "blocked_login_attempt", "login_lockout"]
+    ]
+
+    return {
+        "module": "CMS Security Intelligence",
+        "status": "active",
+        "count": len(records),
+        "filters": {
+            "limit": limit,
+        },
+        "records": {
+            "top_event_types": ranked_metric_counts(records, "event_type", 25),
+            "top_statuses": ranked_metric_counts(records, "status", 25),
+            "top_ip_addresses": ranked_metric_counts(records, "ip_address", 25),
+            "top_emails": ranked_metric_counts(records, "email", 25),
+            "failed_login_ip_addresses": ranked_metric_counts(failed_login_records, "ip_address", 25),
+            "failed_login_emails": ranked_metric_counts(failed_login_records, "email", 25),
+        }
     }
 
 
