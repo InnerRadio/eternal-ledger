@@ -184,6 +184,34 @@ class Contribution(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
+
+class AffiliateCampaign(Base):
+    __tablename__ = "affiliate_campaigns"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    campaign_id = Column(String, unique=True, index=True, nullable=False)
+
+    project = Column(String, default="PurPaws")
+    title = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+
+    campaign_type = Column(String, default="general")
+    sponsor_name = Column(String, nullable=True)
+
+    payout_type = Column(String, default="flat")
+    payout_amount_cents = Column(Integer, default=0)
+    payout_percent = Column(String, nullable=True)
+    currency = Column(String, default="CAD")
+
+    status = Column(String, default="active")
+
+    starts_at = Column(DateTime, nullable=True)
+    ends_at = Column(DateTime, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
 class AffiliateClick(Base):
     __tablename__ = "affiliate_clicks"
 

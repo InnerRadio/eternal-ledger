@@ -2,10 +2,75 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
-from backend.app.models import AffiliateClick, AffiliateConversion, AffiliateCommission
+from backend.app.models import AffiliateClick, AffiliateConversion, AffiliateCommission, AffiliateCampaign
 from backend.app.cms.security import require_roles
 
 router = APIRouter(prefix="/cms/affiliates", tags=["CMS Affiliates"])
+
+
+CAMPAIGN_STATUSES = [
+    "draft",
+    "active",
+    "paused",
+    "ended",
+    "archived",
+]
+
+
+def serialize_campaign(campaign: AffiliateCampaign):
+    return {
+        "id": campaign.id,
+        "campaign_id": campaign.campaign_id,
+        "project": campaign.project,
+        "title": campaign.title,
+        "description": campaign.description,
+        "campaign_type": campaign.campaign_type,
+        "sponsor_name": campaign.sponsor_name,
+        "payout_type": campaign.payout_type,
+        "payout_amount_cents": campaign.payout_amount_cents,
+        "payout_percent": campaign.payout_percent,
+        "currency": campaign.currency,
+        "status": campaign.status,
+        "starts_at": campaign.starts_at,
+        "ends_at": campaign.ends_at,
+        "created_at": campaign.created_at,
+    }
+
+
+def change_campaign_status(
+    campaign_id: str,
+    status: str,
+    db: Session
+):
+    if status not in CAMPAIGN_STATUSES:
+        return {
+            "module": "CMS Affiliate Campaigns",
+            "status": "error",
+            "message": "Invalid campaign status.",
+            "allowed_statuses": CAMPAIGN_STATUSES,
+        }
+
+    campaign = db.query(AffiliateCampaign).filter(
+        AffiliateCampaign.campaign_id == campaign_id
+    ).first()
+
+    if not campaign:
+        return {
+            "module": "CMS Affiliate Campaigns",
+            "status": "error",
+            "message": "Campaign not found.",
+        }
+
+    campaign.status = status
+
+    db.commit()
+    db.refresh(campaign)
+
+    return {
+        "module": "CMS Affiliate Campaigns",
+        "status": "updated",
+        "record": serialize_campaign(campaign)
+    }
 
 
 COMMISSION_STATUSES = [
@@ -68,6 +133,139 @@ def change_commission_status(
         "status": "updated",
         "record": serialize_commission(commission)
     }
+
+
+@router.get("/campaigns")
+def list_affiliate_campaigns(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer", "reviewer"))
+):
+    campaigns = db.query(AffiliateCampaign).order_by(
+        AffiliateCampaign.created_at.desc()
+    ).all()
+
+    return {
+        "module": "CMS Affiliate Campaigns",
+        "status": "active",
+        "count": len(campaigns),
+        "records": [
+            serialize_campaign(campaign)
+            for campaign in campaigns
+        ]
+    }
+
+
+@router.post("/campaigns/create")
+def create_affiliate_campaign(
+    campaign_id: str,
+    title: str,
+    project: str = "PurPaws",
+    description: str | None = None,
+    campaign_type: str = "general",
+    sponsor_name: str | None = None,
+    payout_type: str = "flat",
+    payout_amount_cents: int = 0,
+    payout_percent: str | None = None,
+    currency: str = "CAD",
+    status: str = "active",
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    if status not in CAMPAIGN_STATUSES:
+        return {
+            "module": "CMS Affiliate Campaigns",
+            "status": "error",
+            "message": "Invalid campaign status.",
+            "allowed_statuses": CAMPAIGN_STATUSES,
+        }
+
+    existing = db.query(AffiliateCampaign).filter(
+        AffiliateCampaign.campaign_id == campaign_id
+    ).first()
+
+    if existing:
+        return {
+            "module": "CMS Affiliate Campaigns",
+            "status": "error",
+            "message": "Campaign already exists.",
+            "record": serialize_campaign(existing)
+        }
+
+    campaign = AffiliateCampaign(
+        campaign_id=campaign_id,
+        project=project,
+        title=title,
+        description=description,
+        campaign_type=campaign_type,
+        sponsor_name=sponsor_name,
+        payout_type=payout_type,
+        payout_amount_cents=payout_amount_cents,
+        payout_percent=payout_percent,
+        currency=currency,
+        status=status
+    )
+
+    db.add(campaign)
+    db.commit()
+    db.refresh(campaign)
+
+    return {
+        "module": "CMS Affiliate Campaigns",
+        "status": "created",
+        "record": serialize_campaign(campaign)
+    }
+
+
+@router.post("/campaigns/{campaign_id}/active")
+def activate_affiliate_campaign(
+    campaign_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_campaign_status(
+        campaign_id=campaign_id,
+        status="active",
+        db=db
+    )
+
+
+@router.post("/campaigns/{campaign_id}/pause")
+def pause_affiliate_campaign(
+    campaign_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_campaign_status(
+        campaign_id=campaign_id,
+        status="paused",
+        db=db
+    )
+
+
+@router.post("/campaigns/{campaign_id}/end")
+def end_affiliate_campaign(
+    campaign_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_campaign_status(
+        campaign_id=campaign_id,
+        status="ended",
+        db=db
+    )
+
+
+@router.post("/campaigns/{campaign_id}/archive")
+def archive_affiliate_campaign(
+    campaign_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_campaign_status(
+        campaign_id=campaign_id,
+        status="archived",
+        db=db
+    )
 
 
 @router.get("/commissions")
