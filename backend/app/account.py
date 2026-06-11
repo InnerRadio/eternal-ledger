@@ -7,7 +7,7 @@ import secrets
 import string
 
 from backend.app.database import get_db
-from backend.app.models import User, UserCreate, UserLogin, MemorialCreate, ContributionCreate, Memorial, Contribution, MediaAsset, AccountSecurityEvent, AffiliateConversion
+from backend.app.models import User, UserCreate, UserLogin, MemorialCreate, ContributionCreate, Memorial, Contribution, MediaAsset, AccountSecurityEvent, AffiliateConversion, AffiliateClick, AffiliateCommission
 from backend.app.cms.security import (
     create_access_token,
     get_current_user,
@@ -280,6 +280,57 @@ def serialize_user(user: User):
     }
 
 
+def summarize_by_status(records, amount_field: str | None = None):
+    summary = {}
+
+    for record in records:
+        status = getattr(record, "status", "unknown") or "unknown"
+
+        if status not in summary:
+            summary[status] = {
+                "count": 0
+            }
+
+            if amount_field:
+                summary[status]["amount_cents"] = 0
+
+        summary[status]["count"] += 1
+
+        if amount_field:
+            summary[status]["amount_cents"] += getattr(record, amount_field, 0) or 0
+
+    return summary
+
+
+def serialize_affiliate_conversion(conversion: AffiliateConversion):
+    return {
+        "id": conversion.id,
+        "affiliate_id": conversion.affiliate_id,
+        "referral_code": conversion.referral_code,
+        "conversion_type": conversion.conversion_type,
+        "target_type": conversion.target_type,
+        "target_id": conversion.target_id,
+        "status": conversion.status,
+        "created_at": conversion.created_at,
+    }
+
+
+def serialize_affiliate_commission(commission: AffiliateCommission):
+    return {
+        "id": commission.id,
+        "conversion_id": commission.conversion_id,
+        "affiliate_id": commission.affiliate_id,
+        "referral_code": commission.referral_code,
+        "project": commission.project,
+        "commission_type": commission.commission_type,
+        "amount_cents": commission.amount_cents,
+        "currency": commission.currency,
+        "status": commission.status,
+        "notes": commission.notes,
+        "created_at": commission.created_at,
+    }
+
+
 def status_counts(records):
     counts = {status: 0 for status in STATUS_FLOW}
     for record in records:
@@ -508,6 +559,104 @@ def account_dashboard(
                 "total": len(media_assets),
                 "by_status": status_counts(media_assets)
             }
+        }
+    }
+
+
+@router.get("/affiliate")
+def account_affiliate_dashboard(
+    current_user: dict = Depends(require_active_account),
+    db: Session = Depends(get_db)
+):
+    user_id = current_user.get("user_id")
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return {
+            "module": "Account Affiliate Dashboard",
+            "status": "error",
+            "message": "User not found."
+        }
+
+    referred_users = db.query(User).filter(
+        User.referring_affiliate_id == user.id
+    ).order_by(User.id.desc()).all()
+
+    clicks = db.query(AffiliateClick).filter(
+        AffiliateClick.referral_code == user.referral_code
+    ).order_by(AffiliateClick.created_at.desc()).all()
+
+    conversions = db.query(AffiliateConversion).filter(
+        AffiliateConversion.referral_code == user.referral_code
+    ).order_by(AffiliateConversion.created_at.desc()).all()
+
+    commissions = db.query(AffiliateCommission).filter(
+        AffiliateCommission.referral_code == user.referral_code
+    ).order_by(AffiliateCommission.created_at.desc()).all()
+
+    total_commission_cents = sum(
+        commission.amount_cents or 0
+        for commission in commissions
+    )
+
+    paid_commission_cents = sum(
+        commission.amount_cents or 0
+        for commission in commissions
+        if commission.status == "paid"
+    )
+
+    outstanding_commission_cents = sum(
+        commission.amount_cents or 0
+        for commission in commissions
+        if commission.status in ["pending", "approved", "payable"]
+    )
+
+    return {
+        "module": "Account Affiliate Dashboard",
+        "status": "active",
+        "affiliate": {
+            "user_id": user.id,
+            "affiliate_id": user.affiliate_id,
+            "referral_code": user.referral_code,
+            "role": user.role,
+            "account_status": user.status,
+        },
+        "summary": {
+            "referral_signups": len(referred_users),
+            "clicks": len(clicks),
+            "conversions": {
+                "total": len(conversions),
+                "by_status": summarize_by_status(conversions),
+            },
+            "commissions": {
+                "total": len(commissions),
+                "by_status": summarize_by_status(commissions, amount_field="amount_cents"),
+                "total_commission_cents": total_commission_cents,
+                "paid_commission_cents": paid_commission_cents,
+                "outstanding_commission_cents": outstanding_commission_cents,
+            }
+        },
+        "recent": {
+            "referred_users": [
+                {
+                    "id": referred_user.id,
+                    "email": referred_user.email,
+                    "role": referred_user.role,
+                    "status": referred_user.status,
+                    "created_affiliate_id": referred_user.affiliate_id,
+                    "created_referral_code": referred_user.referral_code,
+                }
+                for referred_user in referred_users[:10]
+            ],
+            "conversions": [
+                serialize_affiliate_conversion(conversion)
+                for conversion in conversions[:10]
+            ],
+            "commissions": [
+                serialize_affiliate_commission(commission)
+                for commission in commissions[:10]
+            ]
         }
     }
 
