@@ -2,10 +2,70 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
-from backend.app.models import AffiliateClick, AffiliateConversion, AffiliateCommission, AffiliateCampaign
+from backend.app.models import AffiliateClick, AffiliateConversion, AffiliateCommission, AffiliateCampaign, PartnerOrganization
 from backend.app.cms.security import require_roles
 
 router = APIRouter(prefix="/cms/affiliates", tags=["CMS Affiliates"])
+
+
+ORGANIZATION_STATUSES = [
+    "active",
+    "pending_review",
+    "paused",
+    "archived",
+]
+
+
+def serialize_partner_organization(org: PartnerOrganization):
+    return {
+        "id": org.id,
+        "organization_name": org.organization_name,
+        "organization_type": org.organization_type,
+        "project": org.project,
+        "contact_name": org.contact_name,
+        "contact_email": org.contact_email,
+        "website_url": org.website_url,
+        "location": org.location,
+        "status": org.status,
+        "notes": org.notes,
+        "created_at": org.created_at,
+    }
+
+
+def change_partner_organization_status(
+    organization_id: int,
+    status: str,
+    db: Session
+):
+    if status not in ORGANIZATION_STATUSES:
+        return {
+            "module": "CMS Partner Organizations",
+            "status": "error",
+            "message": "Invalid organization status.",
+            "allowed_statuses": ORGANIZATION_STATUSES,
+        }
+
+    org = db.query(PartnerOrganization).filter(
+        PartnerOrganization.id == organization_id
+    ).first()
+
+    if not org:
+        return {
+            "module": "CMS Partner Organizations",
+            "status": "error",
+            "message": "Organization not found.",
+        }
+
+    org.status = status
+
+    db.commit()
+    db.refresh(org)
+
+    return {
+        "module": "CMS Partner Organizations",
+        "status": "updated",
+        "record": serialize_partner_organization(org)
+    }
 
 
 CAMPAIGN_STATUSES = [
@@ -133,6 +193,123 @@ def change_commission_status(
         "status": "updated",
         "record": serialize_commission(commission)
     }
+
+
+@router.get("/organizations")
+def list_partner_organizations(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer", "reviewer"))
+):
+    orgs = db.query(PartnerOrganization).order_by(
+        PartnerOrganization.created_at.desc()
+    ).all()
+
+    return {
+        "module": "CMS Partner Organizations",
+        "status": "active",
+        "count": len(orgs),
+        "records": [
+            serialize_partner_organization(org)
+            for org in orgs
+        ]
+    }
+
+
+@router.post("/organizations/create")
+def create_partner_organization(
+    organization_name: str,
+    organization_type: str = "other",
+    project: str = "PurPaws",
+    contact_name: str | None = None,
+    contact_email: str | None = None,
+    website_url: str | None = None,
+    location: str | None = None,
+    status: str = "active",
+    notes: str | None = None,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    if status not in ORGANIZATION_STATUSES:
+        return {
+            "module": "CMS Partner Organizations",
+            "status": "error",
+            "message": "Invalid organization status.",
+            "allowed_statuses": ORGANIZATION_STATUSES,
+        }
+
+    org = PartnerOrganization(
+        organization_name=organization_name,
+        organization_type=organization_type,
+        project=project,
+        contact_name=contact_name,
+        contact_email=contact_email,
+        website_url=website_url,
+        location=location,
+        status=status,
+        notes=notes
+    )
+
+    db.add(org)
+    db.commit()
+    db.refresh(org)
+
+    return {
+        "module": "CMS Partner Organizations",
+        "status": "created",
+        "record": serialize_partner_organization(org)
+    }
+
+
+@router.post("/organizations/{organization_id}/active")
+def activate_partner_organization(
+    organization_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_partner_organization_status(
+        organization_id=organization_id,
+        status="active",
+        db=db
+    )
+
+
+@router.post("/organizations/{organization_id}/pending-review")
+def pending_review_partner_organization(
+    organization_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_partner_organization_status(
+        organization_id=organization_id,
+        status="pending_review",
+        db=db
+    )
+
+
+@router.post("/organizations/{organization_id}/pause")
+def pause_partner_organization(
+    organization_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_partner_organization_status(
+        organization_id=organization_id,
+        status="paused",
+        db=db
+    )
+
+
+@router.post("/organizations/{organization_id}/archive")
+def archive_partner_organization(
+    organization_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_partner_organization_status(
+        organization_id=organization_id,
+        status="archived",
+        db=db
+    )
 
 
 @router.get("/campaigns")

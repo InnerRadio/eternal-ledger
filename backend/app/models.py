@@ -273,6 +273,30 @@ class AffiliateCommission(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
+
+class PartnerOrganization(Base):
+    __tablename__ = "partner_organizations"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    organization_name = Column(String, nullable=False)
+    organization_type = Column(String, default="other")
+
+    project = Column(String, default="PurPaws")
+
+    contact_name = Column(String, nullable=True)
+    contact_email = Column(String, nullable=True)
+
+    website_url = Column(String, nullable=True)
+    location = Column(String, nullable=True)
+
+    status = Column(String, default="active")
+
+    notes = Column(Text, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
 class PartnerInquiry(Base):
     __tablename__ = "partner_inquiries"
 
