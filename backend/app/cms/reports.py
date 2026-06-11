@@ -51,6 +51,160 @@ def serialize_metric_event(event: MetricEvent):
     }
 
 
+def ranked_metric_counts(records, field, limit: int = 25):
+    counts = metric_count_by_field(records, field)
+
+    ranked = [
+        {
+            field: key,
+            "count": value["count"],
+        }
+        for key, value in counts.items()
+        if key != "unknown"
+    ]
+
+    ranked.sort(key=lambda item: item["count"], reverse=True)
+
+    return [
+        {
+            "rank": index + 1,
+            **item
+        }
+        for index, item in enumerate(ranked[:limit])
+    ]
+
+
+def metric_records_for_project(db: Session, project: str | None = None):
+    query = db.query(MetricEvent)
+
+    if project:
+        query = query.filter(MetricEvent.project == project)
+
+    return query.all()
+
+
+@router.get("/intelligence/campaigns")
+def cms_metrics_campaign_intelligence(
+    project: str | None = None,
+    limit: int = 25,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer", "reviewer"))
+):
+    records = metric_records_for_project(db, project)
+
+    campaign_records = [
+        record
+        for record in records
+        if record.campaign_id
+    ]
+
+    campaigns = ranked_metric_counts(campaign_records, "campaign_id", limit)
+
+    return {
+        "module": "CMS Metrics Intelligence Campaigns",
+        "status": "active",
+        "count": len(campaigns),
+        "filters": {
+            "project": project,
+            "limit": limit,
+        },
+        "records": campaigns
+    }
+
+
+@router.get("/intelligence/organizations")
+def cms_metrics_organization_intelligence(
+    project: str | None = None,
+    limit: int = 25,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer", "reviewer"))
+):
+    records = metric_records_for_project(db, project)
+
+    organization_records = [
+        record
+        for record in records
+        if record.organization_id
+    ]
+
+    organizations = ranked_metric_counts(organization_records, "organization_id", limit)
+
+    return {
+        "module": "CMS Metrics Intelligence Organizations",
+        "status": "active",
+        "count": len(organizations),
+        "filters": {
+            "project": project,
+            "limit": limit,
+        },
+        "records": organizations
+    }
+
+
+@router.get("/intelligence/affiliates")
+def cms_metrics_affiliate_intelligence(
+    project: str | None = None,
+    limit: int = 25,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer", "reviewer"))
+):
+    records = metric_records_for_project(db, project)
+
+    affiliate_records = [
+        record
+        for record in records
+        if record.referral_code or record.affiliate_id
+    ]
+
+    by_referral_code = ranked_metric_counts(affiliate_records, "referral_code", limit)
+    by_affiliate_id = ranked_metric_counts(affiliate_records, "affiliate_id", limit)
+
+    return {
+        "module": "CMS Metrics Intelligence Affiliates",
+        "status": "active",
+        "filters": {
+            "project": project,
+            "limit": limit,
+        },
+        "records": {
+            "by_referral_code": by_referral_code,
+            "by_affiliate_id": by_affiliate_id,
+        }
+    }
+
+
+@router.get("/intelligence/pages")
+def cms_metrics_page_intelligence(
+    project: str | None = None,
+    limit: int = 25,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer", "reviewer"))
+):
+    records = metric_records_for_project(db, project)
+
+    page_records = [
+        record
+        for record in records
+        if record.event_type == "page_view"
+    ]
+
+    pages = ranked_metric_counts(page_records, "page_url", limit)
+    targets = ranked_metric_counts(page_records, "target_id", limit)
+
+    return {
+        "module": "CMS Metrics Intelligence Pages",
+        "status": "active",
+        "filters": {
+            "project": project,
+            "limit": limit,
+        },
+        "records": {
+            "by_page_url": pages,
+            "by_target_id": targets,
+        }
+    }
+
+
 @router.get("/metrics")
 def cms_metrics_report(
     project: str | None = None,
