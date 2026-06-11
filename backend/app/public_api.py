@@ -65,6 +65,89 @@ def public_track_metric_event(
     }
 
 
+@router.post("/metrics/batch")
+def public_track_metric_events_batch(
+    events_json: str,
+    db: Session = Depends(get_db)
+):
+    import json
+
+    try:
+        events_data = json.loads(events_json)
+    except Exception:
+        return {
+            "module": "Public Metrics Batch",
+            "status": "error",
+            "message": "Invalid events_json payload."
+        }
+
+    if not isinstance(events_data, list):
+        return {
+            "module": "Public Metrics Batch",
+            "status": "error",
+            "message": "events_json must be a JSON list."
+        }
+
+    created = []
+
+    for item in events_data:
+        if not isinstance(item, dict):
+            continue
+
+        event_type = item.get("event_type")
+
+        if not event_type:
+            continue
+
+        event = MetricEvent(
+            event_type=event_type,
+            project=item.get("project") or "PurPaws",
+            source=item.get("source") or "public",
+            session_id=item.get("session_id"),
+            target_type=item.get("target_type"),
+            target_id=item.get("target_id"),
+            campaign_id=item.get("campaign_id"),
+            organization_id=item.get("organization_id"),
+            affiliate_id=item.get("affiliate_id"),
+            referral_code=item.get("referral_code"),
+            page_url=item.get("page_url"),
+            metadata_json=item.get("metadata_json"),
+        )
+
+        db.add(event)
+        created.append(event)
+
+    db.commit()
+
+    for event in created:
+        db.refresh(event)
+
+    return {
+        "module": "Public Metrics Batch",
+        "status": "tracked",
+        "count": len(created),
+        "records": [
+            {
+                "id": event.id,
+                "event_type": event.event_type,
+                "project": event.project,
+                "source": event.source,
+                "session_id": event.session_id,
+                "target_type": event.target_type,
+                "target_id": event.target_id,
+                "campaign_id": event.campaign_id,
+                "organization_id": event.organization_id,
+                "affiliate_id": event.affiliate_id,
+                "referral_code": event.referral_code,
+                "page_url": event.page_url,
+                "metadata_json": event.metadata_json,
+                "created_at": event.created_at,
+            }
+            for event in created
+        ]
+    }
+
+
 @router.get("/memorials")
 def public_memorials(
     db: Session = Depends(get_db)
