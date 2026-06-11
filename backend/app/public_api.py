@@ -1,9 +1,20 @@
 from fastapi import APIRouter, Depends
+from datetime import datetime
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
 from backend.app.models import Memorial, MediaAsset, Contribution, MetricEvent
 from backend.app.environment_themes import ENVIRONMENT_THEMES
+
+
+def parse_client_event_at(value):
+    if not value:
+        return None
+
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00")).replace(tzinfo=None)
+    except Exception:
+        return None
 
 router = APIRouter(prefix="/public", tags=["Public API"])
 
@@ -22,6 +33,7 @@ def public_track_metric_event(
     referral_code: str | None = None,
     page_url: str | None = None,
     metadata_json: str | None = None,
+    client_event_at: str | None = None,
     db: Session = Depends(get_db)
 ):
     event = MetricEvent(
@@ -37,6 +49,7 @@ def public_track_metric_event(
         referral_code=referral_code,
         page_url=page_url,
         metadata_json=metadata_json,
+        client_event_at=parse_client_event_at(client_event_at),
     )
 
     db.add(event)
@@ -60,6 +73,7 @@ def public_track_metric_event(
             "referral_code": event.referral_code,
             "page_url": event.page_url,
             "metadata_json": event.metadata_json,
+            "client_event_at": event.client_event_at,
             "created_at": event.created_at,
         }
     }
@@ -112,6 +126,7 @@ def public_track_metric_events_batch(
             referral_code=item.get("referral_code"),
             page_url=item.get("page_url"),
             metadata_json=item.get("metadata_json"),
+            client_event_at=parse_client_event_at(item.get("client_event_at")),
         )
 
         db.add(event)
@@ -141,6 +156,7 @@ def public_track_metric_events_batch(
                 "referral_code": event.referral_code,
                 "page_url": event.page_url,
                 "metadata_json": event.metadata_json,
+                "client_event_at": event.client_event_at,
                 "created_at": event.created_at,
             }
             for event in created

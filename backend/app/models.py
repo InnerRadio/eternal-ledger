@@ -163,6 +163,7 @@ class MetricEvent(Base):
     page_url = Column(String, nullable=True)
     metadata_json = Column(Text, nullable=True)
 
+    client_event_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 

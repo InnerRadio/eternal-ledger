@@ -48,6 +48,7 @@ def serialize_metric_event(event: MetricEvent):
         "referral_code": event.referral_code,
         "page_url": event.page_url,
         "metadata_json": event.metadata_json,
+        "client_event_at": event.client_event_at,
         "created_at": event.created_at,
     }
 
@@ -135,10 +136,10 @@ def group_metric_events_by_session(records):
 
 
 def serialize_session_summary(session_id, events):
-    ordered = sorted(events, key=lambda event: event.created_at)
+    ordered = sorted(events, key=lambda event: event.client_event_at or event.created_at)
 
-    start_time = ordered[0].created_at if ordered else None
-    end_time = ordered[-1].created_at if ordered else None
+    start_time = (ordered[0].client_event_at or ordered[0].created_at) if ordered else None
+    end_time = (ordered[-1].client_event_at or ordered[-1].created_at) if ordered else None
 
     duration_seconds = 0
 
