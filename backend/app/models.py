@@ -227,6 +227,23 @@ class AffiliateCampaign(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
+
+class AffiliateCampaignEnrollment(Base):
+    __tablename__ = "affiliate_campaign_enrollments"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    campaign_id = Column(String, nullable=False)
+
+    affiliate_id = Column(String, nullable=True)
+    referral_code = Column(String, nullable=True)
+    user_id = Column(Integer, nullable=True)
+
+    status = Column(String, default="active")
+
+    joined_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
 class AffiliateClick(Base):
     __tablename__ = "affiliate_clicks"
 

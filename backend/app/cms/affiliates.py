@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
-from backend.app.models import AffiliateClick, AffiliateConversion, AffiliateCommission, AffiliateCampaign, PartnerOrganization, OrganizationMember, User
+from backend.app.models import AffiliateClick, AffiliateConversion, AffiliateCommission, AffiliateCampaign, AffiliateCampaignEnrollment, PartnerOrganization, OrganizationMember, User
 from backend.app.cms.security import require_roles
 
 router = APIRouter(prefix="/cms/affiliates", tags=["CMS Affiliates"])
@@ -91,6 +91,61 @@ def change_partner_organization_status(
         "module": "CMS Partner Organizations",
         "status": "updated",
         "record": serialize_partner_organization(org)
+    }
+
+
+ENROLLMENT_STATUSES = [
+    "active",
+    "paused",
+    "removed",
+]
+
+
+def serialize_campaign_enrollment(enrollment: AffiliateCampaignEnrollment):
+    return {
+        "id": enrollment.id,
+        "campaign_id": enrollment.campaign_id,
+        "affiliate_id": enrollment.affiliate_id,
+        "referral_code": enrollment.referral_code,
+        "user_id": enrollment.user_id,
+        "status": enrollment.status,
+        "joined_at": enrollment.joined_at,
+    }
+
+
+def change_campaign_enrollment_status(
+    enrollment_id: int,
+    status: str,
+    db: Session
+):
+    if status not in ENROLLMENT_STATUSES:
+        return {
+            "module": "CMS Affiliate Campaign Enrollments",
+            "status": "error",
+            "message": "Invalid enrollment status.",
+            "allowed_statuses": ENROLLMENT_STATUSES,
+        }
+
+    enrollment = db.query(AffiliateCampaignEnrollment).filter(
+        AffiliateCampaignEnrollment.id == enrollment_id
+    ).first()
+
+    if not enrollment:
+        return {
+            "module": "CMS Affiliate Campaign Enrollments",
+            "status": "error",
+            "message": "Enrollment not found.",
+        }
+
+    enrollment.status = status
+
+    db.commit()
+    db.refresh(enrollment)
+
+    return {
+        "module": "CMS Affiliate Campaign Enrollments",
+        "status": "updated",
+        "record": serialize_campaign_enrollment(enrollment)
     }
 
 
@@ -432,6 +487,126 @@ def archive_partner_organization(
     return change_partner_organization_status(
         organization_id=organization_id,
         status="archived",
+        db=db
+    )
+
+
+@router.get("/enrollments")
+def list_affiliate_campaign_enrollments(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer", "reviewer"))
+):
+    enrollments = db.query(AffiliateCampaignEnrollment).order_by(
+        AffiliateCampaignEnrollment.joined_at.desc()
+    ).all()
+
+    return {
+        "module": "CMS Affiliate Campaign Enrollments",
+        "status": "active",
+        "count": len(enrollments),
+        "records": [
+            serialize_campaign_enrollment(enrollment)
+            for enrollment in enrollments
+        ]
+    }
+
+
+@router.post("/enrollments/create")
+def create_affiliate_campaign_enrollment(
+    campaign_id: str,
+    affiliate_id: str | None = None,
+    referral_code: str | None = None,
+    user_id: int | None = None,
+    status: str = "active",
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    if status not in ENROLLMENT_STATUSES:
+        return {
+            "module": "CMS Affiliate Campaign Enrollments",
+            "status": "error",
+            "message": "Invalid enrollment status.",
+            "allowed_statuses": ENROLLMENT_STATUSES,
+        }
+
+    campaign = db.query(AffiliateCampaign).filter(
+        AffiliateCampaign.campaign_id == campaign_id
+    ).first()
+
+    if not campaign:
+        return {
+            "module": "CMS Affiliate Campaign Enrollments",
+            "status": "error",
+            "message": "Campaign not found.",
+        }
+
+    existing = db.query(AffiliateCampaignEnrollment).filter(
+        AffiliateCampaignEnrollment.campaign_id == campaign_id,
+        AffiliateCampaignEnrollment.referral_code == referral_code
+    ).first()
+
+    if existing:
+        return {
+            "module": "CMS Affiliate Campaign Enrollments",
+            "status": "error",
+            "message": "Affiliate is already enrolled in this campaign.",
+            "record": serialize_campaign_enrollment(existing),
+        }
+
+    enrollment = AffiliateCampaignEnrollment(
+        campaign_id=campaign_id,
+        affiliate_id=affiliate_id,
+        referral_code=referral_code,
+        user_id=user_id,
+        status=status
+    )
+
+    db.add(enrollment)
+    db.commit()
+    db.refresh(enrollment)
+
+    return {
+        "module": "CMS Affiliate Campaign Enrollments",
+        "status": "created",
+        "record": serialize_campaign_enrollment(enrollment)
+    }
+
+
+@router.post("/enrollments/{enrollment_id}/active")
+def activate_affiliate_campaign_enrollment(
+    enrollment_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_campaign_enrollment_status(
+        enrollment_id=enrollment_id,
+        status="active",
+        db=db
+    )
+
+
+@router.post("/enrollments/{enrollment_id}/pause")
+def pause_affiliate_campaign_enrollment(
+    enrollment_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_campaign_enrollment_status(
+        enrollment_id=enrollment_id,
+        status="paused",
+        db=db
+    )
+
+
+@router.post("/enrollments/{enrollment_id}/remove")
+def remove_affiliate_campaign_enrollment(
+    enrollment_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_campaign_enrollment_status(
+        enrollment_id=enrollment_id,
+        status="removed",
         db=db
     )
 
