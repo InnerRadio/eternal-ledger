@@ -221,6 +221,30 @@ class AffiliateConversion(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
+
+class AffiliateCommission(Base):
+    __tablename__ = "affiliate_commissions"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    conversion_id = Column(Integer, nullable=True)
+
+    affiliate_id = Column(String, nullable=True)
+    referral_code = Column(String, nullable=True)
+
+    project = Column(String, default="PurPaws")
+    commission_type = Column(String, default="signup")
+
+    amount_cents = Column(Integer, default=0)
+    currency = Column(String, default="CAD")
+
+    status = Column(String, default="pending")
+
+    notes = Column(Text, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
 class PartnerInquiry(Base):
     __tablename__ = "partner_inquiries"
 

@@ -2,10 +2,189 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
-from backend.app.models import AffiliateClick, AffiliateConversion
+from backend.app.models import AffiliateClick, AffiliateConversion, AffiliateCommission
 from backend.app.cms.security import require_roles
 
 router = APIRouter(prefix="/cms/affiliates", tags=["CMS Affiliates"])
+
+
+COMMISSION_STATUSES = [
+    "pending",
+    "approved",
+    "payable",
+    "paid",
+    "cancelled",
+    "void",
+]
+
+
+def serialize_commission(commission: AffiliateCommission):
+    return {
+        "id": commission.id,
+        "conversion_id": commission.conversion_id,
+        "affiliate_id": commission.affiliate_id,
+        "referral_code": commission.referral_code,
+        "project": commission.project,
+        "commission_type": commission.commission_type,
+        "amount_cents": commission.amount_cents,
+        "currency": commission.currency,
+        "status": commission.status,
+        "notes": commission.notes,
+        "created_at": commission.created_at,
+    }
+
+
+def change_commission_status(
+    commission_id: int,
+    status: str,
+    db: Session
+):
+    if status not in COMMISSION_STATUSES:
+        return {
+            "module": "CMS Affiliate Commissions",
+            "status": "error",
+            "message": "Invalid commission status.",
+            "allowed_statuses": COMMISSION_STATUSES,
+        }
+
+    commission = db.query(AffiliateCommission).filter(
+        AffiliateCommission.id == commission_id
+    ).first()
+
+    if not commission:
+        return {
+            "module": "CMS Affiliate Commissions",
+            "status": "error",
+            "message": "Commission not found.",
+        }
+
+    commission.status = status
+
+    db.commit()
+    db.refresh(commission)
+
+    return {
+        "module": "CMS Affiliate Commissions",
+        "status": "updated",
+        "record": serialize_commission(commission)
+    }
+
+
+@router.get("/commissions")
+def list_affiliate_commissions(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    commissions = db.query(AffiliateCommission).order_by(
+        AffiliateCommission.created_at.desc()
+    ).all()
+
+    return {
+        "module": "CMS Affiliate Commissions",
+        "status": "active",
+        "count": len(commissions),
+        "records": [
+            serialize_commission(commission)
+            for commission in commissions
+        ]
+    }
+
+
+@router.post("/commissions/create")
+def create_affiliate_commission(
+    conversion_id: int | None = None,
+    affiliate_id: str | None = None,
+    referral_code: str | None = None,
+    project: str = "PurPaws",
+    commission_type: str = "signup",
+    amount_cents: int = 0,
+    currency: str = "CAD",
+    status: str = "pending",
+    notes: str | None = None,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    if status not in COMMISSION_STATUSES:
+        return {
+            "module": "CMS Affiliate Commissions",
+            "status": "error",
+            "message": "Invalid commission status.",
+            "allowed_statuses": COMMISSION_STATUSES,
+        }
+
+    commission = AffiliateCommission(
+        conversion_id=conversion_id,
+        affiliate_id=affiliate_id,
+        referral_code=referral_code,
+        project=project,
+        commission_type=commission_type,
+        amount_cents=amount_cents,
+        currency=currency,
+        status=status,
+        notes=notes
+    )
+
+    db.add(commission)
+    db.commit()
+    db.refresh(commission)
+
+    return {
+        "module": "CMS Affiliate Commissions",
+        "status": "created",
+        "record": serialize_commission(commission)
+    }
+
+
+@router.post("/commissions/{commission_id}/approve")
+def approve_affiliate_commission(
+    commission_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_commission_status(
+        commission_id=commission_id,
+        status="approved",
+        db=db
+    )
+
+
+@router.post("/commissions/{commission_id}/payable")
+def payable_affiliate_commission(
+    commission_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_commission_status(
+        commission_id=commission_id,
+        status="payable",
+        db=db
+    )
+
+
+@router.post("/commissions/{commission_id}/paid")
+def paid_affiliate_commission(
+    commission_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_commission_status(
+        commission_id=commission_id,
+        status="paid",
+        db=db
+    )
+
+
+@router.post("/commissions/{commission_id}/void")
+def void_affiliate_commission(
+    commission_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    return change_commission_status(
+        commission_id=commission_id,
+        status="void",
+        db=db
+    )
 
 
 @router.get("/clicks")
