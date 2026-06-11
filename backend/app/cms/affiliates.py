@@ -2,10 +2,36 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
-from backend.app.models import AffiliateClick, AffiliateConversion, AffiliateCommission, AffiliateCampaign, PartnerOrganization
+from backend.app.models import AffiliateClick, AffiliateConversion, AffiliateCommission, AffiliateCampaign, PartnerOrganization, OrganizationMember, User
 from backend.app.cms.security import require_roles
 
 router = APIRouter(prefix="/cms/affiliates", tags=["CMS Affiliates"])
+
+
+ORGANIZATION_MEMBER_ROLES = [
+    "owner",
+    "manager",
+    "analyst",
+    "viewer",
+]
+
+ORGANIZATION_MEMBER_STATUSES = [
+    "invited",
+    "active",
+    "suspended",
+    "removed",
+]
+
+
+def serialize_organization_member(member: OrganizationMember):
+    return {
+        "id": member.id,
+        "organization_id": member.organization_id,
+        "user_id": member.user_id,
+        "role": member.role,
+        "status": member.status,
+        "created_at": member.created_at,
+    }
 
 
 ORGANIZATION_STATUSES = [
@@ -192,6 +218,104 @@ def change_commission_status(
         "module": "CMS Affiliate Commissions",
         "status": "updated",
         "record": serialize_commission(commission)
+    }
+
+
+@router.get("/organizations/{organization_id}/members")
+def list_organization_members(
+    organization_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer", "reviewer"))
+):
+    members = db.query(OrganizationMember).filter(
+        OrganizationMember.organization_id == organization_id
+    ).order_by(OrganizationMember.id.desc()).all()
+
+    return {
+        "module": "CMS Organization Members",
+        "status": "active",
+        "organization_id": organization_id,
+        "count": len(members),
+        "records": [
+            serialize_organization_member(member)
+            for member in members
+        ]
+    }
+
+
+@router.post("/organizations/{organization_id}/members/add")
+def add_organization_member(
+    organization_id: int,
+    user_id: int,
+    role: str = "viewer",
+    status: str = "active",
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer"))
+):
+    if role not in ORGANIZATION_MEMBER_ROLES:
+        return {
+            "module": "CMS Organization Members",
+            "status": "error",
+            "message": "Invalid organization member role.",
+            "allowed_roles": ORGANIZATION_MEMBER_ROLES,
+        }
+
+    if status not in ORGANIZATION_MEMBER_STATUSES:
+        return {
+            "module": "CMS Organization Members",
+            "status": "error",
+            "message": "Invalid organization member status.",
+            "allowed_statuses": ORGANIZATION_MEMBER_STATUSES,
+        }
+
+    org = db.query(PartnerOrganization).filter(
+        PartnerOrganization.id == organization_id
+    ).first()
+
+    if not org:
+        return {
+            "module": "CMS Organization Members",
+            "status": "error",
+            "message": "Organization not found.",
+        }
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return {
+            "module": "CMS Organization Members",
+            "status": "error",
+            "message": "User not found.",
+        }
+
+    existing = db.query(OrganizationMember).filter(
+        OrganizationMember.organization_id == organization_id,
+        OrganizationMember.user_id == user_id
+    ).first()
+
+    if existing:
+        return {
+            "module": "CMS Organization Members",
+            "status": "error",
+            "message": "User is already attached to this organization.",
+            "record": serialize_organization_member(existing),
+        }
+
+    member = OrganizationMember(
+        organization_id=organization_id,
+        user_id=user_id,
+        role=role,
+        status=status
+    )
+
+    db.add(member)
+    db.commit()
+    db.refresh(member)
+
+    return {
+        "module": "CMS Organization Members",
+        "status": "created",
+        "record": serialize_organization_member(member)
     }
 
 
