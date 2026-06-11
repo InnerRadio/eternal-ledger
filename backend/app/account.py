@@ -942,6 +942,10 @@ def account_organization_dashboard(
             AffiliateCommission.referral_code.in_(referral_codes)
         ).all() if referral_codes else []
 
+        clicks = db.query(AffiliateClick).filter(
+            AffiliateClick.campaign_id.in_(campaign_ids)
+        ).all() if campaign_ids else []
+
         total_commission_cents = sum(
             commission.amount_cents or 0
             for commission in commissions
@@ -958,6 +962,79 @@ def account_organization_dashboard(
             for commission in commissions
             if commission.status in ["pending", "approved", "payable"]
         )
+
+        clicks_by_campaign = {}
+
+        for click in clicks:
+            clicks_by_campaign.setdefault(click.campaign_id, []).append(click)
+
+        enrollments_by_campaign = {}
+
+        for enrollment in enrollments:
+            enrollments_by_campaign.setdefault(enrollment.campaign_id, []).append(enrollment)
+
+        conversions_by_referral_code = {}
+
+        for conversion in conversions:
+            conversions_by_referral_code.setdefault(conversion.referral_code, []).append(conversion)
+
+        commissions_by_referral_code = {}
+
+        for commission in commissions:
+            commissions_by_referral_code.setdefault(commission.referral_code, []).append(commission)
+
+        campaign_performance = []
+
+        for campaign in campaigns:
+            campaign_enrollments = enrollments_by_campaign.get(campaign.campaign_id, [])
+
+            campaign_referral_codes = [
+                enrollment.referral_code
+                for enrollment in campaign_enrollments
+                if enrollment.referral_code
+            ]
+
+            campaign_conversions = []
+
+            for code in campaign_referral_codes:
+                campaign_conversions.extend(conversions_by_referral_code.get(code, []))
+
+            campaign_commissions = []
+
+            for code in campaign_referral_codes:
+                campaign_commissions.extend(commissions_by_referral_code.get(code, []))
+
+            campaign_total_commission_cents = sum(
+                commission.amount_cents or 0
+                for commission in campaign_commissions
+            )
+
+            campaign_paid_commission_cents = sum(
+                commission.amount_cents or 0
+                for commission in campaign_commissions
+                if commission.status == "paid"
+            )
+
+            campaign_performance.append({
+                "campaign": serialize_account_campaign(campaign),
+                "summary": {
+                    "clicks": len(clicks_by_campaign.get(campaign.campaign_id, [])),
+                    "enrollments": {
+                        "total": len(campaign_enrollments),
+                        "by_status": summarize_by_status(campaign_enrollments),
+                    },
+                    "conversions": {
+                        "total": len(campaign_conversions),
+                        "by_status": summarize_by_status(campaign_conversions),
+                    },
+                    "commissions": {
+                        "total": len(campaign_commissions),
+                        "by_status": summarize_by_status(campaign_commissions, amount_field="amount_cents"),
+                        "total_commission_cents": campaign_total_commission_cents,
+                        "paid_commission_cents": campaign_paid_commission_cents,
+                    }
+                }
+            })
 
         records.append({
             "organization": {
@@ -1000,6 +1077,7 @@ def account_organization_dashboard(
                     "outstanding_commission_cents": outstanding_commission_cents,
                 },
             },
+            "campaign_performance": campaign_performance,
             "recent": {
                 "campaigns": [
                     serialize_account_campaign(campaign)
