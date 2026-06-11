@@ -120,6 +120,156 @@ def build_funnel_summary(
     }
 
 
+def group_metric_events_by_session(records):
+    sessions = {}
+
+    for record in records:
+        session_id = record.session_id or "unknown"
+
+        if session_id not in sessions:
+            sessions[session_id] = []
+
+        sessions[session_id].append(record)
+
+    return sessions
+
+
+def serialize_session_summary(session_id, events):
+    ordered = sorted(events, key=lambda event: event.created_at)
+
+    start_time = ordered[0].created_at if ordered else None
+    end_time = ordered[-1].created_at if ordered else None
+
+    duration_seconds = 0
+
+    if start_time and end_time:
+        duration_seconds = round((end_time - start_time).total_seconds(), 2)
+
+    page_urls = sorted(set([
+        event.page_url
+        for event in ordered
+        if event.page_url
+    ]))
+
+    event_types = metric_count_by_field(ordered, "event_type")
+
+    scroll_events = [
+        event
+        for event in ordered
+        if event.event_type == "scroll_depth"
+    ]
+
+    return {
+        "session_id": session_id,
+        "events": len(ordered),
+        "duration_seconds": duration_seconds,
+        "pages_visited": len(page_urls),
+        "page_urls": page_urls,
+        "first_event_type": ordered[0].event_type if ordered else None,
+        "last_event_type": ordered[-1].event_type if ordered else None,
+        "event_types": event_types,
+        "scroll_events": len(scroll_events),
+        "started_at": start_time,
+        "ended_at": end_time,
+    }
+
+
+@router.get("/metrics/sessions")
+def cms_metrics_sessions_report(
+    project: str | None = None,
+    source: str | None = None,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer", "reviewer"))
+):
+    query = db.query(MetricEvent)
+
+    if project:
+        query = query.filter(MetricEvent.project == project)
+
+    if source:
+        query = query.filter(MetricEvent.source == source)
+
+    records = query.order_by(MetricEvent.created_at.desc()).limit(limit).all()
+
+    sessions = group_metric_events_by_session(records)
+
+    session_records = [
+        serialize_session_summary(session_id, events)
+        for session_id, events in sessions.items()
+    ]
+
+    session_records.sort(
+        key=lambda item: item["ended_at"] or item["started_at"],
+        reverse=True
+    )
+
+    return {
+        "module": "CMS Metrics Sessions",
+        "status": "active",
+        "count": len(session_records),
+        "filters": {
+            "project": project,
+            "source": source,
+            "limit": limit,
+        },
+        "records": session_records
+    }
+
+
+@router.get("/intelligence/sessions")
+def cms_metrics_session_intelligence(
+    project: str | None = None,
+    source: str | None = None,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer", "reviewer"))
+):
+    query = db.query(MetricEvent)
+
+    if project:
+        query = query.filter(MetricEvent.project == project)
+
+    if source:
+        query = query.filter(MetricEvent.source == source)
+
+    records = query.order_by(MetricEvent.created_at.desc()).limit(limit).all()
+
+    sessions = group_metric_events_by_session(records)
+
+    session_records = [
+        serialize_session_summary(session_id, events)
+        for session_id, events in sessions.items()
+    ]
+
+    session_records.sort(
+        key=lambda item: (
+            item["events"],
+            item["duration_seconds"],
+            item["pages_visited"],
+        ),
+        reverse=True
+    )
+
+    return {
+        "module": "CMS Metrics Intelligence Sessions",
+        "status": "active",
+        "count": len(session_records),
+        "filters": {
+            "project": project,
+            "source": source,
+            "limit": limit,
+        },
+        "records": [
+            {
+                "rank": index + 1,
+                **record
+            }
+            for index, record in enumerate(session_records)
+        ]
+    }
+
+
 @router.get("/attribution/campaigns")
 def cms_attribution_campaign_funnels(
     project: str | None = None,
