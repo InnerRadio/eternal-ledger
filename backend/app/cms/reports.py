@@ -9,6 +9,7 @@ from backend.app.models import (
     Contribution,
     AffiliateClick,
     AffiliateConversion,
+    AffiliateCommission,
 )
 from backend.app.cms.security import require_roles
 
@@ -81,6 +82,253 @@ def metric_records_for_project(db: Session, project: str | None = None):
         query = query.filter(MetricEvent.project == project)
 
     return query.all()
+
+
+def commission_total_cents(records):
+    return sum(
+        record.amount_cents or 0
+        for record in records
+    )
+
+
+def build_funnel_summary(
+    views_count: int,
+    clicks_count: int,
+    enrollments_count: int,
+    conversions_count: int,
+    commissions_count: int,
+    commission_cents: int
+):
+    click_through_rate = round((clicks_count / views_count) * 100, 2) if views_count else 0
+    enrollment_rate = round((enrollments_count / clicks_count) * 100, 2) if clicks_count else 0
+    conversion_rate = round((conversions_count / enrollments_count) * 100, 2) if enrollments_count else 0
+    commission_per_conversion_cents = round(commission_cents / conversions_count, 2) if conversions_count else 0
+
+    return {
+        "views": views_count,
+        "clicks": clicks_count,
+        "enrollments": enrollments_count,
+        "conversions": conversions_count,
+        "commissions": commissions_count,
+        "commission_cents": commission_cents,
+        "rates": {
+            "click_through_rate_percent": click_through_rate,
+            "enrollment_rate_percent": enrollment_rate,
+            "conversion_rate_percent": conversion_rate,
+            "commission_per_conversion_cents": commission_per_conversion_cents,
+        }
+    }
+
+
+@router.get("/attribution/campaigns")
+def cms_attribution_campaign_funnels(
+    project: str | None = None,
+    limit: int = 25,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer", "reviewer"))
+):
+    metric_events = metric_records_for_project(db, project)
+
+    clicks_query = db.query(AffiliateClick)
+    conversions_query = db.query(AffiliateConversion)
+    commissions_query = db.query(AffiliateCommission)
+
+    if project:
+        commissions_query = commissions_query.filter(AffiliateCommission.project == project)
+
+    clicks = clicks_query.all()
+    conversions = conversions_query.all()
+    commissions = commissions_query.all()
+
+    campaign_ids = sorted(set([
+        record.campaign_id
+        for record in metric_events
+        if record.campaign_id
+    ] + [
+        click.campaign_id
+        for click in clicks
+        if click.campaign_id
+    ]))
+
+    records = []
+
+    for campaign_id in campaign_ids:
+        campaign_views = [
+            event
+            for event in metric_events
+            if event.campaign_id == campaign_id and event.event_type in ["campaign_view", "page_view"]
+        ]
+
+        campaign_clicks = [
+            click
+            for click in clicks
+            if click.campaign_id == campaign_id
+        ]
+
+        campaign_referral_codes = list(set([
+            click.referral_code
+            for click in campaign_clicks
+            if click.referral_code
+        ] + [
+            event.referral_code
+            for event in campaign_views
+            if event.referral_code
+        ]))
+
+        campaign_conversions = [
+            conversion
+            for conversion in conversions
+            if conversion.referral_code in campaign_referral_codes
+        ]
+
+        campaign_commissions = [
+            commission
+            for commission in commissions
+            if commission.referral_code in campaign_referral_codes
+        ]
+
+        records.append({
+            "campaign_id": campaign_id,
+            "summary": build_funnel_summary(
+                views_count=len(campaign_views),
+                clicks_count=len(campaign_clicks),
+                enrollments_count=0,
+                conversions_count=len(campaign_conversions),
+                commissions_count=len(campaign_commissions),
+                commission_cents=commission_total_cents(campaign_commissions),
+            )
+        })
+
+    records.sort(
+        key=lambda record: (
+            record["summary"]["conversions"],
+            record["summary"]["commission_cents"],
+            record["summary"]["clicks"],
+            record["summary"]["views"],
+        ),
+        reverse=True
+    )
+
+    return {
+        "module": "CMS Attribution Intelligence Campaigns",
+        "status": "active",
+        "count": len(records[:limit]),
+        "filters": {
+            "project": project,
+            "limit": limit,
+        },
+        "records": [
+            {
+                "rank": index + 1,
+                **record
+            }
+            for index, record in enumerate(records[:limit])
+        ]
+    }
+
+
+@router.get("/attribution/affiliates")
+def cms_attribution_affiliate_funnels(
+    project: str | None = None,
+    limit: int = 25,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_roles("super_admin", "admin", "developer", "reviewer"))
+):
+    metric_events = metric_records_for_project(db, project)
+
+    clicks = db.query(AffiliateClick).all()
+    conversions = db.query(AffiliateConversion).all()
+
+    commissions_query = db.query(AffiliateCommission)
+
+    if project:
+        commissions_query = commissions_query.filter(AffiliateCommission.project == project)
+
+    commissions = commissions_query.all()
+
+    referral_codes = sorted(set([
+        event.referral_code
+        for event in metric_events
+        if event.referral_code
+    ] + [
+        click.referral_code
+        for click in clicks
+        if click.referral_code
+    ] + [
+        conversion.referral_code
+        for conversion in conversions
+        if conversion.referral_code
+    ] + [
+        commission.referral_code
+        for commission in commissions
+        if commission.referral_code
+    ]))
+
+    records = []
+
+    for referral_code in referral_codes:
+        affiliate_views = [
+            event
+            for event in metric_events
+            if event.referral_code == referral_code
+        ]
+
+        affiliate_clicks = [
+            click
+            for click in clicks
+            if click.referral_code == referral_code
+        ]
+
+        affiliate_conversions = [
+            conversion
+            for conversion in conversions
+            if conversion.referral_code == referral_code
+        ]
+
+        affiliate_commissions = [
+            commission
+            for commission in commissions
+            if commission.referral_code == referral_code
+        ]
+
+        records.append({
+            "referral_code": referral_code,
+            "summary": build_funnel_summary(
+                views_count=len(affiliate_views),
+                clicks_count=len(affiliate_clicks),
+                enrollments_count=0,
+                conversions_count=len(affiliate_conversions),
+                commissions_count=len(affiliate_commissions),
+                commission_cents=commission_total_cents(affiliate_commissions),
+            )
+        })
+
+    records.sort(
+        key=lambda record: (
+            record["summary"]["conversions"],
+            record["summary"]["commission_cents"],
+            record["summary"]["clicks"],
+            record["summary"]["views"],
+        ),
+        reverse=True
+    )
+
+    return {
+        "module": "CMS Attribution Intelligence Affiliates",
+        "status": "active",
+        "count": len(records[:limit]),
+        "filters": {
+            "project": project,
+            "limit": limit,
+        },
+        "records": [
+            {
+                "rank": index + 1,
+                **record
+            }
+            for index, record in enumerate(records[:limit])
+        ]
+    }
 
 
 @router.get("/intelligence/campaigns")
