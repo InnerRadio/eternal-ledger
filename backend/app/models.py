@@ -137,6 +137,35 @@ class OrganizationMember(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
+
+class MetricEvent(Base):
+    __tablename__ = "metric_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    event_type = Column(String, nullable=False)
+
+    project = Column(String, default="PurPaws")
+    source = Column(String, default="public")
+
+    actor_user_id = Column(Integer, nullable=True)
+    session_id = Column(String, nullable=True)
+
+    target_type = Column(String, nullable=True)
+    target_id = Column(String, nullable=True)
+
+    campaign_id = Column(String, nullable=True)
+    organization_id = Column(Integer, nullable=True)
+
+    affiliate_id = Column(String, nullable=True)
+    referral_code = Column(String, nullable=True)
+
+    page_url = Column(String, nullable=True)
+    metadata_json = Column(Text, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
 class AuditLog(Base):
     __tablename__ = "audit_logs"
 

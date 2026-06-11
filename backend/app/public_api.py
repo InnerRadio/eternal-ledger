@@ -2,10 +2,67 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
-from backend.app.models import Memorial, MediaAsset, Contribution
+from backend.app.models import Memorial, MediaAsset, Contribution, MetricEvent
 from backend.app.environment_themes import ENVIRONMENT_THEMES
 
 router = APIRouter(prefix="/public", tags=["Public API"])
+
+
+@router.post("/metrics/track")
+def public_track_metric_event(
+    event_type: str,
+    project: str = "PurPaws",
+    source: str = "public",
+    session_id: str | None = None,
+    target_type: str | None = None,
+    target_id: str | None = None,
+    campaign_id: str | None = None,
+    organization_id: int | None = None,
+    affiliate_id: str | None = None,
+    referral_code: str | None = None,
+    page_url: str | None = None,
+    metadata_json: str | None = None,
+    db: Session = Depends(get_db)
+):
+    event = MetricEvent(
+        event_type=event_type,
+        project=project,
+        source=source,
+        session_id=session_id,
+        target_type=target_type,
+        target_id=target_id,
+        campaign_id=campaign_id,
+        organization_id=organization_id,
+        affiliate_id=affiliate_id,
+        referral_code=referral_code,
+        page_url=page_url,
+        metadata_json=metadata_json,
+    )
+
+    db.add(event)
+    db.commit()
+    db.refresh(event)
+
+    return {
+        "module": "Public Metrics",
+        "status": "tracked",
+        "record": {
+            "id": event.id,
+            "event_type": event.event_type,
+            "project": event.project,
+            "source": event.source,
+            "session_id": event.session_id,
+            "target_type": event.target_type,
+            "target_id": event.target_id,
+            "campaign_id": event.campaign_id,
+            "organization_id": event.organization_id,
+            "affiliate_id": event.affiliate_id,
+            "referral_code": event.referral_code,
+            "page_url": event.page_url,
+            "metadata_json": event.metadata_json,
+            "created_at": event.created_at,
+        }
+    }
 
 
 @router.get("/memorials")
