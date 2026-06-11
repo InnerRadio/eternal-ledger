@@ -7,7 +7,7 @@ import secrets
 import string
 
 from backend.app.database import get_db
-from backend.app.models import User, UserCreate, UserLogin, MemorialCreate, ContributionCreate, Memorial, Contribution, MediaAsset, AccountSecurityEvent, AffiliateConversion, AffiliateClick, AffiliateCommission, AffiliateCampaign, AffiliateCampaignEnrollment, PartnerOrganization
+from backend.app.models import User, UserCreate, UserLogin, MemorialCreate, ContributionCreate, Memorial, Contribution, MediaAsset, AccountSecurityEvent, AffiliateConversion, AffiliateClick, AffiliateCommission, AffiliateCampaign, AffiliateCampaignEnrollment, PartnerOrganization, OrganizationMember
 from backend.app.cms.security import (
     create_access_token,
     get_current_user,
@@ -863,6 +863,175 @@ def account_my_campaigns(
             )
             for enrollment in enrollments
         ]
+    }
+
+
+@router.get("/organization")
+def account_organization_dashboard(
+    current_user: dict = Depends(require_active_account),
+    db: Session = Depends(get_db)
+):
+    user_id = current_user.get("user_id")
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return {
+            "module": "Account Organization Dashboard",
+            "status": "error",
+            "message": "User not found."
+        }
+
+    memberships = db.query(OrganizationMember).filter(
+        OrganizationMember.user_id == user.id,
+        OrganizationMember.status == "active"
+    ).all()
+
+    if not memberships:
+        return {
+            "module": "Account Organization Dashboard",
+            "status": "active",
+            "count": 0,
+            "message": "No active organizations attached to this account.",
+            "records": []
+        }
+
+    organization_ids = [
+        membership.organization_id
+        for membership in memberships
+    ]
+
+    organizations = db.query(PartnerOrganization).filter(
+        PartnerOrganization.id.in_(organization_ids)
+    ).all()
+
+    membership_by_org_id = {
+        membership.organization_id: membership
+        for membership in memberships
+    }
+
+    records = []
+
+    for org in organizations:
+        membership = membership_by_org_id.get(org.id)
+
+        campaigns = db.query(AffiliateCampaign).filter(
+            AffiliateCampaign.sponsor_name == org.organization_name
+        ).order_by(AffiliateCampaign.created_at.desc()).all()
+
+        campaign_ids = [
+            campaign.campaign_id
+            for campaign in campaigns
+        ]
+
+        enrollments = db.query(AffiliateCampaignEnrollment).filter(
+            AffiliateCampaignEnrollment.campaign_id.in_(campaign_ids)
+        ).all() if campaign_ids else []
+
+        referral_codes = [
+            enrollment.referral_code
+            for enrollment in enrollments
+            if enrollment.referral_code
+        ]
+
+        conversions = db.query(AffiliateConversion).filter(
+            AffiliateConversion.referral_code.in_(referral_codes)
+        ).all() if referral_codes else []
+
+        commissions = db.query(AffiliateCommission).filter(
+            AffiliateCommission.referral_code.in_(referral_codes)
+        ).all() if referral_codes else []
+
+        total_commission_cents = sum(
+            commission.amount_cents or 0
+            for commission in commissions
+        )
+
+        paid_commission_cents = sum(
+            commission.amount_cents or 0
+            for commission in commissions
+            if commission.status == "paid"
+        )
+
+        outstanding_commission_cents = sum(
+            commission.amount_cents or 0
+            for commission in commissions
+            if commission.status in ["pending", "approved", "payable"]
+        )
+
+        records.append({
+            "organization": {
+                "id": org.id,
+                "organization_name": org.organization_name,
+                "organization_type": org.organization_type,
+                "project": org.project,
+                "contact_name": org.contact_name,
+                "contact_email": org.contact_email,
+                "website_url": org.website_url,
+                "location": org.location,
+                "status": org.status,
+                "notes": org.notes,
+                "created_at": org.created_at,
+            },
+            "membership": {
+                "id": membership.id if membership else None,
+                "role": membership.role if membership else None,
+                "status": membership.status if membership else None,
+                "created_at": membership.created_at if membership else None,
+            },
+            "summary": {
+                "campaigns": {
+                    "total": len(campaigns),
+                    "by_status": summarize_by_status(campaigns),
+                },
+                "enrollments": {
+                    "total": len(enrollments),
+                    "by_status": summarize_by_status(enrollments),
+                },
+                "conversions": {
+                    "total": len(conversions),
+                    "by_status": summarize_by_status(conversions),
+                },
+                "commissions": {
+                    "total": len(commissions),
+                    "by_status": summarize_by_status(commissions, amount_field="amount_cents"),
+                    "total_commission_cents": total_commission_cents,
+                    "paid_commission_cents": paid_commission_cents,
+                    "outstanding_commission_cents": outstanding_commission_cents,
+                },
+            },
+            "recent": {
+                "campaigns": [
+                    serialize_account_campaign(campaign)
+                    for campaign in campaigns[:10]
+                ],
+                "enrollments": [
+                    serialize_account_enrollment(enrollment)
+                    for enrollment in enrollments[:10]
+                ],
+                "conversions": [
+                    serialize_affiliate_conversion(conversion)
+                    for conversion in conversions[:10]
+                ],
+                "commissions": [
+                    serialize_affiliate_commission(commission)
+                    for commission in commissions[:10]
+                ],
+            }
+        })
+
+    return {
+        "module": "Account Organization Dashboard",
+        "status": "active",
+        "count": len(records),
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "role": user.role,
+            "affiliate_id": user.affiliate_id,
+            "referral_code": user.referral_code,
+        },
+        "records": records
     }
 
 
