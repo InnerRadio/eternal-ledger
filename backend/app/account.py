@@ -7,7 +7,7 @@ import secrets
 import string
 
 from backend.app.database import get_db
-from backend.app.models import User, UserCreate, UserLogin, MemorialCreate, ContributionCreate, Memorial, Contribution, MediaAsset, AccountSecurityEvent, AffiliateConversion, AffiliateClick, AffiliateCommission
+from backend.app.models import User, UserCreate, UserLogin, MemorialCreate, ContributionCreate, Memorial, Contribution, MediaAsset, AccountSecurityEvent, AffiliateConversion, AffiliateClick, AffiliateCommission, AffiliateCampaign, AffiliateCampaignEnrollment, PartnerOrganization
 from backend.app.cms.security import (
     create_access_token,
     get_current_user,
@@ -277,6 +277,50 @@ def serialize_user(user: User):
         "affiliate_id": user.affiliate_id,
         "referral_code": user.referral_code,
         "referring_affiliate_id": user.referring_affiliate_id,
+    }
+
+
+def serialize_account_campaign(
+    campaign: AffiliateCampaign,
+    enrollment: AffiliateCampaignEnrollment | None = None
+):
+    return {
+        "id": campaign.id,
+        "campaign_id": campaign.campaign_id,
+        "project": campaign.project,
+        "title": campaign.title,
+        "description": campaign.description,
+        "campaign_type": campaign.campaign_type,
+        "sponsor_name": campaign.sponsor_name,
+        "payout_type": campaign.payout_type,
+        "payout_amount_cents": campaign.payout_amount_cents,
+        "payout_percent": campaign.payout_percent,
+        "currency": campaign.currency,
+        "status": campaign.status,
+        "starts_at": campaign.starts_at,
+        "ends_at": campaign.ends_at,
+        "created_at": campaign.created_at,
+        "enrollment": {
+            "id": enrollment.id,
+            "status": enrollment.status,
+            "joined_at": enrollment.joined_at,
+        } if enrollment else None
+    }
+
+
+def serialize_account_enrollment(
+    enrollment: AffiliateCampaignEnrollment,
+    campaign: AffiliateCampaign | None = None
+):
+    return {
+        "id": enrollment.id,
+        "campaign_id": enrollment.campaign_id,
+        "affiliate_id": enrollment.affiliate_id,
+        "referral_code": enrollment.referral_code,
+        "user_id": enrollment.user_id,
+        "status": enrollment.status,
+        "joined_at": enrollment.joined_at,
+        "campaign": serialize_account_campaign(campaign) if campaign else None
     }
 
 
@@ -658,6 +702,167 @@ def account_affiliate_dashboard(
                 for commission in commissions[:10]
             ]
         }
+    }
+
+
+@router.get("/opportunities")
+def account_opportunities(
+    current_user: dict = Depends(require_active_account),
+    db: Session = Depends(get_db)
+):
+    user_id = current_user.get("user_id")
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return {
+            "module": "Account Opportunities",
+            "status": "error",
+            "message": "User not found."
+        }
+
+    campaigns = db.query(AffiliateCampaign).filter(
+        AffiliateCampaign.status == "active"
+    ).order_by(AffiliateCampaign.created_at.desc()).all()
+
+    enrollments = db.query(AffiliateCampaignEnrollment).filter(
+        AffiliateCampaignEnrollment.user_id == user.id
+    ).all()
+
+    enrollment_by_campaign = {
+        enrollment.campaign_id: enrollment
+        for enrollment in enrollments
+    }
+
+    return {
+        "module": "Account Opportunities",
+        "status": "active",
+        "count": len(campaigns),
+        "affiliate": {
+            "user_id": user.id,
+            "affiliate_id": user.affiliate_id,
+            "referral_code": user.referral_code,
+            "role": user.role,
+        },
+        "records": [
+            serialize_account_campaign(
+                campaign,
+                enrollment_by_campaign.get(campaign.campaign_id)
+            )
+            for campaign in campaigns
+        ]
+    }
+
+
+@router.post("/opportunities/{campaign_id}/join")
+def account_join_opportunity(
+    campaign_id: str,
+    current_user: dict = Depends(require_active_account),
+    db: Session = Depends(get_db)
+):
+    user_id = current_user.get("user_id")
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return {
+            "module": "Account Opportunities",
+            "status": "error",
+            "message": "User not found."
+        }
+
+    campaign = db.query(AffiliateCampaign).filter(
+        AffiliateCampaign.campaign_id == campaign_id,
+        AffiliateCampaign.status == "active"
+    ).first()
+
+    if not campaign:
+        return {
+            "module": "Account Opportunities",
+            "status": "error",
+            "message": "Active campaign not found."
+        }
+
+    existing = db.query(AffiliateCampaignEnrollment).filter(
+        AffiliateCampaignEnrollment.campaign_id == campaign_id,
+        AffiliateCampaignEnrollment.user_id == user.id
+    ).first()
+
+    if existing:
+        return {
+            "module": "Account Opportunities",
+            "status": "already_enrolled",
+            "record": serialize_account_enrollment(existing, campaign)
+        }
+
+    enrollment = AffiliateCampaignEnrollment(
+        campaign_id=campaign.campaign_id,
+        affiliate_id=user.affiliate_id,
+        referral_code=user.referral_code,
+        user_id=user.id,
+        status="active"
+    )
+
+    db.add(enrollment)
+    db.commit()
+    db.refresh(enrollment)
+
+    return {
+        "module": "Account Opportunities",
+        "status": "joined",
+        "record": serialize_account_enrollment(enrollment, campaign)
+    }
+
+
+@router.get("/opportunities/my-campaigns")
+def account_my_campaigns(
+    current_user: dict = Depends(require_active_account),
+    db: Session = Depends(get_db)
+):
+    user_id = current_user.get("user_id")
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return {
+            "module": "Account Opportunities",
+            "status": "error",
+            "message": "User not found."
+        }
+
+    enrollments = db.query(AffiliateCampaignEnrollment).filter(
+        AffiliateCampaignEnrollment.user_id == user.id
+    ).order_by(AffiliateCampaignEnrollment.joined_at.desc()).all()
+
+    campaigns = db.query(AffiliateCampaign).filter(
+        AffiliateCampaign.campaign_id.in_([
+            enrollment.campaign_id
+            for enrollment in enrollments
+        ])
+    ).all() if enrollments else []
+
+    campaign_by_id = {
+        campaign.campaign_id: campaign
+        for campaign in campaigns
+    }
+
+    return {
+        "module": "Account My Campaigns",
+        "status": "active",
+        "count": len(enrollments),
+        "affiliate": {
+            "user_id": user.id,
+            "affiliate_id": user.affiliate_id,
+            "referral_code": user.referral_code,
+            "role": user.role,
+        },
+        "records": [
+            serialize_account_enrollment(
+                enrollment,
+                campaign_by_id.get(enrollment.campaign_id)
+            )
+            for enrollment in enrollments
+        ]
     }
 
 
