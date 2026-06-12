@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
-from backend.app.models import Memorial, MediaAsset, Contribution, MetricEvent
+from backend.app.models import Memorial, MediaAsset, Contribution, MetricEvent, User, AffiliateCampaign, PartnerOrganization
 from backend.app.environment_themes import ENVIRONMENT_THEMES
 
 
@@ -324,22 +324,177 @@ def public_network_pulse(
         Contribution.status == "published"
     ).count()
 
+    users = db.query(User).all()
+
+    organizations = db.query(PartnerOrganization).filter(
+        PartnerOrganization.status == "active"
+    ).all()
+
+    opportunities = db.query(AffiliateCampaign).filter(
+        AffiliateCampaign.status == "active"
+    ).order_by(AffiliateCampaign.created_at.desc()).limit(6).all()
+
+    creator_count = len([
+        user for user in users
+        if (user.role or "").lower() == "creator"
+    ])
+
+    rescue_count = len([
+        user for user in users
+        if (user.role or "").lower() == "rescue"
+    ])
+
+    affiliate_count = len([
+        user for user in users
+        if user.affiliate_id or user.referral_code
+    ])
+
+    rescue_organization_count = len([
+        organization for organization in organizations
+        if "rescue" in ((organization.organization_type or "").lower())
+    ])
+
+    opportunity_records = [
+        {
+            "id": opportunity.id,
+            "campaign_id": opportunity.campaign_id,
+            "label": "Opportunity",
+            "title": opportunity.title,
+            "description": opportunity.description,
+            "project": opportunity.project,
+            "sponsor_name": opportunity.sponsor_name,
+            "opportunity_type": opportunity.campaign_type,
+            "payout_type": opportunity.payout_type,
+            "payout_amount_cents": opportunity.payout_amount_cents,
+            "payout_percent": opportunity.payout_percent,
+            "currency": opportunity.currency,
+            "status": opportunity.status,
+            "starts_at": opportunity.starts_at,
+            "ends_at": opportunity.ends_at,
+            "created_at": opportunity.created_at,
+        }
+        for opportunity in opportunities
+    ]
+
+    featured_opportunity = opportunity_records[0] if opportunity_records else None
+
     return {
-        "module": "PurPaws Continuity Pulse",
+        "module": "PurPaws Network Pulse",
         "status": "active",
+        "version": "v30b-public-network-pulse",
+        "visibility": "public",
         "network": "PurPaws Continuity Network",
+        "philosophy": "The Pulse Medallion is the public-facing heartbeat of the community.",
 
         "metrics": {
             "published_memorials": memorial_count,
             "published_media_assets": media_count,
-            "published_contributions": contribution_count
+            "published_contributions": contribution_count,
+
+            "members": len(users),
+            "organizations": len(organizations),
+            "creators": creator_count,
+            "rescues": rescue_count,
+            "rescue_organizations": rescue_organization_count,
+            "affiliates": affiliate_count,
+            "active_opportunities": len(opportunity_records)
         },
 
+        "continuity": {
+            "memorials": memorial_count,
+            "media_assets": media_count,
+            "contributions": contribution_count
+        },
+
+        "community": {
+            "members": len(users),
+            "organizations": len(organizations),
+            "creators": creator_count,
+            "rescues": rescue_count,
+            "rescue_organizations": rescue_organization_count,
+            "affiliates": affiliate_count
+        },
+
+        "opportunities": {
+            "label": "Opportunities",
+            "description": "Public-facing campaigns and side-hustle paths available through the PurPaws network.",
+            "count": len(opportunity_records),
+            "featured": featured_opportunity,
+            "records": opportunity_records
+        },
+
+        "pulse_layers": [
+            {
+                "key": "continuity",
+                "label": "Continuity Layer",
+                "enabled": True,
+                "locked": False
+            },
+            {
+                "key": "community",
+                "label": "Community Layer",
+                "enabled": True,
+                "locked": False
+            },
+            {
+                "key": "opportunities",
+                "label": "Opportunities",
+                "enabled": bool(opportunity_records),
+                "locked": not bool(opportunity_records),
+                "reason": "Available when active public campaigns exist."
+            },
+            {
+                "key": "leaderboard_highlights",
+                "label": "Leaderboard Highlights",
+                "enabled": False,
+                "locked": True,
+                "reason": "Requires public-safe leaderboard promotion layer."
+            },
+            {
+                "key": "featured_creators",
+                "label": "Featured Creators",
+                "enabled": False,
+                "locked": True,
+                "reason": "Requires featured community curation."
+            },
+            {
+                "key": "featured_rescues",
+                "label": "Featured Rescues",
+                "enabled": False,
+                "locked": True,
+                "reason": "Requires featured rescue curation."
+            },
+            {
+                "key": "xrpl_verification",
+                "label": "XRPL Verification",
+                "enabled": False,
+                "locked": True,
+                "reason": "Future ledger verification pulse layer."
+            }
+        ],
+
         "systems": {
-            "xrpl": "connected",
+            "xrpl": "planned",
             "eternal_ledger": "active",
-            "continuity_layer": "operational"
-        }
+            "continuity_layer": "operational",
+            "community_layer": "active",
+            "opportunity_layer": "active" if opportunity_records else "waiting"
+        },
+
+        "coming_soon": [
+            "Leaderboard Highlights",
+            "Featured Creators",
+            "Featured Rescues",
+            "Featured Organizations",
+            "XRPL Verification",
+            "White Label Communities"
+        ],
+
+        "notes": [
+            "This endpoint is public-safe and does not require account authentication.",
+            "The legacy metrics object is preserved for compatibility with existing Pulse Medallion UI.",
+            "AffiliateCampaign records are presented publicly as Opportunities."
+        ]
     }
 
 
