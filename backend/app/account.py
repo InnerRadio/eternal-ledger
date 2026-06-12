@@ -2269,3 +2269,391 @@ def account_creator_dashboard(
         ]
     }
 
+
+@router.get("/rescue")
+def account_rescue_dashboard(
+    current_user: dict = Depends(require_active_account),
+    db: Session = Depends(get_db)
+):
+    user_id = current_user.get("user_id")
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return {
+            "module": "Rescue Dashboard",
+            "status": "error",
+            "message": "User not found."
+        }
+
+    account_role = user.role or "free"
+    has_rescue_access = account_role in ["rescue", "admin", "super_admin"]
+
+    memorials = db.query(Memorial).filter(
+        Memorial.created_by_user_id == user.id
+    ).order_by(Memorial.id.desc()).all()
+
+    contributions = db.query(Contribution).filter(
+        Contribution.created_by_user_id == user.id
+    ).order_by(Contribution.id.desc()).all()
+
+    media_assets = db.query(MediaAsset).filter(
+        MediaAsset.uploaded_by_user_id == user.id
+    ).order_by(MediaAsset.id.desc()).all()
+
+    campaigns = db.query(AffiliateCampaign).filter(
+        AffiliateCampaign.status == "active"
+    ).order_by(AffiliateCampaign.created_at.desc()).all()
+
+    enrollments = db.query(AffiliateCampaignEnrollment).filter(
+        AffiliateCampaignEnrollment.user_id == user.id
+    ).order_by(AffiliateCampaignEnrollment.joined_at.desc()).all()
+
+    enrollment_by_campaign = {
+        enrollment.campaign_id: enrollment
+        for enrollment in enrollments
+    }
+
+    clicks = db.query(AffiliateClick).filter(
+        AffiliateClick.referral_code == user.referral_code
+    ).order_by(AffiliateClick.created_at.desc()).all() if user.referral_code else []
+
+    conversions = db.query(AffiliateConversion).filter(
+        AffiliateConversion.referral_code == user.referral_code
+    ).order_by(AffiliateConversion.created_at.desc()).all() if user.referral_code else []
+
+    commissions = db.query(AffiliateCommission).filter(
+        AffiliateCommission.referral_code == user.referral_code
+    ).order_by(AffiliateCommission.created_at.desc()).all() if user.referral_code else []
+
+    organization_memberships = db.query(OrganizationMember).filter(
+        OrganizationMember.user_id == user.id,
+        OrganizationMember.status == "active"
+    ).all()
+
+    organization_ids = [
+        membership.organization_id
+        for membership in organization_memberships
+    ]
+
+    organizations = db.query(PartnerOrganization).filter(
+        PartnerOrganization.id.in_(organization_ids)
+    ).all() if organization_ids else []
+
+    organization_by_id = {
+        organization.id: organization
+        for organization in organizations
+    }
+
+    active_organizations = []
+    rescue_organizations = []
+
+    for membership in organization_memberships:
+        organization = organization_by_id.get(membership.organization_id)
+
+        if not organization:
+            continue
+
+        record = {
+            "organization": {
+                "id": organization.id,
+                "organization_name": organization.organization_name,
+                "organization_type": organization.organization_type,
+                "project": organization.project,
+                "status": organization.status,
+            },
+            "membership": {
+                "id": membership.id,
+                "role": membership.role,
+                "status": membership.status,
+                "created_at": membership.created_at,
+            }
+        }
+
+        active_organizations.append(record)
+
+        org_type = (organization.organization_type or "").lower()
+        member_role = (membership.role or "").lower()
+
+        if "rescue" in org_type or "rescue" in member_role:
+            rescue_organizations.append(record)
+
+    total_commission_cents = sum(
+        commission.amount_cents or 0
+        for commission in commissions
+    )
+
+    paid_commission_cents = sum(
+        commission.amount_cents or 0
+        for commission in commissions
+        if commission.status == "paid"
+    )
+
+    outstanding_commission_cents = sum(
+        commission.amount_cents or 0
+        for commission in commissions
+        if commission.status in ["pending", "approved", "payable"]
+    )
+
+    joined_campaign_ids = [
+        enrollment.campaign_id
+        for enrollment in enrollments
+    ]
+
+    reviewed_memorials = [
+        memorial
+        for memorial in memorials
+        if memorial.status in ["reviewed", "approved", "published"]
+    ]
+
+    submitted_memorials = [
+        memorial
+        for memorial in memorials
+        if memorial.status in ["submitted", "reviewed", "approved", "published"]
+    ]
+
+    submitted_contributions = [
+        contribution
+        for contribution in contributions
+        if contribution.status in ["submitted", "reviewed", "approved", "published"]
+    ]
+
+    rescue_leaderboard_score = (
+        (len(rescue_organizations) * 30)
+        + (len(reviewed_memorials) * 20)
+        + (len(submitted_memorials) * 10)
+        + (len(submitted_contributions) * 5)
+        + (len(media_assets) * 2)
+        + (len(enrollments) * 15)
+        + (len(conversions) * 10)
+        + len(clicks)
+        + int(total_commission_cents / 100)
+    )
+
+    locked_features = [
+        {
+            "key": "adoption_management",
+            "label": "Adoption Management",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Rescue Operations"
+        },
+        {
+            "key": "foster_management",
+            "label": "Foster Management",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Foster Network Tools"
+        },
+        {
+            "key": "intake_tracking",
+            "label": "Intake Tracking",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Animal Intake Module"
+        },
+        {
+            "key": "rescue_verification",
+            "label": "Rescue Verification",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Verified Rescue Identity"
+        },
+        {
+            "key": "donation_campaigns",
+            "label": "Donation Campaigns",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Rescue Fundraising"
+        },
+        {
+            "key": "xrpl_rescue_identity",
+            "label": "XRPL Rescue Identity",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "XRPL Verification Layer"
+        }
+    ]
+
+    return {
+        "module": "Rescue Dashboard",
+        "status": "active" if has_rescue_access else "locked",
+        "version": "v28-rescue-dashboard",
+        "access": {
+            "enabled": has_rescue_access,
+            "role": account_role,
+            "upgrade_path": None if has_rescue_access else "Apply for rescue organization access."
+        },
+        "identity": {
+            "user_id": user.id,
+            "email": user.email,
+            "role": account_role,
+            "status": user.status,
+            "affiliate_id": user.affiliate_id,
+            "referral_code": user.referral_code,
+            "referring_affiliate_id": user.referring_affiliate_id,
+        },
+        "rescue_profile": {
+            "rescue_id": f"rescue-{user.id}",
+            "rescue_type": account_role if account_role == "rescue" else "unverified",
+            "rescue_status": "active" if has_rescue_access else "locked",
+            "public_profile_status": "pending",
+            "verification_status": "pending",
+            "organization_count": len(rescue_organizations)
+        },
+        "summary": {
+            "memorials": {
+                "total": len(memorials),
+                "submitted": len(submitted_memorials),
+                "reviewed_or_published": len(reviewed_memorials),
+                "by_status": status_counts(memorials)
+            },
+            "contributions": {
+                "total": len(contributions),
+                "submitted": len(submitted_contributions),
+                "by_status": status_counts(contributions)
+            },
+            "media_assets": {
+                "total": len(media_assets),
+                "by_status": status_counts(media_assets),
+                "quota": account_media_quota(db=db, user_id=user.id, role=account_role),
+            },
+            "opportunities": {
+                "available": len(campaigns),
+                "joined": len(enrollments),
+            },
+            "organizations": {
+                "total": len(active_organizations),
+                "rescue_related": len(rescue_organizations),
+            },
+            "affiliate_attribution": {
+                "clicks": len(clicks),
+                "conversions": {
+                    "total": len(conversions),
+                    "by_status": summarize_by_status(conversions),
+                },
+                "commissions": {
+                    "total": len(commissions),
+                    "by_status": summarize_by_status(commissions, amount_field="amount_cents"),
+                    "total_commission_cents": total_commission_cents,
+                    "paid_commission_cents": paid_commission_cents,
+                    "outstanding_commission_cents": outstanding_commission_cents,
+                }
+            },
+            "leaderboard": {
+                "score": rescue_leaderboard_score,
+                "rank_scope": "rescue-platform",
+                "rank": None,
+                "status": "scoring_active",
+                "note": "Rank will be calculated globally when rescue leaderboard aggregation is enabled."
+            }
+        },
+        "leaderboard": {
+            "score": rescue_leaderboard_score,
+            "components": {
+                "rescue_organizations": len(rescue_organizations),
+                "reviewed_memorials": len(reviewed_memorials),
+                "submitted_memorials": len(submitted_memorials),
+                "submitted_contributions": len(submitted_contributions),
+                "media_assets": len(media_assets),
+                "campaign_enrollments": len(enrollments),
+                "conversions": len(conversions),
+                "clicks": len(clicks),
+                "commission_points": int(total_commission_cents / 100),
+            },
+            "formula": {
+                "rescue_organization": 30,
+                "reviewed_memorial": 20,
+                "submitted_memorial": 10,
+                "submitted_contribution": 5,
+                "media_asset": 2,
+                "campaign_enrollment": 15,
+                "conversion": 10,
+                "click": 1,
+                "commission_point": "1 point per dollar"
+            }
+        },
+        "opportunities": {
+            "available": [
+                serialize_account_campaign(
+                    campaign,
+                    enrollment_by_campaign.get(campaign.campaign_id)
+                )
+                for campaign in campaigns[:10]
+            ],
+            "joined_campaign_ids": joined_campaign_ids
+        },
+        "organizations": {
+            "all": active_organizations,
+            "rescue_related": rescue_organizations
+        },
+        "recent": {
+            "memorials": [
+                {
+                    "id": memorial.id,
+                    "companion_name": memorial.companion_name,
+                    "status": memorial.status,
+                    "created_by_user_id": memorial.created_by_user_id,
+                    "created_at": memorial.created_at,
+                }
+                for memorial in memorials[:10]
+            ],
+            "contributions": [
+                serialize_contribution(contribution)
+                for contribution in contributions[:10]
+            ],
+            "media_assets": [
+                serialize_media(asset)
+                for asset in media_assets[:10]
+            ],
+            "conversions": [
+                serialize_affiliate_conversion(conversion)
+                for conversion in conversions[:10]
+            ],
+            "commissions": [
+                serialize_affiliate_commission(commission)
+                for commission in commissions[:10]
+            ]
+        },
+        "features": [
+            {
+                "key": "rescue_dashboard",
+                "label": "Rescue Dashboard",
+                "enabled": has_rescue_access,
+                "status": "enabled" if has_rescue_access else "locked",
+                "upgrade_path": None if has_rescue_access else "Rescue access required."
+            },
+            {
+                "key": "rescue_media_library",
+                "label": "Rescue Media Library",
+                "enabled": True,
+                "status": "enabled",
+                "upgrade_path": None
+            },
+            {
+                "key": "rescue_opportunities",
+                "label": "Rescue Opportunities",
+                "enabled": True,
+                "status": "enabled",
+                "upgrade_path": None
+            },
+            {
+                "key": "rescue_leaderboard",
+                "label": "Rescue Leaderboard",
+                "enabled": True,
+                "status": "enabled",
+                "upgrade_path": None
+            },
+            *locked_features
+        ],
+        "quick_actions": [
+            {"key": "view_member_dashboard", "label": "View Member Dashboard", "method": "GET", "endpoint": "/account/member"},
+            {"key": "view_media", "label": "View Media Library", "method": "GET", "endpoint": "/account/media"},
+            {"key": "upload_media", "label": "Upload Media", "method": "POST", "endpoint": "/account/media/upload"},
+            {"key": "view_opportunities", "label": "View Opportunities", "method": "GET", "endpoint": "/account/opportunities"},
+            {"key": "view_my_campaigns", "label": "View My Campaigns", "method": "GET", "endpoint": "/account/opportunities/my-campaigns"},
+            {"key": "view_affiliate_dashboard", "label": "View Affiliate Dashboard", "method": "GET", "endpoint": "/account/affiliate"},
+            {"key": "view_organizations", "label": "View Organizations", "method": "GET", "endpoint": "/account/organization"},
+        ]
+    }
+
