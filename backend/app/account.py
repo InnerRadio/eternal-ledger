@@ -1924,3 +1924,348 @@ def account_contributions(
             for contribution in records
         ]
     }
+
+
+@router.get("/creator")
+def account_creator_dashboard(
+    current_user: dict = Depends(require_active_account),
+    db: Session = Depends(get_db)
+):
+    user_id = current_user.get("user_id")
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return {
+            "module": "Creator Dashboard",
+            "status": "error",
+            "message": "User not found."
+        }
+
+    account_role = user.role or "free"
+    has_creator_access = account_role in ["creator", "admin", "super_admin"]
+
+    memorials = db.query(Memorial).filter(
+        Memorial.created_by_user_id == user.id
+    ).order_by(Memorial.id.desc()).all()
+
+    contributions = db.query(Contribution).filter(
+        Contribution.created_by_user_id == user.id
+    ).order_by(Contribution.id.desc()).all()
+
+    media_assets = db.query(MediaAsset).filter(
+        MediaAsset.uploaded_by_user_id == user.id
+    ).order_by(MediaAsset.id.desc()).all()
+
+    campaigns = db.query(AffiliateCampaign).filter(
+        AffiliateCampaign.status == "active"
+    ).order_by(AffiliateCampaign.created_at.desc()).all()
+
+    enrollments = db.query(AffiliateCampaignEnrollment).filter(
+        AffiliateCampaignEnrollment.user_id == user.id
+    ).order_by(AffiliateCampaignEnrollment.joined_at.desc()).all()
+
+    enrollment_by_campaign = {
+        enrollment.campaign_id: enrollment
+        for enrollment in enrollments
+    }
+
+    clicks = db.query(AffiliateClick).filter(
+        AffiliateClick.referral_code == user.referral_code
+    ).order_by(AffiliateClick.created_at.desc()).all() if user.referral_code else []
+
+    conversions = db.query(AffiliateConversion).filter(
+        AffiliateConversion.referral_code == user.referral_code
+    ).order_by(AffiliateConversion.created_at.desc()).all() if user.referral_code else []
+
+    commissions = db.query(AffiliateCommission).filter(
+        AffiliateCommission.referral_code == user.referral_code
+    ).order_by(AffiliateCommission.created_at.desc()).all() if user.referral_code else []
+
+    organization_memberships = db.query(OrganizationMember).filter(
+        OrganizationMember.user_id == user.id,
+        OrganizationMember.status == "active"
+    ).all()
+
+    organization_ids = [
+        membership.organization_id
+        for membership in organization_memberships
+    ]
+
+    organizations = db.query(PartnerOrganization).filter(
+        PartnerOrganization.id.in_(organization_ids)
+    ).all() if organization_ids else []
+
+    organization_by_id = {
+        organization.id: organization
+        for organization in organizations
+    }
+
+    active_organizations = []
+
+    for membership in organization_memberships:
+        organization = organization_by_id.get(membership.organization_id)
+
+        if not organization:
+            continue
+
+        active_organizations.append({
+            "organization": {
+                "id": organization.id,
+                "organization_name": organization.organization_name,
+                "organization_type": organization.organization_type,
+                "project": organization.project,
+                "status": organization.status,
+            },
+            "membership": {
+                "id": membership.id,
+                "role": membership.role,
+                "status": membership.status,
+                "created_at": membership.created_at,
+            }
+        })
+
+    total_commission_cents = sum(
+        commission.amount_cents or 0
+        for commission in commissions
+    )
+
+    paid_commission_cents = sum(
+        commission.amount_cents or 0
+        for commission in commissions
+        if commission.status == "paid"
+    )
+
+    outstanding_commission_cents = sum(
+        commission.amount_cents or 0
+        for commission in commissions
+        if commission.status in ["pending", "approved", "payable"]
+    )
+
+    joined_campaign_ids = [
+        enrollment.campaign_id
+        for enrollment in enrollments
+    ]
+
+    leaderboard_score = (
+        len(clicks)
+        + (len(conversions) * 10)
+        + (len(enrollments) * 15)
+        + (len(memorials) * 5)
+        + (len(contributions) * 3)
+        + (len(media_assets) * 2)
+        + (len(active_organizations) * 20)
+        + int(total_commission_cents / 100)
+    )
+
+    locked_features = [
+        {
+            "key": "creator_store",
+            "label": "Creator Store",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Creator Commerce"
+        },
+        {
+            "key": "creator_subscriptions",
+            "label": "Creator Subscriptions",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Creator Memberships"
+        },
+        {
+            "key": "creator_marketplace",
+            "label": "Creator Marketplace",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Marketplace Access"
+        },
+        {
+            "key": "creator_sponsorships",
+            "label": "Creator Sponsorships",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Campaign Sponsorship Tools"
+        },
+        {
+            "key": "creator_verification",
+            "label": "Creator Verification",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Verified Creator Identity"
+        },
+        {
+            "key": "xrpl_creator_identity",
+            "label": "XRPL Creator Identity",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "XRPL Verification Layer"
+        }
+    ]
+
+    return {
+        "module": "Creator Dashboard",
+        "status": "active" if has_creator_access else "locked",
+        "version": "v27-creator-dashboard",
+        "access": {
+            "enabled": has_creator_access,
+            "role": account_role,
+            "upgrade_path": None if has_creator_access else "Upgrade to Creator access."
+        },
+        "identity": {
+            "user_id": user.id,
+            "email": user.email,
+            "role": account_role,
+            "status": user.status,
+            "affiliate_id": user.affiliate_id,
+            "referral_code": user.referral_code,
+            "referring_affiliate_id": user.referring_affiliate_id,
+        },
+        "creator_profile": {
+            "creator_id": f"creator-{user.id}",
+            "creator_type": account_role if account_role == "creator" else "unverified",
+            "creator_status": "active" if has_creator_access else "locked",
+            "public_profile_status": "pending",
+            "portfolio_status": "pending"
+        },
+        "summary": {
+            "memorials": {"total": len(memorials), "by_status": status_counts(memorials)},
+            "contributions": {"total": len(contributions), "by_status": status_counts(contributions)},
+            "media_assets": {
+                "total": len(media_assets),
+                "by_status": status_counts(media_assets),
+                "quota": account_media_quota(db=db, user_id=user.id, role=account_role),
+            },
+            "opportunities": {
+                "available": len(campaigns),
+                "joined": len(enrollments),
+            },
+            "organizations": {
+                "total": len(active_organizations),
+            },
+            "affiliate_attribution": {
+                "clicks": len(clicks),
+                "conversions": {
+                    "total": len(conversions),
+                    "by_status": summarize_by_status(conversions),
+                },
+                "commissions": {
+                    "total": len(commissions),
+                    "by_status": summarize_by_status(commissions, amount_field="amount_cents"),
+                    "total_commission_cents": total_commission_cents,
+                    "paid_commission_cents": paid_commission_cents,
+                    "outstanding_commission_cents": outstanding_commission_cents,
+                }
+            },
+            "leaderboard": {
+                "score": leaderboard_score,
+                "rank_scope": "creator-platform",
+                "rank": None,
+                "status": "scoring_active",
+                "note": "Rank will be calculated globally when leaderboard aggregation is enabled."
+            }
+        },
+        "leaderboard": {
+            "score": leaderboard_score,
+            "components": {
+                "clicks": len(clicks),
+                "conversions": len(conversions),
+                "campaign_enrollments": len(enrollments),
+                "memorials": len(memorials),
+                "contributions": len(contributions),
+                "media_assets": len(media_assets),
+                "organizations": len(active_organizations),
+                "commission_points": int(total_commission_cents / 100),
+            },
+            "formula": {
+                "click": 1,
+                "conversion": 10,
+                "campaign_enrollment": 15,
+                "memorial": 5,
+                "contribution": 3,
+                "media_asset": 2,
+                "organization": 20,
+                "commission_point": "1 point per dollar"
+            }
+        },
+        "opportunities": {
+            "available": [
+                serialize_account_campaign(
+                    campaign,
+                    enrollment_by_campaign.get(campaign.campaign_id)
+                )
+                for campaign in campaigns[:10]
+            ],
+            "joined_campaign_ids": joined_campaign_ids
+        },
+        "organizations": active_organizations,
+        "recent": {
+            "memorials": [
+                {
+                    "id": memorial.id,
+                    "companion_name": memorial.companion_name,
+                    "status": memorial.status,
+                    "created_by_user_id": memorial.created_by_user_id,
+                    "created_at": memorial.created_at,
+                }
+                for memorial in memorials[:10]
+            ],
+            "contributions": [
+                serialize_contribution(contribution)
+                for contribution in contributions[:10]
+            ],
+            "media_assets": [
+                serialize_media(asset)
+                for asset in media_assets[:10]
+            ],
+            "conversions": [
+                serialize_affiliate_conversion(conversion)
+                for conversion in conversions[:10]
+            ],
+            "commissions": [
+                serialize_affiliate_commission(commission)
+                for commission in commissions[:10]
+            ]
+        },
+        "features": [
+            {
+                "key": "creator_dashboard",
+                "label": "Creator Dashboard",
+                "enabled": has_creator_access,
+                "status": "enabled" if has_creator_access else "locked",
+                "upgrade_path": None if has_creator_access else "Creator access required."
+            },
+            {
+                "key": "creator_media_library",
+                "label": "Creator Media Library",
+                "enabled": True,
+                "status": "enabled",
+                "upgrade_path": None
+            },
+            {
+                "key": "creator_opportunities",
+                "label": "Creator Opportunities",
+                "enabled": True,
+                "status": "enabled",
+                "upgrade_path": None
+            },
+            {
+                "key": "creator_leaderboard",
+                "label": "Creator Leaderboard",
+                "enabled": True,
+                "status": "enabled",
+                "upgrade_path": None
+            },
+            *locked_features
+        ],
+        "quick_actions": [
+            {"key": "view_member_dashboard", "label": "View Member Dashboard", "method": "GET", "endpoint": "/account/member"},
+            {"key": "view_media", "label": "View Media Library", "method": "GET", "endpoint": "/account/media"},
+            {"key": "upload_media", "label": "Upload Media", "method": "POST", "endpoint": "/account/media/upload"},
+            {"key": "view_opportunities", "label": "View Opportunities", "method": "GET", "endpoint": "/account/opportunities"},
+            {"key": "view_my_campaigns", "label": "View My Campaigns", "method": "GET", "endpoint": "/account/opportunities/my-campaigns"},
+            {"key": "view_affiliate_dashboard", "label": "View Affiliate Dashboard", "method": "GET", "endpoint": "/account/affiliate"},
+            {"key": "view_organizations", "label": "View Organizations", "method": "GET", "endpoint": "/account/organization"},
+        ]
+    }
+
