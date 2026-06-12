@@ -582,14 +582,213 @@ def account_dashboard(
 ):
     user_id = current_user.get("user_id")
 
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return {
+            "module": "Account Dashboard",
+            "status": "error",
+            "message": "User not found."
+        }
+
     memorials = db.query(Memorial).filter(Memorial.created_by_user_id == user_id).all()
     contributions = db.query(Contribution).filter(Contribution.created_by_user_id == user_id).all()
     media_assets = db.query(MediaAsset).filter(MediaAsset.uploaded_by_user_id == user_id).all()
 
+    organization_memberships = db.query(OrganizationMember).filter(
+        OrganizationMember.user_id == user.id,
+        OrganizationMember.status == "active"
+    ).all()
+
+    organization_ids = [
+        membership.organization_id
+        for membership in organization_memberships
+    ]
+
+    organizations = db.query(PartnerOrganization).filter(
+        PartnerOrganization.id.in_(organization_ids)
+    ).all() if organization_ids else []
+
+    organization_by_id = {
+        organization.id: organization
+        for organization in organizations
+    }
+
+    active_organizations = []
+
+    for membership in organization_memberships:
+        organization = organization_by_id.get(membership.organization_id)
+
+        if not organization:
+            continue
+
+        active_organizations.append({
+            "organization": {
+                "id": organization.id,
+                "organization_name": organization.organization_name,
+                "organization_type": organization.organization_type,
+                "project": organization.project,
+                "status": organization.status,
+            },
+            "membership": {
+                "id": membership.id,
+                "role": membership.role,
+                "status": membership.status,
+                "created_at": membership.created_at,
+            }
+        })
+
+    account_role = user.role or "free"
+    organization_roles = [
+        membership.role
+        for membership in organization_memberships
+        if membership.role
+    ]
+
+    has_creator_access = account_role in ["creator", "admin", "super_admin"]
+    has_rescue_access = account_role in ["rescue", "admin", "super_admin"]
+    has_partner_access = len(active_organizations) > 0 or account_role in ["admin", "super_admin"]
+    has_affiliate_access = bool(user.affiliate_id or user.referral_code)
+    has_admin_access = account_role in ["admin", "super_admin"]
+
+    dashboard_access = {
+        "member": True,
+        "affiliate": has_affiliate_access,
+        "creator": has_creator_access,
+        "rescue": has_rescue_access,
+        "partner": has_partner_access,
+        "admin": has_admin_access,
+    }
+
+    all_features = [
+        {
+            "key": "memorials",
+            "label": "Memorials",
+            "enabled": True,
+            "reason": "Available to all active accounts."
+        },
+        {
+            "key": "contributions",
+            "label": "Contributions",
+            "enabled": True,
+            "reason": "Available to all active accounts."
+        },
+        {
+            "key": "media_library",
+            "label": "Media Library",
+            "enabled": True,
+            "reason": "Available within account tier limits."
+        },
+        {
+            "key": "affiliate_tools",
+            "label": "Affiliate Tools",
+            "enabled": has_affiliate_access,
+            "reason": "Available after account verification and affiliate identity assignment."
+        },
+        {
+            "key": "creator_tools",
+            "label": "Creator Tools",
+            "enabled": has_creator_access,
+            "reason": "Requires creator access or upgrade."
+        },
+        {
+            "key": "rescue_tools",
+            "label": "Rescue Tools",
+            "enabled": has_rescue_access,
+            "reason": "Requires rescue access or rescue organization approval."
+        },
+        {
+            "key": "partner_tools",
+            "label": "Partner Tools",
+            "enabled": has_partner_access,
+            "reason": "Requires active organization relationship."
+        },
+        {
+            "key": "xrpl_verification",
+            "label": "XRPL Verification",
+            "enabled": False,
+            "reason": "Planned XRPL integration module."
+        },
+        {
+            "key": "white_label_modules",
+            "label": "White Label Modules",
+            "enabled": has_partner_access or has_admin_access,
+            "reason": "Requires partner, organization, or admin access."
+        },
+    ]
+
+    enabled_features = [
+        feature
+        for feature in all_features
+        if feature["enabled"]
+    ]
+
+    locked_features = [
+        feature
+        for feature in all_features
+        if not feature["enabled"]
+    ]
+
+    upgrade_paths = [
+        {
+            "key": "creator_upgrade",
+            "label": "Creator Dashboard",
+            "target_dashboard": "creator",
+            "available": not has_creator_access,
+            "message": "Upgrade or apply for creator access."
+        },
+        {
+            "key": "rescue_upgrade",
+            "label": "Rescue Dashboard",
+            "target_dashboard": "rescue",
+            "available": not has_rescue_access,
+            "message": "Apply for rescue organization access."
+        },
+        {
+            "key": "partner_upgrade",
+            "label": "Partner Dashboard",
+            "target_dashboard": "partner",
+            "available": not has_partner_access,
+            "message": "Connect this account to a partner organization."
+        },
+        {
+            "key": "xrpl_upgrade",
+            "label": "XRPL Verification",
+            "target_dashboard": "xrpl",
+            "available": True,
+            "message": "XRPL verification will be enabled in a future platform module."
+        },
+    ]
+
     return {
         "module": "Account Dashboard",
         "status": "active",
-        "user_id": user_id,
+        "version": "v25-dashboard-foundation",
+        "identity": {
+            "user_id": user.id,
+            "email": user.email,
+            "role": account_role,
+            "status": user.status,
+            "affiliate_id": user.affiliate_id,
+            "referral_code": user.referral_code,
+            "referring_affiliate_id": user.referring_affiliate_id,
+        },
+        "dashboard_access": dashboard_access,
+        "organizations": {
+            "count": len(active_organizations),
+            "records": active_organizations,
+            "roles": organization_roles,
+        },
+        "features": {
+            "available": all_features,
+            "enabled": enabled_features,
+            "locked": locked_features,
+        },
+        "upgrade_paths": [
+            upgrade_path
+            for upgrade_path in upgrade_paths
+            if upgrade_path["available"]
+        ],
         "summary": {
             "memorials": {
                 "total": len(memorials),
