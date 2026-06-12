@@ -2657,3 +2657,378 @@ def account_rescue_dashboard(
         ]
     }
 
+
+@router.get("/partner")
+def account_partner_dashboard(
+    current_user: dict = Depends(require_active_account),
+    db: Session = Depends(get_db)
+):
+    user_id = current_user.get("user_id")
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return {
+            "module": "Partner Dashboard",
+            "status": "error",
+            "message": "User not found."
+        }
+
+    account_role = user.role or "free"
+
+    memberships = db.query(OrganizationMember).filter(
+        OrganizationMember.user_id == user.id,
+        OrganizationMember.status == "active"
+    ).all()
+
+    organization_ids = [
+        membership.organization_id
+        for membership in memberships
+    ]
+
+    organizations = db.query(PartnerOrganization).filter(
+        PartnerOrganization.id.in_(organization_ids)
+    ).all() if organization_ids else []
+
+    membership_by_org_id = {
+        membership.organization_id: membership
+        for membership in memberships
+    }
+
+    has_partner_access = len(organizations) > 0 or account_role in ["admin", "super_admin"]
+
+    partner_records = []
+    creator_relationships = []
+    rescue_relationships = []
+
+    total_campaigns = 0
+    total_enrollments = 0
+    total_conversions = 0
+    total_commissions = 0
+    total_clicks = 0
+    total_commission_cents = 0
+    paid_commission_cents = 0
+    outstanding_commission_cents = 0
+
+    for org in organizations:
+        membership = membership_by_org_id.get(org.id)
+
+        campaigns = db.query(AffiliateCampaign).filter(
+            AffiliateCampaign.sponsor_name == org.organization_name
+        ).order_by(AffiliateCampaign.created_at.desc()).all()
+
+        campaign_ids = [
+            campaign.campaign_id
+            for campaign in campaigns
+        ]
+
+        enrollments = db.query(AffiliateCampaignEnrollment).filter(
+            AffiliateCampaignEnrollment.campaign_id.in_(campaign_ids)
+        ).all() if campaign_ids else []
+
+        referral_codes = [
+            enrollment.referral_code
+            for enrollment in enrollments
+            if enrollment.referral_code
+        ]
+
+        conversions = db.query(AffiliateConversion).filter(
+            AffiliateConversion.referral_code.in_(referral_codes)
+        ).all() if referral_codes else []
+
+        commissions = db.query(AffiliateCommission).filter(
+            AffiliateCommission.referral_code.in_(referral_codes)
+        ).all() if referral_codes else []
+
+        clicks = db.query(AffiliateClick).filter(
+            AffiliateClick.campaign_id.in_(campaign_ids)
+        ).all() if campaign_ids else []
+
+        org_total_commission_cents = sum(
+            commission.amount_cents or 0
+            for commission in commissions
+        )
+
+        org_paid_commission_cents = sum(
+            commission.amount_cents or 0
+            for commission in commissions
+            if commission.status == "paid"
+        )
+
+        org_outstanding_commission_cents = sum(
+            commission.amount_cents or 0
+            for commission in commissions
+            if commission.status in ["pending", "approved", "payable"]
+        )
+
+        total_campaigns += len(campaigns)
+        total_enrollments += len(enrollments)
+        total_conversions += len(conversions)
+        total_commissions += len(commissions)
+        total_clicks += len(clicks)
+        total_commission_cents += org_total_commission_cents
+        paid_commission_cents += org_paid_commission_cents
+        outstanding_commission_cents += org_outstanding_commission_cents
+
+        org_type = (org.organization_type or "").lower()
+        member_role = (membership.role or "").lower() if membership else ""
+
+        if "creator" in org_type or "creator" in member_role:
+            creator_relationships.append({
+                "organization_id": org.id,
+                "organization_name": org.organization_name,
+                "organization_type": org.organization_type,
+                "membership_role": membership.role if membership else None
+            })
+
+        if "rescue" in org_type or "rescue" in member_role:
+            rescue_relationships.append({
+                "organization_id": org.id,
+                "organization_name": org.organization_name,
+                "organization_type": org.organization_type,
+                "membership_role": membership.role if membership else None
+            })
+
+        partner_records.append({
+            "organization": {
+                "id": org.id,
+                "organization_name": org.organization_name,
+                "organization_type": org.organization_type,
+                "project": org.project,
+                "contact_name": org.contact_name,
+                "contact_email": org.contact_email,
+                "website_url": org.website_url,
+                "location": org.location,
+                "status": org.status,
+                "notes": org.notes,
+                "created_at": org.created_at,
+            },
+            "membership": {
+                "id": membership.id if membership else None,
+                "role": membership.role if membership else None,
+                "status": membership.status if membership else None,
+                "created_at": membership.created_at if membership else None,
+            },
+            "summary": {
+                "campaigns": {
+                    "total": len(campaigns),
+                    "by_status": summarize_by_status(campaigns),
+                },
+                "enrollments": {
+                    "total": len(enrollments),
+                    "by_status": summarize_by_status(enrollments),
+                },
+                "conversions": {
+                    "total": len(conversions),
+                    "by_status": summarize_by_status(conversions),
+                },
+                "clicks": {
+                    "total": len(clicks),
+                },
+                "commissions": {
+                    "total": len(commissions),
+                    "by_status": summarize_by_status(commissions, amount_field="amount_cents"),
+                    "total_commission_cents": org_total_commission_cents,
+                    "paid_commission_cents": org_paid_commission_cents,
+                    "outstanding_commission_cents": org_outstanding_commission_cents,
+                },
+            },
+            "recent": {
+                "campaigns": [
+                    serialize_account_campaign(campaign)
+                    for campaign in campaigns[:10]
+                ],
+                "enrollments": [
+                    serialize_account_enrollment(enrollment)
+                    for enrollment in enrollments[:10]
+                ],
+                "conversions": [
+                    serialize_affiliate_conversion(conversion)
+                    for conversion in conversions[:10]
+                ],
+                "commissions": [
+                    serialize_affiliate_commission(commission)
+                    for commission in commissions[:10]
+                ],
+            }
+        })
+
+    partner_leaderboard_score = (
+        (len(organizations) * 40)
+        + (total_campaigns * 25)
+        + (total_enrollments * 15)
+        + (total_conversions * 10)
+        + total_clicks
+        + (len(creator_relationships) * 20)
+        + (len(rescue_relationships) * 20)
+        + int(total_commission_cents / 100)
+    )
+
+    locked_features = [
+        {
+            "key": "partner_white_label_console",
+            "label": "White Label Console",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "White Label Partner Deployment"
+        },
+        {
+            "key": "partner_billing",
+            "label": "Partner Billing",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Partner Billing Module"
+        },
+        {
+            "key": "partner_team_management",
+            "label": "Team Management",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Organization Team Tools"
+        },
+        {
+            "key": "partner_creator_network",
+            "label": "Creator Network",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Creator Relationship Management"
+        },
+        {
+            "key": "partner_rescue_network",
+            "label": "Rescue Network",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "Rescue Relationship Management"
+        },
+        {
+            "key": "xrpl_partner_identity",
+            "label": "XRPL Partner Identity",
+            "enabled": False,
+            "status": "locked",
+            "upgrade_path": "XRPL Verification Layer"
+        }
+    ]
+
+    return {
+        "module": "Partner Dashboard",
+        "status": "active" if has_partner_access else "locked",
+        "version": "v29-partner-dashboard",
+        "access": {
+            "enabled": has_partner_access,
+            "role": account_role,
+            "upgrade_path": None if has_partner_access else "Connect this account to a partner organization."
+        },
+        "identity": {
+            "user_id": user.id,
+            "email": user.email,
+            "role": account_role,
+            "status": user.status,
+            "affiliate_id": user.affiliate_id,
+            "referral_code": user.referral_code,
+            "referring_affiliate_id": user.referring_affiliate_id,
+        },
+        "partner_profile": {
+            "partner_id": f"partner-{user.id}",
+            "partner_status": "active" if has_partner_access else "locked",
+            "organization_count": len(organizations),
+            "public_profile_status": "pending",
+            "verification_status": "pending"
+        },
+        "summary": {
+            "organizations": {
+                "total": len(organizations),
+                "creator_relationships": len(creator_relationships),
+                "rescue_relationships": len(rescue_relationships),
+            },
+            "campaigns": {
+                "total": total_campaigns,
+            },
+            "enrollments": {
+                "total": total_enrollments,
+            },
+            "conversions": {
+                "total": total_conversions,
+            },
+            "clicks": {
+                "total": total_clicks,
+            },
+            "commissions": {
+                "total": total_commissions,
+                "total_commission_cents": total_commission_cents,
+                "paid_commission_cents": paid_commission_cents,
+                "outstanding_commission_cents": outstanding_commission_cents,
+            },
+            "leaderboard": {
+                "score": partner_leaderboard_score,
+                "rank_scope": "partner-platform",
+                "rank": None,
+                "status": "scoring_active",
+                "note": "Rank will be calculated globally when partner leaderboard aggregation is enabled."
+            }
+        },
+        "leaderboard": {
+            "score": partner_leaderboard_score,
+            "components": {
+                "organizations": len(organizations),
+                "campaigns": total_campaigns,
+                "campaign_enrollments": total_enrollments,
+                "conversions": total_conversions,
+                "clicks": total_clicks,
+                "creator_relationships": len(creator_relationships),
+                "rescue_relationships": len(rescue_relationships),
+                "commission_points": int(total_commission_cents / 100),
+            },
+            "formula": {
+                "organization": 40,
+                "campaign": 25,
+                "campaign_enrollment": 15,
+                "conversion": 10,
+                "click": 1,
+                "creator_relationship": 20,
+                "rescue_relationship": 20,
+                "commission_point": "1 point per dollar"
+            }
+        },
+        "relationships": {
+            "creators": creator_relationships,
+            "rescues": rescue_relationships,
+        },
+        "organizations": {
+            "count": len(partner_records),
+            "records": partner_records,
+        },
+        "features": [
+            {
+                "key": "partner_dashboard",
+                "label": "Partner Dashboard",
+                "enabled": has_partner_access,
+                "status": "enabled" if has_partner_access else "locked",
+                "upgrade_path": None if has_partner_access else "Partner organization access required."
+            },
+            {
+                "key": "partner_organization_analytics",
+                "label": "Organization Analytics",
+                "enabled": has_partner_access,
+                "status": "enabled" if has_partner_access else "locked",
+                "upgrade_path": None if has_partner_access else "Partner organization access required."
+            },
+            {
+                "key": "partner_leaderboard",
+                "label": "Partner Leaderboard",
+                "enabled": True,
+                "status": "enabled",
+                "upgrade_path": None
+            },
+            *locked_features
+        ],
+        "quick_actions": [
+            {"key": "view_organization_dashboard", "label": "View Organization Dashboard", "method": "GET", "endpoint": "/account/organization"},
+            {"key": "view_member_dashboard", "label": "View Member Dashboard", "method": "GET", "endpoint": "/account/member"},
+            {"key": "view_creator_dashboard", "label": "View Creator Dashboard", "method": "GET", "endpoint": "/account/creator"},
+            {"key": "view_rescue_dashboard", "label": "View Rescue Dashboard", "method": "GET", "endpoint": "/account/rescue"},
+            {"key": "view_opportunities", "label": "View Opportunities", "method": "GET", "endpoint": "/account/opportunities"},
+            {"key": "view_my_campaigns", "label": "View My Campaigns", "method": "GET", "endpoint": "/account/opportunities/my-campaigns"},
+            {"key": "view_affiliate_dashboard", "label": "View Affiliate Dashboard", "method": "GET", "endpoint": "/account/affiliate"},
+        ]
+    }
+
