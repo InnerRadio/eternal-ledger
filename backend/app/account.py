@@ -149,6 +149,22 @@ def serialize_media(asset: MediaAsset):
     }
 
 
+def serialize_contribution(contribution: Contribution):
+    return {
+        "id": contribution.id,
+        "memorial_id": contribution.memorial_id,
+        "contributor_name": contribution.contributor_name,
+        "contribution_type": contribution.contribution_type,
+        "content": contribution.content,
+        "media_asset_id": contribution.media_asset_id,
+        "created_by_user_id": contribution.created_by_user_id,
+        "status": contribution.status,
+        "ipfs_cid": contribution.ipfs_cid,
+        "xrpl_tx_hash": contribution.xrpl_tx_hash,
+        "created_at": contribution.created_at,
+    }
+
+
 LOGIN_LOCKOUT_WINDOW_MINUTES = 15
 LOGIN_LOCKOUT_BAD_PASSWORD_LIMIT = 5
 
@@ -803,6 +819,172 @@ def account_dashboard(
                 "by_status": status_counts(media_assets)
             }
         }
+    }
+
+
+
+@router.get("/member")
+def account_member_dashboard(
+    current_user: dict = Depends(require_active_account),
+    db: Session = Depends(get_db)
+):
+    user_id = current_user.get("user_id")
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        return {"module": "Member Dashboard", "status": "error", "message": "User not found."}
+
+    memorials = db.query(Memorial).filter(Memorial.created_by_user_id == user_id).order_by(Memorial.id.desc()).all()
+    contributions = db.query(Contribution).filter(Contribution.created_by_user_id == user_id).order_by(Contribution.id.desc()).all()
+    media_assets = db.query(MediaAsset).filter(MediaAsset.uploaded_by_user_id == user_id).order_by(MediaAsset.id.desc()).all()
+
+    referred_users = db.query(User).filter(User.referring_affiliate_id == user.id).order_by(User.id.desc()).all()
+
+    clicks = db.query(AffiliateClick).filter(
+        AffiliateClick.referral_code == user.referral_code
+    ).order_by(AffiliateClick.created_at.desc()).all() if user.referral_code else []
+
+    conversions = db.query(AffiliateConversion).filter(
+        AffiliateConversion.referral_code == user.referral_code
+    ).order_by(AffiliateConversion.created_at.desc()).all() if user.referral_code else []
+
+    commissions = db.query(AffiliateCommission).filter(
+        AffiliateCommission.referral_code == user.referral_code
+    ).order_by(AffiliateCommission.created_at.desc()).all() if user.referral_code else []
+
+    campaigns = db.query(AffiliateCampaign).filter(
+        AffiliateCampaign.status == "active"
+    ).order_by(AffiliateCampaign.created_at.desc()).all()
+
+    enrollments = db.query(AffiliateCampaignEnrollment).filter(
+        AffiliateCampaignEnrollment.user_id == user.id
+    ).order_by(AffiliateCampaignEnrollment.joined_at.desc()).all()
+
+    campaign_by_id = {campaign.campaign_id: campaign for campaign in campaigns}
+
+    organization_memberships = db.query(OrganizationMember).filter(
+        OrganizationMember.user_id == user.id,
+        OrganizationMember.status == "active"
+    ).all()
+
+    organization_ids = [membership.organization_id for membership in organization_memberships]
+
+    organizations = db.query(PartnerOrganization).filter(
+        PartnerOrganization.id.in_(organization_ids)
+    ).all() if organization_ids else []
+
+    organization_by_id = {organization.id: organization for organization in organizations}
+
+    active_organizations = []
+
+    for membership in organization_memberships:
+        organization = organization_by_id.get(membership.organization_id)
+
+        if not organization:
+            continue
+
+        active_organizations.append({
+            "organization": {
+                "id": organization.id,
+                "organization_name": organization.organization_name,
+                "organization_type": organization.organization_type,
+                "project": organization.project,
+                "status": organization.status,
+            },
+            "membership": {
+                "id": membership.id,
+                "role": membership.role,
+                "status": membership.status,
+                "created_at": membership.created_at,
+            }
+        })
+
+    account_role = user.role or "free"
+    media_quota = account_media_quota(db=db, user_id=user.id, role=account_role)
+
+    total_commission_cents = sum(commission.amount_cents or 0 for commission in commissions)
+
+    outstanding_commission_cents = sum(
+        commission.amount_cents or 0
+        for commission in commissions
+        if commission.status in ["pending", "approved", "payable"]
+    )
+
+    return {
+        "module": "Member Dashboard",
+        "status": "active",
+        "version": "v26-member-dashboard",
+        "identity": {
+            "user_id": user.id,
+            "email": user.email,
+            "role": account_role,
+            "status": user.status,
+            "affiliate_id": user.affiliate_id,
+            "referral_code": user.referral_code,
+            "referring_affiliate_id": user.referring_affiliate_id,
+        },
+        "summary": {
+            "memorials": {"total": len(memorials), "by_status": status_counts(memorials)},
+            "contributions": {"total": len(contributions), "by_status": status_counts(contributions)},
+            "media_assets": {
+                "total": len(media_assets),
+                "by_status": status_counts(media_assets),
+                "quota": media_quota,
+            },
+            "affiliate": {
+                "referral_signups": len(referred_users),
+                "clicks": len(clicks),
+                "conversions": {
+                    "total": len(conversions),
+                    "by_status": summarize_by_status(conversions),
+                },
+                "commissions": {
+                    "total": len(commissions),
+                    "by_status": summarize_by_status(commissions, amount_field="amount_cents"),
+                    "total_commission_cents": total_commission_cents,
+                    "outstanding_commission_cents": outstanding_commission_cents,
+                }
+            },
+            "opportunities": {
+                "available_campaigns": len(campaigns),
+                "joined_campaigns": len(enrollments),
+            },
+            "organizations": {"count": len(active_organizations)}
+        },
+        "recent": {
+            "memorials": [
+                {
+                    "id": memorial.id,
+                    "companion_name": memorial.companion_name,
+                    "status": memorial.status,
+                    "project": memorial.project,
+                    "archive_type": memorial.archive_type,
+                }
+                for memorial in memorials[:10]
+            ],
+            "contributions": [serialize_contribution(contribution) for contribution in contributions[:10]],
+            "media_assets": [serialize_media(asset) for asset in media_assets[:10]],
+            "referred_users": [
+                {
+                    "id": referred_user.id,
+                    "email": referred_user.email,
+                    "role": referred_user.role,
+                    "status": referred_user.status,
+                }
+                for referred_user in referred_users[:10]
+            ],
+            "campaigns": [
+                serialize_account_enrollment(enrollment, campaign_by_id.get(enrollment.campaign_id))
+                for enrollment in enrollments[:10]
+            ],
+            "organizations": active_organizations[:10],
+        },
+        "quick_actions": [
+            {"key": "create_memorial", "label": "Create Memorial", "method": "POST", "endpoint": "/account/memorials"},
+            {"key": "upload_media", "label": "Upload Media", "method": "POST", "endpoint": "/account/media"},
+            {"key": "view_affiliate", "label": "View Affiliate Dashboard", "method": "GET", "endpoint": "/account/affiliate"},
+            {"key": "view_opportunities", "label": "View Opportunities", "method": "GET", "endpoint": "/account/opportunities"},
+        ]
     }
 
 
