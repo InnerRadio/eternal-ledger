@@ -395,6 +395,100 @@ class AccountSecurityEvent(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
+class NginxSecurityEvent(Base):
+    __tablename__ = "nginx_security_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    remote_ip = Column(String, nullable=True)
+    request_method = Column(String, nullable=True)
+    request_path = Column(Text, nullable=True)
+    status_code = Column(Integer, nullable=True)
+
+    user_agent = Column(Text, nullable=True)
+    referer = Column(Text, nullable=True)
+
+    country = Column(String, nullable=True)
+    source = Column(String, default="nginx")
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class NginxSecurityAlert(Base):
+    __tablename__ = "nginx_security_alerts"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    severity = Column(String, nullable=False)
+    alert_type = Column(String, nullable=False)
+    message = Column(Text, nullable=False)
+
+    remote_ip = Column(String, nullable=True)
+    request_path = Column(Text, nullable=True)
+
+    value = Column(Integer, nullable=True)
+    threshold = Column(Integer, nullable=True)
+
+    status = Column(String, default="open")
+    source = Column(String, default="nginx_alerts_v5")
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    reviewed_at = Column(DateTime, nullable=True)
+    resolved_at = Column(DateTime, nullable=True)
+
+
+class NginxSecurityActivation(Base):
+    __tablename__ = "nginx_security_activations"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    domain = Column(String, nullable=False)
+    config_path = Column(Text, nullable=False)
+    include_path = Column(Text, nullable=False)
+
+    status = Column(String, default="active")
+    notes = Column(Text, nullable=True)
+
+    activated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class NginxAlertSuppression(Base):
+    __tablename__ = "nginx_alert_suppressions"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    alert_type = Column(String, nullable=True)
+    request_path = Column(Text, nullable=True)
+    remote_ip = Column(String, nullable=True)
+
+    status = Column(String, default="active")
+    notes = Column(Text, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class NginxSecurityIncident(Base):
+    __tablename__ = "nginx_security_incidents"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    alert_type = Column(String, nullable=False)
+    severity = Column(String, nullable=False)
+
+    status = Column(String, default="open")
+
+    occurrences = Column(Integer, default=0)
+    first_seen = Column(DateTime, nullable=True)
+    last_seen = Column(DateTime, nullable=True)
+
+    notes = Column(Text, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    reviewed_at = Column(DateTime, nullable=True)
+    resolved_at = Column(DateTime, nullable=True)
+
+
 class RescueProfile(Base):
     __tablename__ = "rescue_profiles"
 
