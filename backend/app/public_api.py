@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
-from backend.app.models import Memorial, MediaAsset, Contribution, MetricEvent, User, AffiliateCampaign, PartnerOrganization
+from backend.app.models import Memorial, MediaAsset, Contribution, MetricEvent, User, AffiliateCampaign, PartnerOrganization, AffiliateConversion, AffiliateClick, AffiliateCommission, AffiliateCampaignEnrollment, OrganizationMember
 from backend.app.environment_themes import ENVIRONMENT_THEMES
 
 
@@ -376,6 +376,237 @@ def public_network_pulse(
         for opportunity in opportunities
     ]
 
+    clicks = db.query(AffiliateClick).all()
+    conversions = db.query(AffiliateConversion).all()
+    commissions = db.query(AffiliateCommission).all()
+    enrollments = db.query(AffiliateCampaignEnrollment).all()
+    memberships = db.query(OrganizationMember).filter(
+        OrganizationMember.status == "active"
+    ).all()
+
+    memorials_all = db.query(Memorial).all()
+    contributions_all = db.query(Contribution).all()
+    media_assets_all = db.query(MediaAsset).all()
+
+    memberships_by_user_id = {}
+    for membership in memberships:
+        memberships_by_user_id.setdefault(membership.user_id, []).append(membership)
+
+    memorials_by_user_id = {}
+    for memorial in memorials_all:
+        memorials_by_user_id.setdefault(memorial.created_by_user_id, []).append(memorial)
+
+    contributions_by_user_id = {}
+    for contribution in contributions_all:
+        contributions_by_user_id.setdefault(contribution.created_by_user_id, []).append(contribution)
+
+    media_by_user_id = {}
+    for asset in media_assets_all:
+        media_by_user_id.setdefault(asset.uploaded_by_user_id, []).append(asset)
+
+    enrollments_by_user_id = {}
+    for enrollment in enrollments:
+        enrollments_by_user_id.setdefault(enrollment.user_id, []).append(enrollment)
+
+    clicks_by_referral_code = {}
+    for click in clicks:
+        clicks_by_referral_code.setdefault(click.referral_code, []).append(click)
+
+    conversions_by_referral_code = {}
+    for conversion in conversions:
+        conversions_by_referral_code.setdefault(conversion.referral_code, []).append(conversion)
+
+    commissions_by_referral_code = {}
+    for commission in commissions:
+        commissions_by_referral_code.setdefault(commission.referral_code, []).append(commission)
+
+    creator_rankings = []
+    rescue_rankings = []
+    affiliate_rankings = []
+
+    for platform_user in users:
+        role = platform_user.role or "free"
+        user_memorials = memorials_by_user_id.get(platform_user.id, [])
+        user_contributions = contributions_by_user_id.get(platform_user.id, [])
+        user_media = media_by_user_id.get(platform_user.id, [])
+        user_enrollments = enrollments_by_user_id.get(platform_user.id, [])
+        user_clicks = clicks_by_referral_code.get(platform_user.referral_code, [])
+        user_conversions = conversions_by_referral_code.get(platform_user.referral_code, [])
+        user_commissions = commissions_by_referral_code.get(platform_user.referral_code, [])
+        user_commission_cents = sum(
+            commission.amount_cents or 0
+            for commission in user_commissions
+        )
+
+        active_orgs = memberships_by_user_id.get(platform_user.id, [])
+
+        rescue_orgs = [
+            membership
+            for membership in active_orgs
+            if "rescue" in ((membership.role or "").lower())
+        ]
+
+        creator_score = (
+            25
+            + (len([m for m in user_memorials if m.status in ["reviewed", "approved", "published"]]) * 20)
+            + (len([m for m in user_memorials if m.status in ["submitted", "reviewed", "approved", "published"]]) * 10)
+            + (len([c for c in user_contributions if c.status in ["submitted", "reviewed", "approved", "published"]]) * 5)
+            + (len(user_media) * 2)
+            + (len(user_enrollments) * 15)
+            + (len(user_conversions) * 10)
+            + len(user_clicks)
+            + int(user_commission_cents / 100)
+        )
+
+        rescue_score = (
+            25
+            + (len(rescue_orgs) * 40)
+            + (len([m for m in user_memorials if m.status in ["reviewed", "approved", "published"]]) * 20)
+            + (len([m for m in user_memorials if m.status in ["submitted", "reviewed", "approved", "published"]]) * 10)
+            + (len([c for c in user_contributions if c.status in ["submitted", "reviewed", "approved", "published"]]) * 5)
+            + (len(user_media) * 2)
+            + (len(user_enrollments) * 15)
+            + (len(user_conversions) * 10)
+            + len(user_clicks)
+            + int(user_commission_cents / 100)
+        )
+
+        affiliate_score = (
+            len(user_clicks)
+            + (len(user_conversions) * 10)
+            + (len(user_enrollments) * 15)
+            + int(user_commission_cents / 100)
+        )
+
+        public_label = platform_user.affiliate_id or "Community Member"
+
+        creator_rankings.append({
+            "label": public_label,
+            "role": role,
+            "score": creator_score,
+        })
+
+        rescue_rankings.append({
+            "label": public_label,
+            "role": role,
+            "score": rescue_score,
+        })
+
+        affiliate_rankings.append({
+            "label": public_label,
+            "role": role,
+            "score": affiliate_score,
+        })
+
+    campaigns_by_sponsor = {}
+    for campaign in opportunities:
+        campaigns_by_sponsor.setdefault(campaign.sponsor_name, []).append(campaign)
+
+    memberships_by_org_id = {}
+    for membership in memberships:
+        memberships_by_org_id.setdefault(membership.organization_id, []).append(membership)
+
+    enrollments_by_campaign = {}
+    for enrollment in enrollments:
+        enrollments_by_campaign.setdefault(enrollment.campaign_id, []).append(enrollment)
+
+    clicks_by_campaign = {}
+    for click in clicks:
+        clicks_by_campaign.setdefault(click.campaign_id, []).append(click)
+
+    partner_rankings = []
+
+    for organization in organizations:
+        org_campaigns = campaigns_by_sponsor.get(organization.organization_name, [])
+        org_campaign_ids = [
+            campaign.campaign_id
+            for campaign in org_campaigns
+        ]
+
+        org_enrollments = []
+        org_clicks = []
+
+        for campaign_id in org_campaign_ids:
+            org_enrollments.extend(enrollments_by_campaign.get(campaign_id, []))
+            org_clicks.extend(clicks_by_campaign.get(campaign_id, []))
+
+        org_referral_codes = [
+            enrollment.referral_code
+            for enrollment in org_enrollments
+            if enrollment.referral_code
+        ]
+
+        org_conversions = [
+            conversion
+            for conversion in conversions
+            if conversion.referral_code in org_referral_codes
+        ]
+
+        org_commissions = [
+            commission
+            for commission in commissions
+            if commission.referral_code in org_referral_codes
+        ]
+
+        org_memberships = memberships_by_org_id.get(organization.id, [])
+
+        creator_relationships = [
+            membership
+            for membership in org_memberships
+            if "creator" in ((membership.role or "").lower())
+        ]
+
+        rescue_relationships = [
+            membership
+            for membership in org_memberships
+            if "rescue" in ((membership.role or "").lower())
+        ]
+
+        org_commission_cents = sum(
+            commission.amount_cents or 0
+            for commission in org_commissions
+        )
+
+        partner_score = (
+            40
+            + (len(org_campaigns) * 25)
+            + (len(org_enrollments) * 15)
+            + (len(org_conversions) * 10)
+            + len(org_clicks)
+            + (len(creator_relationships) * 20)
+            + (len(rescue_relationships) * 20)
+            + int(org_commission_cents / 100)
+        )
+
+        partner_rankings.append({
+            "label": organization.organization_name,
+            "organization_type": organization.organization_type,
+            "project": organization.project,
+            "score": partner_score,
+        })
+
+    def top_public_record(records):
+        if not records:
+            return None
+
+        ordered = sorted(
+            records,
+            key=lambda item: item.get("score", 0),
+            reverse=True
+        )
+
+        record = dict(ordered[0])
+        record["rank"] = 1
+        return record
+
+    leaderboard_highlights = {
+        "top_creator": top_public_record(creator_rankings),
+        "top_rescue": top_public_record(rescue_rankings),
+        "top_partner": top_public_record(partner_rankings),
+        "top_affiliate": top_public_record(affiliate_rankings),
+        "privacy": "Public-safe highlights exclude email, user_id, referral_code, and internal organization_id."
+    }
+
     featured_opportunity = opportunity_records[0] if opportunity_records else None
 
     return {
@@ -423,6 +654,8 @@ def public_network_pulse(
             "records": opportunity_records
         },
 
+        "leaderboard_highlights": leaderboard_highlights,
+
         "pulse_layers": [
             {
                 "key": "continuity",
@@ -446,9 +679,9 @@ def public_network_pulse(
             {
                 "key": "leaderboard_highlights",
                 "label": "Leaderboard Highlights",
-                "enabled": False,
-                "locked": True,
-                "reason": "Requires public-safe leaderboard promotion layer."
+                "enabled": True,
+                "locked": False,
+                "reason": "Public-safe leaderboard highlights are available."
             },
             {
                 "key": "featured_creators",
