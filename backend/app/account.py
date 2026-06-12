@@ -3370,3 +3370,149 @@ def account_platform_leaderboard(
         ]
     }
 
+
+@router.get("/network-pulse")
+def account_network_pulse(
+    db: Session = Depends(get_db)
+):
+    users = db.query(User).all()
+
+    organizations = db.query(PartnerOrganization).filter(
+        PartnerOrganization.status == "active"
+    ).all()
+
+    memorials = db.query(Memorial).all()
+    contributions = db.query(Contribution).all()
+    media_assets = db.query(MediaAsset).all()
+
+    campaigns = db.query(AffiliateCampaign).filter(
+        AffiliateCampaign.status == "active"
+    ).order_by(AffiliateCampaign.created_at.desc()).all()
+
+    creator_count = len([
+        user for user in users
+        if (user.role or "").lower() == "creator"
+    ])
+
+    rescue_count = len([
+        user for user in users
+        if (user.role or "").lower() == "rescue"
+    ])
+
+    affiliate_count = len([
+        user for user in users
+        if user.affiliate_id or user.referral_code
+    ])
+
+    rescue_organization_count = len([
+        organization for organization in organizations
+        if "rescue" in ((organization.organization_type or "").lower())
+    ])
+
+    featured_campaign = campaigns[0] if campaigns else None
+
+    return {
+        "module": "Network Pulse",
+        "status": "active",
+        "version": "v30b-network-pulse",
+        "visibility": "public",
+        "philosophy": "The Pulse Medallion is the public-facing heartbeat of the community.",
+        "network": {
+            "members": len(users),
+            "organizations": len(organizations),
+            "creators": creator_count,
+            "rescues": rescue_count,
+            "rescue_organizations": rescue_organization_count,
+            "affiliates": affiliate_count,
+        },
+        "activity": {
+            "memorials": len(memorials),
+            "contributions": len(contributions),
+            "media_assets": len(media_assets),
+            "active_campaigns": len(campaigns),
+        },
+        "leaderboard_highlights": {
+            "top_creator": None,
+            "top_rescue": None,
+            "top_partner": None,
+            "note": "Public-safe leaderboard highlights will be promoted from v30A leaderboard scoring in a future pulse layer."
+        },
+        "featured": {
+            "creator": None,
+            "rescue": None,
+            "organization": None,
+            "campaign": serialize_account_campaign(featured_campaign) if featured_campaign else None,
+        },
+        "pulse_layers": [
+            {
+                "key": "community_activity",
+                "label": "Community Activity",
+                "enabled": True,
+                "locked": False,
+            },
+            {
+                "key": "network_size",
+                "label": "Network Size",
+                "enabled": True,
+                "locked": False,
+            },
+            {
+                "key": "leaderboard_highlights",
+                "label": "Leaderboard Highlights",
+                "enabled": False,
+                "locked": True,
+                "reason": "Requires public-safe leaderboard promotion layer."
+            },
+            {
+                "key": "featured_creators",
+                "label": "Featured Creators",
+                "enabled": False,
+                "locked": True,
+                "reason": "Requires featured community curation."
+            },
+            {
+                "key": "featured_rescues",
+                "label": "Featured Rescues",
+                "enabled": False,
+                "locked": True,
+                "reason": "Requires featured rescue curation."
+            },
+            {
+                "key": "featured_organizations",
+                "label": "Featured Organizations",
+                "enabled": False,
+                "locked": True,
+                "reason": "Requires public organization profiles."
+            },
+            {
+                "key": "featured_opportunities",
+                "label": "Featured Opportunities",
+                "enabled": bool(featured_campaign),
+                "locked": not bool(featured_campaign),
+                "reason": "Available when active public campaigns exist."
+            },
+            {
+                "key": "xrpl_verification",
+                "label": "XRPL Verification",
+                "enabled": False,
+                "locked": True,
+                "reason": "Future ledger verification pulse layer."
+            },
+        ],
+        "coming_soon": [
+            "Leaderboard Highlights",
+            "Featured Creators",
+            "Featured Rescues",
+            "Featured Organizations",
+            "Featured Campaigns",
+            "Featured Opportunities",
+            "XRPL Verification",
+            "White Label Communities",
+        ],
+        "notes": [
+            "This endpoint is public-safe and does not require account authentication.",
+            "Network Pulse is community heartbeat data, not private analytics.",
+            "Future versions may promote public-safe highlights from leaderboard and campaign systems."
+        ]
+    }
+
