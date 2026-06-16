@@ -362,82 +362,6 @@ class AffiliateCommission(Base):
 
 
 
-
-class PartnerTaxonomyCategory(Base):
-    __tablename__ = "partner_taxonomy_categories"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    parent_id = Column(Integer, nullable=True)
-
-    name = Column(String, nullable=False)
-    slug = Column(String, nullable=False, index=True)
-
-    description = Column(Text, nullable=True)
-
-    taxonomy_type = Column(String, default="partner")
-    project = Column(String, default="PurPaws")
-
-    status = Column(String, default="active")
-    sort_order = Column(Integer, default=100)
-
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, nullable=True)
-
-
-
-class PartnerTaxonomyAssignment(Base):
-    __tablename__ = "partner_taxonomy_assignments"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    partner_organization_id = Column(Integer, nullable=False)
-    taxonomy_category_id = Column(Integer, nullable=False)
-
-    assignment_context = Column(String, default="organization")
-    campaign_id = Column(Integer, nullable=True)
-
-    project = Column(String, default="PurPaws")
-
-    status = Column(String, default="active")
-
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, nullable=True)
-
-
-
-class PartnerCampaign(Base):
-    __tablename__ = "partner_campaigns"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    partner_organization_id = Column(Integer, nullable=False)
-
-    name = Column(String, nullable=False)
-    slug = Column(String, nullable=False, index=True)
-
-    headline = Column(String, nullable=True)
-    description = Column(Text, nullable=True)
-
-    campaign_type = Column(String, default="affiliate_promotion")
-
-    project = Column(String, default="PurPaws")
-
-    landing_url = Column(String, nullable=True)
-    asset_url = Column(String, nullable=True)
-
-    budget_cents = Column(Integer, default=0)
-    currency = Column(String, default="CAD")
-
-    status = Column(String, default="draft")
-
-    start_date = Column(DateTime, nullable=True)
-    end_date = Column(DateTime, nullable=True)
-
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, nullable=True)
-
-
 class PartnerOrganization(Base):
     __tablename__ = "partner_organizations"
 
@@ -672,30 +596,4 @@ class ContactRelayMessage(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     reviewed_at = Column(DateTime, nullable=True)
     resolved_at = Column(DateTime, nullable=True)
-
-
-class CommunicationPermission(Base):
-    __tablename__ = "communication_permissions"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    project = Column(String, default="PurPaws")
-
-    listing_type = Column(String, nullable=False)
-    listing_id = Column(Integer, nullable=True)
-
-    allow_contact_relay = Column(Integer, default=1)
-
-    allow_founder_inquiries = Column(Integer, default=1)
-    allow_creator_inquiries = Column(Integer, default=1)
-    allow_rescue_inquiries = Column(Integer, default=1)
-    allow_partner_inquiries = Column(Integer, default=1)
-    allow_organization_inquiries = Column(Integer, default=1)
-
-    auto_accept = Column(Integer, default=0)
-
-    status = Column(String, default="active")
-
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, nullable=True)
 

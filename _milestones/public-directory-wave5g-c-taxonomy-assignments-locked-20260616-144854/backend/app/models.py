@@ -405,39 +405,6 @@ class PartnerTaxonomyAssignment(Base):
     updated_at = Column(DateTime, nullable=True)
 
 
-
-class PartnerCampaign(Base):
-    __tablename__ = "partner_campaigns"
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    partner_organization_id = Column(Integer, nullable=False)
-
-    name = Column(String, nullable=False)
-    slug = Column(String, nullable=False, index=True)
-
-    headline = Column(String, nullable=True)
-    description = Column(Text, nullable=True)
-
-    campaign_type = Column(String, default="affiliate_promotion")
-
-    project = Column(String, default="PurPaws")
-
-    landing_url = Column(String, nullable=True)
-    asset_url = Column(String, nullable=True)
-
-    budget_cents = Column(Integer, default=0)
-    currency = Column(String, default="CAD")
-
-    status = Column(String, default="draft")
-
-    start_date = Column(DateTime, nullable=True)
-    end_date = Column(DateTime, nullable=True)
-
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, nullable=True)
-
-
 class PartnerOrganization(Base):
     __tablename__ = "partner_organizations"
 

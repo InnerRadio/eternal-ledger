@@ -986,133 +986,11 @@ def public_directory_actions(listing_type: str):
     return base_actions
 
 
-
-def public_directory_metrics(
-    db: Session,
-    listing_type: str,
-    listing_id: int | None
-):
-    if listing_type == "founder":
-        founder = db.query(FounderProfile).filter(
-            FounderProfile.id == listing_id
-        ).first()
-
-        return {
-            "founder_since": founder.created_at if founder else None,
-            "founder_type": founder.founder_type if founder else None,
-            "founder_level": founder.founder_level if founder else None
-        }
-
-    if listing_type == "creator":
-        profile = db.query(PublicProfile).filter(
-            PublicProfile.user_id == listing_id
-        ).first()
-
-        media_assets = db.query(MediaAsset).filter(
-            MediaAsset.uploaded_by_user_id == listing_id,
-            MediaAsset.status == "published"
-        ).all()
-
-        return {
-            "published_media_count": len(media_assets),
-            "public_profile_status": profile.public_profile_status if profile else "missing",
-            "verification_status": profile.verification_status if profile else "pending"
-        }
-
-    if listing_type == "rescue":
-        animals = db.query(RescueAnimal).filter(
-            RescueAnimal.rescue_profile_id == listing_id
-        ).all()
-
-        available_animals = [
-            animal for animal in animals
-            if animal.adoption_status == "available"
-        ]
-
-        return {
-            "animal_count": len(animals),
-            "available_animal_count": len(available_animals)
-        }
-
-    if listing_type in ["partner", "organization"]:
-        active_members = db.query(OrganizationMember).filter(
-            OrganizationMember.organization_id == listing_id,
-            OrganizationMember.status == "active"
-        ).all()
-
-        campaigns = db.query(AffiliateCampaign).filter(
-            AffiliateCampaign.status == "active"
-        ).all()
-
-        return {
-            "active_member_count": len(active_members),
-            "active_campaign_count": len(campaigns)
-        }
-
-    return {}
-
-
-
-def public_directory_discovery(
-    listing_type: str,
-    metrics: dict | None = None,
-    status: str | None = "active"
-):
-    metrics = metrics or {}
-
-    verification_score = 0
-    activity_score = 0
-    sort_priority = 50
-
-    if status == "active":
-        activity_score += 10
-
-    if listing_type == "founder":
-        sort_priority = 10
-        verification_score = 100
-        activity_score += 20
-
-    if listing_type == "creator":
-        sort_priority = 30
-        if metrics.get("verification_status") == "verified":
-            verification_score = 100
-        elif metrics.get("verification_status") == "pending":
-            verification_score = 25
-
-        activity_score += int(metrics.get("published_media_count") or 0)
-
-    if listing_type == "rescue":
-        sort_priority = 20
-        verification_score = 75
-        activity_score += int(metrics.get("available_animal_count") or 0)
-
-    if listing_type in ["partner", "organization"]:
-        sort_priority = 25
-        verification_score = 75
-        activity_score += int(metrics.get("active_member_count") or 0)
-        activity_score += int(metrics.get("active_campaign_count") or 0)
-
-    ranking_score = verification_score + activity_score + max(0, 100 - sort_priority)
-
-    return {
-        "featured": ranking_score >= 100,
-        "ranking_score": ranking_score,
-        "verification_score": verification_score,
-        "activity_score": activity_score,
-        "sort_priority": sort_priority
-    }
-
-
 @router.get("/directory")
 def public_directory(
     listing_type: str | None = None,
     location: str | None = None,
     project: str | None = None,
-    search: str | None = None,
-    featured_only: int = 0,
-    sort: str = "ranking",
-    limit: int = 100,
-    offset: int = 0,
     db: Session = Depends(get_db)
 ):
     records = []
@@ -1148,11 +1026,7 @@ def public_directory(
                     "founder_level": founder.founder_level,
                     "created_at": founder.created_at,
                 },
-                "metrics": public_directory_metrics(
-                    db=db,
-                    listing_type="founder",
-                    listing_id=founder.id
-                ),
+                "metrics": {},
                 "communication": public_directory_communication_metadata(
                     db=db,
                     project="PurPaws",
@@ -1160,15 +1034,6 @@ def public_directory(
                     listing_id=founder.id
                 ),
                 "actions": public_directory_actions("founder"),
-                "discovery": public_directory_discovery(
-                    listing_type="founder",
-                    metrics=public_directory_metrics(
-                        db=db,
-                        listing_type="founder",
-                        listing_id=founder.id
-                    ),
-                    status=founder.status
-                ),
                 "status": founder.status,
             })
 
@@ -1207,11 +1072,7 @@ def public_directory(
                     "verification_status": profile.verification_status if profile else "pending",
                     "public_profile_status": profile.public_profile_status if profile else "missing",
                 },
-                "metrics": public_directory_metrics(
-                    db=db,
-                    listing_type="creator",
-                    listing_id=creator.id
-                ),
+                "metrics": {},
                 "communication": public_directory_communication_metadata(
                     db=db,
                     project="PurPaws",
@@ -1219,15 +1080,6 @@ def public_directory(
                     listing_id=creator.id
                 ),
                 "actions": public_directory_actions("creator"),
-                "discovery": public_directory_discovery(
-                    listing_type="creator",
-                    metrics=public_directory_metrics(
-                        db=db,
-                        listing_type="creator",
-                        listing_id=creator.id
-                    ),
-                    status=creator.status
-                ),
                 "status": creator.status,
             })
 
@@ -1264,11 +1116,9 @@ def public_directory(
                 "profile": {
                     "organization_type": "rescue",
                 },
-                "metrics": public_directory_metrics(
-                    db=db,
-                    listing_type="rescue",
-                    listing_id=rescue.id
-                ),
+                "metrics": {
+                    "available_animal_count": len(animals)
+                },
                 "communication": public_directory_communication_metadata(
                     db=db,
                     project="PurPaws",
@@ -1276,15 +1126,6 @@ def public_directory(
                     listing_id=rescue.id
                 ),
                 "actions": public_directory_actions("rescue"),
-                "discovery": public_directory_discovery(
-                    listing_type="rescue",
-                    metrics=public_directory_metrics(
-                        db=db,
-                        listing_type="rescue",
-                        listing_id=rescue.id
-                    ),
-                    status=rescue.status
-                ),
                 "status": rescue.status,
             })
 
@@ -1326,11 +1167,9 @@ def public_directory(
                 "profile": {
                     "organization_type": partner.organization_type,
                 },
-                "metrics": public_directory_metrics(
-                    db=db,
-                    listing_type=effective_listing_type,
-                    listing_id=partner.id
-                ),
+                "metrics": {
+                    "active_member_count": len(active_members)
+                },
                 "communication": public_directory_communication_metadata(
                     db=db,
                     project=partner.project or "PurPaws",
@@ -1338,88 +1177,8 @@ def public_directory(
                     listing_id=partner.id
                 ),
                 "actions": public_directory_actions(effective_listing_type),
-                "discovery": public_directory_discovery(
-                    listing_type=effective_listing_type,
-                    metrics=public_directory_metrics(
-                        db=db,
-                        listing_type=effective_listing_type,
-                        listing_id=partner.id
-                    ),
-                    status=partner.status
-                ),
                 "status": partner.status,
             })
-
-    filtered_records = records
-
-    if search:
-        needle = search.strip().lower()
-
-        def record_matches_search(record):
-            haystack = " ".join([
-                str(record.get("name") or ""),
-                str(record.get("headline") or ""),
-                str(record.get("description") or ""),
-                str(record.get("organization_name") or ""),
-                str(record.get("location") or ""),
-                str(record.get("listing_type") or ""),
-            ]).lower()
-
-            return needle in haystack
-
-        filtered_records = [
-            record for record in filtered_records
-            if record_matches_search(record)
-        ]
-
-    if featured_only:
-        filtered_records = [
-            record for record in filtered_records
-            if record.get("discovery", {}).get("featured")
-        ]
-
-    total_count = len(filtered_records)
-
-    if sort == "ranking":
-        filtered_records = sorted(
-            filtered_records,
-            key=lambda record: (
-                record.get("discovery", {}).get("ranking_score", 0),
-                -record.get("discovery", {}).get("sort_priority", 999),
-                str(record.get("name") or "")
-            ),
-            reverse=True
-        )
-    elif sort == "name":
-        filtered_records = sorted(
-            filtered_records,
-            key=lambda record: str(record.get("name") or "").lower()
-        )
-    elif sort == "newest":
-        filtered_records = sorted(
-            filtered_records,
-            key=lambda record: str(record.get("profile", {}).get("created_at") or ""),
-            reverse=True
-        )
-    elif sort == "priority":
-        filtered_records = sorted(
-            filtered_records,
-            key=lambda record: (
-                record.get("discovery", {}).get("sort_priority", 999),
-                str(record.get("name") or "").lower()
-            )
-        )
-
-    if offset < 0:
-        offset = 0
-
-    if limit < 1:
-        limit = 100
-
-    if limit > 250:
-        limit = 250
-
-    paginated_records = filtered_records[offset:offset + limit]
 
     return {
         "module": "Public Directory",
@@ -1430,15 +1189,9 @@ def public_directory(
             "listing_type": listing_type,
             "location": location,
             "project": project,
-            "search": search,
-            "featured_only": featured_only,
-            "sort": sort,
-            "limit": limit,
-            "offset": offset
         },
-        "count": len(paginated_records),
-        "total_count": total_count,
-        "records": paginated_records
+        "count": len(records),
+        "records": records
     }
 
 
@@ -1491,11 +1244,7 @@ def public_directory_detail(
                     "founder_level": founder.founder_level,
                     "created_at": founder.created_at,
                 },
-                "metrics": public_directory_metrics(
-                    db=db,
-                    listing_type="founder",
-                    listing_id=founder.id
-                ),
+                "metrics": {},
                 "communication": public_directory_communication_metadata(
                     db=db,
                     project="PurPaws",
@@ -1503,15 +1252,6 @@ def public_directory_detail(
                     listing_id=founder.id
                 ),
                 "actions": public_directory_actions("founder"),
-                "discovery": public_directory_discovery(
-                    listing_type="founder",
-                    metrics=public_directory_metrics(
-                        db=db,
-                        listing_type="founder",
-                        listing_id=founder.id
-                    ),
-                    status=founder.status
-                ),
                 "status": founder.status,
             }
 
@@ -1546,11 +1286,7 @@ def public_directory_detail(
                     "verification_status": profile.verification_status if profile else "pending",
                     "public_profile_status": profile.public_profile_status if profile else "missing",
                 },
-                "metrics": public_directory_metrics(
-                    db=db,
-                    listing_type="creator",
-                    listing_id=creator.id
-                ),
+                "metrics": {},
                 "communication": public_directory_communication_metadata(
                     db=db,
                     project="PurPaws",
@@ -1558,15 +1294,6 @@ def public_directory_detail(
                     listing_id=creator.id
                 ),
                 "actions": public_directory_actions("creator"),
-                "discovery": public_directory_discovery(
-                    listing_type="creator",
-                    metrics=public_directory_metrics(
-                        db=db,
-                        listing_type="creator",
-                        listing_id=creator.id
-                    ),
-                    status=creator.status
-                ),
                 "status": creator.status,
             }
 
@@ -1637,11 +1364,9 @@ def public_directory_detail(
                 "profile": {
                     "organization_type": partner.organization_type,
                 },
-                "metrics": public_directory_metrics(
-                    db=db,
-                    listing_type=listing_type,
-                    listing_id=partner.id
-                ),
+                "metrics": {
+                    "active_member_count": len(active_members)
+                },
                 "communication": public_directory_communication_metadata(
                     db=db,
                     project=partner.project or "PurPaws",
@@ -1649,15 +1374,6 @@ def public_directory_detail(
                     listing_id=partner.id
                 ),
                 "actions": public_directory_actions(listing_type),
-                "discovery": public_directory_discovery(
-                    listing_type=listing_type,
-                    metrics=public_directory_metrics(
-                        db=db,
-                        listing_type=listing_type,
-                        listing_id=partner.id
-                    ),
-                    status=partner.status
-                ),
                 "status": partner.status,
             }
 

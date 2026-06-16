@@ -1,0 +1,25 @@
+PUBLIC DISCOVERY WAVE 2 LOCKED
+
+Implemented:
+- GET /public/creators
+- GET /public/rescues
+- GET /public/partners
+
+Verified:
+- OpenAPI registration confirmed
+- curl tests successful
+- creators endpoint live
+- rescues endpoint live
+- partners endpoint live
+
+Privacy:
+- email excluded
+- referral_code excluded
+- private contact routing excluded
+- private account details excluded
+- internal member details excluded
+
+Status:
+- creators endpoint returns 0 until creator-role users exist
+- rescues endpoint returns 0 until rescue_profiles exist
+- partners endpoint returns active partner organizations

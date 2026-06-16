@@ -1,0 +1,18 @@
+IDENTITY LAYER v2 FOUNDATION LOCKED
+
+Implemented:
+- PublicProfile model
+- public_profiles table
+- GET /account/public-profile
+- POST /account/public-profile
+
+Verified:
+- API active
+- table exists
+- auth works
+- profile save works
+- profile read works
+
+Note:
+POST currently accepts query parameters.
+Future improvement: JSON body input.

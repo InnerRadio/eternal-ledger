@@ -1,0 +1,54 @@
+PUBLIC DIRECTORY WAVE 5E DISCOVERY RANKING LOCKED
+
+Implemented:
+- Public directory discovery helper
+- Discovery metadata for directory list records
+- Discovery metadata for directory detail records
+- Featured flag
+- Ranking score
+- Verification score
+- Activity score
+- Sort priority
+
+Verified:
+- eternal-ledger-api.service restarts successfully
+- /public/directory returns discovery metadata
+- /public/directory/founder/1 returns discovery metadata
+- /public/directory/partner/1 returns discovery metadata
+- Founder detail and list discovery aligned
+- Partner detail and list discovery aligned
+- Discovery metadata remains public-safe
+
+Endpoint:
+- /public/directory
+- /public/directory/{listing_type}/{listing_id}
+
+Discovery Fields:
+- featured
+- ranking_score
+- verification_score
+- activity_score
+- sort_priority
+
+Purpose:
+- Enables featured directory sections
+- Enables backend-driven sorting
+- Enables future discovery ranking
+- Enables future Founder Wall ordering
+- Enables future Creator / Rescue / Partner directory ranking
+- Supports future reputation and search systems
+
+Privacy:
+- Excludes email
+- Excludes contact_email
+- Excludes referral_code
+- Excludes affiliate_id
+- Excludes private account details
+- Excludes security data
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

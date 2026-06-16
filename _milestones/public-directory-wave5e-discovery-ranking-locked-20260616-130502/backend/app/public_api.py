@@ -1108,11 +1108,6 @@ def public_directory(
     listing_type: str | None = None,
     location: str | None = None,
     project: str | None = None,
-    search: str | None = None,
-    featured_only: int = 0,
-    sort: str = "ranking",
-    limit: int = 100,
-    offset: int = 0,
     db: Session = Depends(get_db)
 ):
     records = []
@@ -1350,77 +1345,6 @@ def public_directory(
                 "status": partner.status,
             })
 
-    filtered_records = records
-
-    if search:
-        needle = search.strip().lower()
-
-        def record_matches_search(record):
-            haystack = " ".join([
-                str(record.get("name") or ""),
-                str(record.get("headline") or ""),
-                str(record.get("description") or ""),
-                str(record.get("organization_name") or ""),
-                str(record.get("location") or ""),
-                str(record.get("listing_type") or ""),
-            ]).lower()
-
-            return needle in haystack
-
-        filtered_records = [
-            record for record in filtered_records
-            if record_matches_search(record)
-        ]
-
-    if featured_only:
-        filtered_records = [
-            record for record in filtered_records
-            if record.get("discovery", {}).get("featured")
-        ]
-
-    total_count = len(filtered_records)
-
-    if sort == "ranking":
-        filtered_records = sorted(
-            filtered_records,
-            key=lambda record: (
-                record.get("discovery", {}).get("ranking_score", 0),
-                -record.get("discovery", {}).get("sort_priority", 999),
-                str(record.get("name") or "")
-            ),
-            reverse=True
-        )
-    elif sort == "name":
-        filtered_records = sorted(
-            filtered_records,
-            key=lambda record: str(record.get("name") or "").lower()
-        )
-    elif sort == "newest":
-        filtered_records = sorted(
-            filtered_records,
-            key=lambda record: str(record.get("profile", {}).get("created_at") or ""),
-            reverse=True
-        )
-    elif sort == "priority":
-        filtered_records = sorted(
-            filtered_records,
-            key=lambda record: (
-                record.get("discovery", {}).get("sort_priority", 999),
-                str(record.get("name") or "").lower()
-            )
-        )
-
-    if offset < 0:
-        offset = 0
-
-    if limit < 1:
-        limit = 100
-
-    if limit > 250:
-        limit = 250
-
-    paginated_records = filtered_records[offset:offset + limit]
-
     return {
         "module": "Public Directory",
         "status": "active",
@@ -1430,15 +1354,9 @@ def public_directory(
             "listing_type": listing_type,
             "location": location,
             "project": project,
-            "search": search,
-            "featured_only": featured_only,
-            "sort": sort,
-            "limit": limit,
-            "offset": offset
         },
-        "count": len(paginated_records),
-        "total_count": total_count,
-        "records": paginated_records
+        "count": len(records),
+        "records": records
     }
 
 

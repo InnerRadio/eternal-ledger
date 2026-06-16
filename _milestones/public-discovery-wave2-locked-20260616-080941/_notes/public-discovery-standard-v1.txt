@@ -1,0 +1,82 @@
+PUBLIC DISCOVERY STANDARD v1
+
+Purpose:
+Define the common public-safe JSON structure for all future discovery endpoints.
+
+Applies to:
+- /public/organizations
+- /public/campaigns
+- /public/opportunities
+- /public/creators
+- /public/rescues
+- /public/partners
+- /public/founders
+- /public/services
+- /public/directory
+
+Core Rule:
+Public discovery.
+Private communication.
+Platform relay.
+Auditable participation.
+
+Never expose publicly:
+- email
+- password/hash
+- referral_code
+- internal security events
+- private commission details
+- private contact routing
+
+Public identity may expose:
+- affiliate_id
+- username
+- display_name
+- role
+- public_profile_status
+- verification_status
+
+Public organization may expose:
+- organization_name
+- organization_type
+- project
+- website_url
+- location
+- status
+
+Public opportunity may expose:
+- campaign_id
+- title
+- description
+- project
+- sponsor_name
+- campaign_type
+- payout_type
+- payout_amount_cents
+- payout_percent
+- currency
+- status
+- starts_at
+- ends_at
+
+Canonical public record shape:
+
+{
+  "id": 123,
+  "type": "organization | profile | campaign | opportunity",
+  "identity": {
+    "affiliate_id": "...",
+    "username": "...",
+    "display_name": "...",
+    "role": "...",
+    "public_profile_status": "...",
+    "verification_status": "..."
+  },
+  "organization": {},
+  "profile": {},
+  "metrics": {},
+  "status": "active"
+}
+
+Next build:
+- /public/organizations

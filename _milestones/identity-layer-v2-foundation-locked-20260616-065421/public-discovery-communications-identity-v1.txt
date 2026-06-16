@@ -1,0 +1,94 @@
+ETERNAL LEDGER / PURPAWS — PUBLIC DISCOVERY, COMMUNICATIONS, IDENTITY v1
+
+Inspection Findings:
+
+1. Public API already exists:
+backend/app/public_api.py
+
+Existing public endpoints include:
+- /public/metrics/track
+- /public/metrics/batch
+- /public/memorials
+- /public/memorials/{memorial_id}
+- /public/memorials/{memorial_id}/media
+- /public/memorials/{memorial_id}/contributions
+- /public/environment-themes
+- /public/pulse
+- /public/trails
+
+2. Identity Layer v1 already exists:
+User
+- email
+- role
+- status
+- affiliate_id
+- referral_code
+- referring_affiliate_id
+
+Every registered account receives affiliate_id and referral_code.
+
+3. Organization Layer already exists:
+PartnerOrganization
+OrganizationMember
+
+Users can belong to organizations with roles.
+
+4. Opportunity Layer already exists:
+AffiliateCampaign = Opportunity
+AffiliateCampaignEnrollment = Participation
+AffiliateCommission = Reward
+
+5. Communications Layer partially exists:
+PartnerInquiry is the current Contact / Inquiry foundation.
+
+6. Identity Layer v2 does NOT exist yet:
+Missing:
+- username
+- display_name
+- headline
+- bio
+- avatar_url
+- banner_url
+- public profile fields
+
+Architecture Decision:
+
+Do not build public discovery around email.
+
+Public identity should use:
+- username
+- display_name
+- affiliate_id
+- role
+- public_profile_status
+- verification_status
+
+Private identity should keep:
+- email
+- referral_code
+- internal user_id
+- security events
+- commission details
+
+Core Rule:
+
+Public discovery.
+Private communication.
+Platform relay.
+Auditable participation.
+
+Next Build:
+
+Identity Layer v2:
+PublicProfile
+
+Then:
+- Network Communications Architecture v1
+- Public Discovery Standard v1
+- /public/organizations
+- /public/campaigns
+- /public/opportunities
+- /public/creators
+- /public/rescues
+- /public/partners
+- /public/directory

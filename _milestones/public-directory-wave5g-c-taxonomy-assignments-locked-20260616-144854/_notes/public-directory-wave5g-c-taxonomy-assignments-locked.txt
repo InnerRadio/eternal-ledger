@@ -1,0 +1,67 @@
+PUBLIC DIRECTORY WAVE 5G-C TAXONOMY ASSIGNMENTS LOCKED
+
+Implemented:
+- PartnerTaxonomyAssignment model
+- partner_taxonomy_assignments database table
+- Admin taxonomy assignment serializer
+- GET /account/taxonomy/assignments
+- POST /account/taxonomy/assignments
+- Organization-level taxonomy assignments
+- Future campaign-level taxonomy assignment fields
+
+Verified:
+- python3 -m py_compile backend/app/account.py backend/app/models.py
+- eternal-ledger-api.service restarts successfully
+- OpenAPI exposes /account/taxonomy/assignments GET and POST
+- Senior Companion Foods assigned to Food & Nutrition
+- Senior Companion Foods assigned to Pet Food
+- Senior Companion Foods assigned to Senior Nutrition
+- Assignment list returns active assignment records
+- Assignment records include organization name and category slug
+
+Model:
+- PartnerTaxonomyAssignment
+
+Table:
+- partner_taxonomy_assignments
+
+Admin Endpoints:
+- GET /account/taxonomy/assignments
+- POST /account/taxonomy/assignments
+
+Assignment Fields:
+- partner_organization_id
+- taxonomy_category_id
+- assignment_context
+- campaign_id
+- project
+- status
+- created_at
+- updated_at
+
+Initial Assignment:
+- Senior Companion Foods
+  - Food & Nutrition
+  - Pet Food
+  - Senior Nutrition
+
+Future Support:
+- assignment_context supports organization and future campaign contexts
+- campaign_id prepares for campaign-specific promotional taxonomy
+- Enables partner dashboards to manage category visibility
+- Enables future campaign boards, campaign stats, campaign decks, and campaign-specific discovery
+
+Purpose:
+- Connects Partner Organizations to the taxonomy library
+- Enables partner category filtering
+- Enables dashboard-managed category assignments
+- Enables campaign-level taxonomy expansion
+- Supports membership packages based on category and campaign visibility
+- Supports future public directory category filtering
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

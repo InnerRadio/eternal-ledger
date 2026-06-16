@@ -1,0 +1,45 @@
+PUBLIC DIRECTORY WAVE 5A CONTACT METADATA LOCKED
+
+Implemented:
+- Public directory communication metadata helper
+- Directory records now expose communication metadata
+- Founder listings include contact relay metadata
+- Creator listings include contact relay metadata
+- Rescue listings include contact relay metadata
+- Partner / Organization listings include contact relay metadata
+
+Verified:
+- eternal-ledger-api.service restarts successfully
+- /public/directory returns communication metadata
+- /public/directory?listing_type=founder returns communication metadata
+- /public/directory?listing_type=partner returns communication metadata
+- contact_enabled reflects CommunicationPermission.allow_contact_relay
+- contact_method returns relay when enabled
+- contact_endpoint returns /public/contact-relay when enabled
+- permission_status returns configured when permission record exists
+
+Endpoint:
+- /public/directory
+
+Communication Metadata:
+- contact_enabled
+- contact_method
+- contact_endpoint
+- listing_type
+- listing_id
+- permission_status
+- privacy
+
+Purpose:
+- Public listings can now power Contact buttons
+- Public directory remains privacy-safe
+- Recipient contact details remain hidden
+- Contact flow routes through /public/contact-relay
+- Supports Founder Wall, Creator Directory, Rescue Directory, Partner Directory, and future white-label communities
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

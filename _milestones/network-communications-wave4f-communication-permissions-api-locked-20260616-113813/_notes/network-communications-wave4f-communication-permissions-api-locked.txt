@@ -1,0 +1,34 @@
+NETWORK COMMUNICATIONS WAVE 4F COMMUNICATION PERMISSIONS API LOCKED
+
+Implemented:
+- GET /account/communication-permissions
+- POST /account/communication-permissions
+- CommunicationPermission serializer
+- Authenticated communication permission management
+
+Verified:
+- eternal-ledger-api.service restarts successfully
+- OpenAPI exposes /account/communication-permissions GET and POST
+- Admin token can list communication permissions
+- Admin token can update founder communication permission
+- Founder auto_accept test value restored to 0
+- Founder communication permission remains active
+
+Endpoint:
+- /account/communication-permissions
+
+Model:
+- CommunicationPermission
+
+Purpose:
+- Account-side management of communication preferences
+- Enables future dashboard control over contact relay settings
+- Keeps permissions attached to listing_type + listing_id
+- Supports multi-role identities with separate communication settings per listing
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching
