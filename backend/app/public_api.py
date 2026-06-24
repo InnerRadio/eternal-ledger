@@ -1,10 +1,15 @@
 from fastapi import APIRouter, Depends
 from datetime import datetime
+import json
+import secrets
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
-from backend.app.models import Memorial, MediaAsset, Contribution, MetricEvent, User, AffiliateCampaign, PartnerOrganization, AffiliateConversion, AffiliateClick, AffiliateCommission, AffiliateCampaignEnrollment, OrganizationMember, RescueProfile, RescueAnimal, PublicProfile, FounderProfile, ContactRelayMessage, CommunicationPermission
+from backend.app.models import Memorial, MediaAsset, Contribution, MetricEvent, User, AffiliateCampaign, PartnerOrganization, AffiliateConversion, AffiliateClick, AffiliateCommission, AffiliateCampaignEnrollment, OrganizationMember, RescueProfile, RescueAnimal, PublicProfile, FounderProfile, ContactRelayMessage, CommunicationPermission, OnboardingRecord
 from backend.app.environment_themes import ENVIRONMENT_THEMES
+from backend.app.account import generate_affiliate_id, generate_referral_code
+from backend.app.cms.security import get_password_hash, create_access_token
+from backend.app.mail import send_onboarding_verification_email
 
 
 def parse_client_event_at(value):
@@ -1350,6 +1355,75 @@ def public_directory(
                 "status": partner.status,
             })
 
+    if include_all or listing_type == "directory":
+        onboarding_query = db.query(OnboardingRecord).filter(
+            OnboardingRecord.path == "directory",
+            OnboardingRecord.status == "published",
+            OnboardingRecord.verification_status == "verified"
+        )
+
+        directory_onboarding_records = onboarding_query.order_by(
+            OnboardingRecord.updated_at.desc(),
+            OnboardingRecord.id.desc()
+        ).all()
+
+        for onboarding in directory_onboarding_records:
+            try:
+                payload = json.loads(onboarding.payload_json or "{}")
+            except Exception:
+                payload = {}
+
+            listing_location = payload.get("location")
+
+            if location and listing_location != location:
+                continue
+
+            records.append({
+                "id": f"directory-{onboarding.id}",
+                "listing_id": onboarding.id,
+                "listing_type": "directory",
+                "source": "onboarding_records",
+                "name": payload.get("listing_name") or onboarding.display_name,
+                "headline": payload.get("headline") or payload.get("category"),
+                "description": payload.get("description"),
+                "location": listing_location,
+                "project": "PurPaws",
+                "website_url": payload.get("website"),
+                "organization_name": payload.get("listing_name"),
+                "profile": {
+                    "category": payload.get("category"),
+                    "logo_media_asset_id": payload.get("logo_media_asset_id"),
+                    "logo_file_path": payload.get("logo_file_path"),
+                    "cover_media_asset_id": payload.get("cover_media_asset_id"),
+                    "cover_file_path": payload.get("cover_file_path"),
+                    "published_from": "onboarding_record",
+                    "created_at": onboarding.created_at,
+                    "updated_at": onboarding.updated_at,
+                },
+                "metrics": public_directory_metrics(
+                    db=db,
+                    listing_type="directory",
+                    listing_id=onboarding.id
+                ),
+                "communication": public_directory_communication_metadata(
+                    db=db,
+                    project="PurPaws",
+                    listing_type="directory",
+                    listing_id=onboarding.id
+                ),
+                "actions": public_directory_actions("directory"),
+                "discovery": public_directory_discovery(
+                    listing_type="directory",
+                    metrics=public_directory_metrics(
+                        db=db,
+                        listing_type="directory",
+                        listing_id=onboarding.id
+                    ),
+                    status=onboarding.status
+                ),
+                "status": onboarding.status,
+            })
+
     filtered_records = records
 
     if search:
@@ -2079,5 +2153,443 @@ def public_trails(db: Session = Depends(get_db)):
         "status": "active",
         "count": len(records),
         "records": records
+    }
+
+@router.post("/onboarding")
+def public_create_onboarding_record(
+    path: str,
+    display_name: str | None = None,
+    email: str | None = None,
+    payload_json: str | None = None,
+    user_id: int | None = None,
+    db: Session = Depends(get_db)
+):
+    allowed_paths = [
+        "directory",
+        "companion",
+        "memorial",
+        "creator",
+        "event",
+        "partner",
+        "founder"
+    ]
+
+    clean_path = (path or "").strip().lower()
+
+    if clean_path not in allowed_paths:
+        return {
+            "module": "Public Onboarding",
+            "status": "error",
+            "message": "Unsupported onboarding path.",
+            "allowed_paths": allowed_paths
+        }
+
+    verification_token = secrets.token_urlsafe(32)
+    now = datetime.utcnow()
+
+    record = OnboardingRecord(
+        user_id=user_id,
+        path=clean_path,
+        display_name=(display_name or "").strip() or None,
+        email=(email or "").strip() or None,
+        payload_json=payload_json,
+        status="verification_pending",
+        verification_status="pending",
+        verification_token=verification_token,
+        verification_sent_at=now,
+        updated_at=now
+    )
+
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+
+    verification_url = "https://purpaws.ca/21/verify.html?token=" + verification_token
+
+    mail_result = send_onboarding_verification_email(
+        to_email=record.email,
+        display_name=record.display_name,
+        verify_url=verification_url
+    )
+
+    return {
+        "module": "Public Onboarding",
+        "status": "verification_pending",
+        "version": "public-onboarding-record-v2",
+        "message": "Draft onboarding record created. Verify email before dashboard access.",
+        "record": {
+            "id": record.id,
+            "user_id": record.user_id,
+            "path": record.path,
+            "display_name": record.display_name,
+            "email": record.email,
+            "payload_json": record.payload_json,
+            "status": record.status,
+            "verification_status": record.verification_status,
+            "verification_sent_at": record.verification_sent_at,
+            "created_at": record.created_at,
+            "updated_at": record.updated_at,
+        },
+        "next": {
+            "verification_status": "pending",
+            "dashboard_status": "locked_until_verified",
+            "publish_status": "not_published"
+        },
+        "email_delivery": mail_result,
+        "debug": {
+            "verification_url": verification_url
+        }
+    }
+
+@router.post("/onboarding/update")
+def public_update_onboarding_record(
+    onboarding_id: int,
+    payload_json: str,
+    db: Session = Depends(get_db)
+):
+    record = db.query(OnboardingRecord).filter(
+        OnboardingRecord.id == onboarding_id
+    ).first()
+
+    if not record:
+        return {
+            "module": "Public Onboarding Update",
+            "status": "error",
+            "message": "Onboarding record not found."
+        }
+
+    now = datetime.utcnow()
+
+    record.payload_json = payload_json
+    record.status = "workspace_draft"
+    record.updated_at = now
+
+    db.commit()
+    db.refresh(record)
+
+    return {
+        "module": "Public Onboarding Update",
+        "status": "workspace_draft",
+        "version": "public-onboarding-update-v1",
+        "message": "Workspace draft saved.",
+        "record": {
+            "id": record.id,
+            "user_id": record.user_id,
+            "path": record.path,
+            "display_name": record.display_name,
+            "email": record.email,
+            "payload_json": record.payload_json,
+            "status": record.status,
+            "verification_status": record.verification_status,
+            "updated_at": record.updated_at
+        }
+    }
+
+
+@router.post("/onboarding/publish")
+def public_publish_onboarding_record(
+    onboarding_id: int,
+    db: Session = Depends(get_db)
+):
+    record = db.query(OnboardingRecord).filter(
+        OnboardingRecord.id == onboarding_id
+    ).first()
+
+    if not record:
+        return {
+            "module": "Public Onboarding Publish",
+            "status": "error",
+            "message": "Onboarding record not found."
+        }
+
+    if record.verification_status != "verified":
+        return {
+            "module": "Public Onboarding Publish",
+            "status": "error",
+            "message": "Email verification is required before publishing.",
+            "verification_status": record.verification_status
+        }
+
+    if record.path != "directory":
+        return {
+            "module": "Public Onboarding Publish",
+            "status": "error",
+            "message": "Publishing is currently enabled for directory records only.",
+            "path": record.path
+        }
+
+    now = datetime.utcnow()
+
+    record.status = "published"
+    record.updated_at = now
+
+    db.commit()
+    db.refresh(record)
+
+    return {
+        "module": "Public Onboarding Publish",
+        "status": "published",
+        "version": "public-onboarding-publish-v1",
+        "message": "Directory listing published.",
+        "record": {
+            "id": record.id,
+            "user_id": record.user_id,
+            "path": record.path,
+            "display_name": record.display_name,
+            "payload_json": record.payload_json,
+            "status": record.status,
+            "verification_status": record.verification_status,
+            "updated_at": record.updated_at
+        }
+    }
+
+
+
+@router.get("/onboarding/record")
+def public_get_onboarding_record(
+    onboarding_id: int,
+    db: Session = Depends(get_db)
+):
+    record = db.query(OnboardingRecord).filter(
+        OnboardingRecord.id == onboarding_id
+    ).first()
+
+    if not record:
+        return {
+            "module": "Public Onboarding Record",
+            "status": "error",
+            "message": "Onboarding record not found."
+        }
+
+    return {
+        "module": "Public Onboarding Record",
+        "status": "active",
+        "version": "public-onboarding-record-read-v1",
+        "record": {
+            "id": record.id,
+            "user_id": record.user_id,
+            "path": record.path,
+            "display_name": record.display_name,
+            "email": record.email,
+            "payload_json": record.payload_json,
+            "status": record.status,
+            "verification_status": record.verification_status,
+            "created_at": record.created_at,
+            "updated_at": record.updated_at
+        }
+    }
+
+
+@router.get("/onboarding/verify")
+def public_verify_onboarding_record(
+    token: str,
+    db: Session = Depends(get_db)
+):
+    clean_token = (token or "").strip()
+
+    if not clean_token:
+        return {
+            "module": "Public Onboarding Verification",
+            "status": "error",
+            "message": "Missing verification token."
+        }
+
+    record = db.query(OnboardingRecord).filter(
+        OnboardingRecord.verification_token == clean_token
+    ).first()
+
+    if not record:
+        return {
+            "module": "Public Onboarding Verification",
+            "status": "error",
+            "message": "Verification token not found."
+        }
+
+    now = datetime.utcnow()
+
+    record.verification_status = "verified"
+    record.status = "verified"
+    record.verified_at = now
+    record.updated_at = now
+
+    db.commit()
+    db.refresh(record)
+
+    return {
+        "module": "Public Onboarding Verification",
+        "status": "verified",
+        "version": "public-onboarding-verification-v1",
+        "message": "Onboarding record verified. Dashboard access can now be enabled.",
+        "record": {
+            "id": record.id,
+            "path": record.path,
+            "display_name": record.display_name,
+            "email": record.email,
+            "payload_json": record.payload_json,
+            "status": record.status,
+            "verification_status": record.verification_status,
+            "verified_at": record.verified_at,
+            "updated_at": record.updated_at,
+        },
+        "next": {
+            "dashboard_status": "enabled",
+            "publish_status": "not_published"
+        }
+    }
+
+@router.post("/onboarding/complete-account")
+def public_complete_onboarding_account(
+    token: str,
+    password: str,
+    db: Session = Depends(get_db)
+):
+    clean_token = (token or "").strip()
+    clean_password = (password or "").strip()
+
+    if not clean_token:
+        return {
+            "module": "Public Onboarding Account Completion",
+            "status": "error",
+            "message": "Missing verification token."
+        }
+
+    if len(clean_password) < 8:
+        return {
+            "module": "Public Onboarding Account Completion",
+            "status": "error",
+            "message": "Password must be at least 8 characters."
+        }
+
+    record = db.query(OnboardingRecord).filter(
+        OnboardingRecord.verification_token == clean_token
+    ).first()
+
+    if not record:
+        return {
+            "module": "Public Onboarding Account Completion",
+            "status": "error",
+            "message": "Onboarding record not found."
+        }
+
+    if record.verification_status != "verified":
+        return {
+            "module": "Public Onboarding Account Completion",
+            "status": "error",
+            "message": "Email must be verified before account creation."
+        }
+
+    if record.user_id:
+        existing_linked_user = db.query(User).filter(User.id == record.user_id).first()
+
+        if existing_linked_user:
+            token_value = create_access_token({
+                "sub": existing_linked_user.email,
+                "role": existing_linked_user.role,
+                "user_id": existing_linked_user.id
+            })
+
+            return {
+                "module": "Public Onboarding Account Completion",
+                "status": "already_completed",
+                "version": "public-onboarding-complete-account-v1",
+                "message": "Account already exists for this onboarding record.",
+                "access_token": token_value,
+                "token_type": "bearer",
+                "user": {
+                    "id": existing_linked_user.id,
+                    "email": existing_linked_user.email,
+                    "role": existing_linked_user.role,
+                    "status": existing_linked_user.status,
+                    "affiliate_id": existing_linked_user.affiliate_id,
+                    "referral_code": existing_linked_user.referral_code
+                },
+                "onboarding": {
+                    "id": record.id,
+                    "path": record.path,
+                    "status": record.status,
+                    "verification_status": record.verification_status
+                },
+                "next": {
+                    "dashboard_status": "enabled"
+                }
+            }
+
+    existing_user = db.query(User).filter(User.email == record.email).first()
+
+    if existing_user:
+        record.user_id = existing_user.id
+        record.status = "account_linked"
+        record.updated_at = datetime.utcnow()
+
+        db.commit()
+        db.refresh(record)
+
+        return {
+            "module": "Public Onboarding Account Completion",
+            "status": "error",
+            "message": "An account already exists for this email. Please log in instead.",
+            "onboarding": {
+                "id": record.id,
+                "path": record.path,
+                "status": record.status,
+                "verification_status": record.verification_status,
+                "user_id": record.user_id
+            }
+        }
+
+    now = datetime.utcnow()
+
+    user = User(
+        email=record.email,
+        hashed_password=get_password_hash(clean_password),
+        role="free",
+        status="active",
+        affiliate_id=generate_affiliate_id(),
+        referral_code=generate_referral_code()
+    )
+
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    record.user_id = user.id
+    record.status = "account_created"
+    record.updated_at = now
+
+    db.commit()
+    db.refresh(record)
+
+    token_value = create_access_token({
+        "sub": user.email,
+        "role": user.role,
+        "user_id": user.id
+    })
+
+    return {
+        "module": "Public Onboarding Account Completion",
+        "status": "account_created",
+        "version": "public-onboarding-complete-account-v1",
+        "message": "Account created. Affiliate ID issued. Dashboard access enabled.",
+        "access_token": token_value,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "role": user.role,
+            "status": user.status,
+            "affiliate_id": user.affiliate_id,
+            "referral_code": user.referral_code
+        },
+        "onboarding": {
+            "id": record.id,
+            "path": record.path,
+            "status": record.status,
+            "verification_status": record.verification_status,
+            "user_id": record.user_id
+        },
+        "next": {
+            "dashboard_status": "enabled",
+            "dashboard_url": "/21/dashboard.html?onboarding_id=" + str(record.id) + "&path=" + str(record.path)
+        }
     }
 
