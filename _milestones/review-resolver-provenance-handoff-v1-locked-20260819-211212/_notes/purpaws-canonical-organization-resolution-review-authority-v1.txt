@@ -1,0 +1,668 @@
+PURPAWS CANONICAL ORGANIZATION RESOLUTION REVIEW AUTHORITY v1
+
+STATUS
+
+LOCKED.
+
+
+================================================================================
+PURPOSE
+================================================================================
+
+This document defines the authority that may explicitly establish that one
+intake source refers to one existing canonical Organization.
+
+It exists between:
+
+Organization Resolver REVIEW
+
+and:
+
+Canonicalization Provenance REUSE.
+
+It does not replace the Organization Resolver.
+
+It does not create Organization membership.
+
+It does not grant permissions.
+
+It does not determine eligibility, commerce, publication, or Directory state.
+
+
+================================================================================
+GOVERNING ARCHITECTURE
+================================================================================
+
+This authority is governed by:
+
+purpaws-canonical-organization-resolution-invariants-v1.txt
+
+The following remain locked:
+
+Person != Organization
+
+Organization != Location
+
+Organization != Brand
+
+Observed Fact != Canonical Fact
+
+Domain Match = Strong Evidence
+
+Similarity != Identity
+
+Relationship = Separate Authority
+
+Permission = Separate Authority
+
+Publication = Separate Authority
+
+Directory = Aggregation / Projection
+
+DEFER RATHER THAN GUESS.
+
+
+================================================================================
+WHY THIS AUTHORITY EXISTS
+================================================================================
+
+The Organization Resolver may discover that an intake source appears to match
+an existing Organization.
+
+Example:
+
+OnboardingRecord #15
+
+organization_name = Purpaws.ca
+website_url = www.purpaws.ca
+location = Toronto, Ontario
+
+Possible canonical candidate:
+
+Organization #2
+
+organization_name = PurPaws Testing
+website_url = www.purpaws.ca
+location = Toronto, Ontario, Canada
+
+The exact normalized domain match is strong evidence.
+
+It is not, by itself, universal canonical merge authority.
+
+Therefore:
+
+Resolver => REVIEW
+
+A separate trusted authority must establish whether the source actually refers
+to the existing Organization.
+
+
+================================================================================
+CORE PRINCIPLE
+================================================================================
+
+The resolver may consume an established target.
+
+The resolver must not manufacture the authority that establishes that target.
+
+
+================================================================================
+REVIEW SUBJECT
+================================================================================
+
+A review concerns one source-to-target identity question.
+
+Example:
+
+source_type = onboarding_record
+source_id   = 15
+
+target_type = organization
+target_id   = 2
+
+Question:
+
+Does this source describe / represent this canonical Organization?
+
+
+================================================================================
+REVIEW DECISIONS
+================================================================================
+
+The minimum supported review decisions are:
+
+ESTABLISHED
+
+The reviewer explicitly determines that the source refers to the target
+canonical Organization.
+
+
+NOT_SAME
+
+The reviewer explicitly determines that the source does not refer to the
+candidate target.
+
+
+DEFERRED
+
+The available evidence is insufficient or conflicting.
+
+No canonical target is established.
+
+
+================================================================================
+ESTABLISHED MEANS
+================================================================================
+
+ESTABLISHED means only:
+
+this source refers to this canonical Organization.
+
+It does NOT automatically mean:
+
+- the linked User owns the Organization
+- the linked User is employed by the Organization
+- the linked User is an administrator
+- the linked User is a steward
+- the linked User has edit permission
+- the linked User may invite teammates
+- the linked User may publish
+- the Organization is eligible
+- commerce is satisfied
+- workspace entitlement exists
+- publication entitlement exists
+
+
+================================================================================
+NOT_SAME MEANS
+================================================================================
+
+NOT_SAME means:
+
+the reviewed candidate target is not the canonical Organization described by
+this source.
+
+It does not automatically authorize creation of a new Organization.
+
+After NOT_SAME, the source may require:
+
+- another candidate review
+- new evidence
+- resolver re-evaluation
+- safe CREATE classification
+
+
+================================================================================
+DEFERRED MEANS
+================================================================================
+
+DEFERRED means:
+
+the evidence does not support a safe identity decision.
+
+The system must preserve ambiguity rather than guess.
+
+
+================================================================================
+DURABLE REVIEW RECORD
+================================================================================
+
+A durable Organization Resolution Review should preserve at minimum:
+
+source_type
+source_id
+
+target_type
+target_id
+
+decision
+basis
+
+evidence_summary
+
+reviewer_user_id
+reviewed_at
+
+created_at
+updated_at
+
+
+================================================================================
+SOURCE IDENTITY
+================================================================================
+
+For launch onboarding:
+
+source_type = onboarding_record
+
+source_id = OnboardingRecord.id
+
+
+================================================================================
+TARGET IDENTITY
+================================================================================
+
+For the current resolver:
+
+target_type = organization
+
+target_id = PartnerOrganization.id
+
+
+================================================================================
+REVIEW BASIS
+================================================================================
+
+The review basis explains what authority or evidence supported the decision.
+
+Possible bases may include:
+
+admin_review
+
+existing_steward_confirmation
+
+teammate_invitation
+
+organizational_domain_evidence
+
+documentary_evidence
+
+participant_confirmation_with_supporting_evidence
+
+manual_resolution
+
+future_locked_authority
+
+
+================================================================================
+DOMAIN EVIDENCE
+================================================================================
+
+Exact normalized domain equality may be included as strong review evidence.
+
+Example:
+
+source normalized domain:
+purpaws.ca
+
+target normalized domain:
+purpaws.ca
+
+This substantially supports identity resolution.
+
+It does not universally force ESTABLISHED.
+
+
+================================================================================
+REVIEW EVIDENCE
+================================================================================
+
+Evidence may include:
+
+- raw organization name submitted
+- normalized organization name
+- raw website submitted
+- normalized domain
+- location
+- contact information
+- prior source references
+- existing provenance
+- prior Organization relationships
+- administrative knowledge
+- organizational documents
+- invitation context
+- steward confirmation
+- FCIS evidence where appropriate
+
+The evidence summary must not overwrite or erase the underlying source facts.
+
+
+================================================================================
+AUTHORIZED REVIEWER
+================================================================================
+
+A review decision must be produced by an authorized authority.
+
+For launch v1, the minimum safe authority may be restricted to:
+
+admin
+super_admin
+
+until additional steward / invitation / domain-verification governance is
+separately locked and implemented.
+
+Ordinary authenticated membership alone is not sufficient review authority.
+
+
+================================================================================
+FUTURE REVIEW AUTHORITIES
+================================================================================
+
+Future authorized review paths may include:
+
+- existing Organization steward confirmation
+- accepted teammate invitation
+- verified organizational-domain control
+- documentary evidence
+- delegated Organization administrator
+- trusted FCIS/manual review
+
+These are not automatically authorized by this v1 architecture note.
+
+Each must be implemented under an explicit governance rule.
+
+
+================================================================================
+REVIEW AUTHORITY IS NOT RELATIONSHIP AUTHORITY
+================================================================================
+
+Establishing:
+
+onboarding_record:15 -> organization:2
+
+does not establish:
+
+user:8 -> organization:2
+
+Those are separate facts.
+
+A User/Organization relationship must be created through its own authority.
+
+
+================================================================================
+REVIEW AUTHORITY IS NOT PERMISSION AUTHORITY
+================================================================================
+
+A reviewer may establish canonical identity without granting the linked User
+any application permission.
+
+Permission remains separate.
+
+
+================================================================================
+REVIEW AUTHORITY IS NOT CANONICALIZATION PROVENANCE ITSELF
+================================================================================
+
+The review record preserves:
+
+who decided
+what was decided
+why
+when
+
+Canonicalization provenance preserves:
+
+source -> canonical target
+
+The review may authorize provenance creation.
+
+The two records serve different purposes and must not be silently collapsed.
+
+
+================================================================================
+PROVENANCE HANDOFF
+================================================================================
+
+After an ESTABLISHED review:
+
+source:
+onboarding_record:15
+
+target:
+organization:2
+
+the trusted handoff may invoke the resolver with:
+
+established_target_id = 2
+
+The resolver may then return:
+
+REUSE
+
+reason = explicitly_established_target
+
+
+================================================================================
+PROVENANCE CREATION
+================================================================================
+
+After trusted REUSE is confirmed, canonicalization authority may create:
+
+source_type = onboarding_record
+source_id   = 15
+target_type = organization
+target_id   = 2
+
+This provenance must remain idempotent for the same source.
+
+
+================================================================================
+SAME-SOURCE IDEMPOTENCY
+================================================================================
+
+Once provenance exists:
+
+onboarding_record:15 -> organization:2
+
+future resolution of onboarding_record:15 must reuse organization:2.
+
+A later review must not silently redirect the same source to another target
+without an explicit reconciliation authority.
+
+
+================================================================================
+MULTI-MEMBER / SINGLE-ORGANIZATION
+================================================================================
+
+Different onboarding sources may independently establish the same target.
+
+Example:
+
+onboarding_record:15 -> organization:2
+
+onboarding_record:16 -> organization:2
+
+onboarding_record:17 -> organization:2
+
+Each source keeps its own review evidence and provenance.
+
+Only one canonical Organization is required.
+
+
+================================================================================
+NO LAST-WRITE-WINS
+================================================================================
+
+A new review for another member does not overwrite canonical Organization facts
+simply because it is newer.
+
+Submitted facts remain evidence.
+
+
+================================================================================
+NO AUTOMATIC ORGANIZATION MEMBER CREATION
+================================================================================
+
+An ESTABLISHED review must not automatically create OrganizationMember.
+
+Membership remains downstream.
+
+
+================================================================================
+NO AUTOMATIC STEWARDSHIP
+================================================================================
+
+An ESTABLISHED review must not automatically create:
+
+owner
+manager
+admin
+steward
+
+or any equivalent role.
+
+
+================================================================================
+NO AUTOMATIC TEAM INVITATION
+================================================================================
+
+Teammate invitation remains separate access-governance authority.
+
+
+================================================================================
+NO AUTOMATIC ELIGIBILITY
+================================================================================
+
+Organization identity resolution does not determine eligibility.
+
+
+================================================================================
+NO AUTOMATIC COMMERCE
+================================================================================
+
+Organization identity resolution does not determine commerce requirement or
+commerce fulfillment.
+
+
+================================================================================
+NO AUTOMATIC WORKSPACE ACCESS
+================================================================================
+
+Canonical identity resolution does not by itself grant workspace entitlement.
+
+
+================================================================================
+NO AUTOMATIC PUBLICATION
+================================================================================
+
+Canonical identity resolution does not imply publication entitlement or
+publication state.
+
+
+================================================================================
+NO DIRECTORY MUTATION
+================================================================================
+
+Directory remains downstream aggregation / projection.
+
+Review authority must not mutate Directory state.
+
+
+================================================================================
+AUDITABILITY
+================================================================================
+
+Every ESTABLISHED decision must be explainable later.
+
+At minimum the system must be able to answer:
+
+- which source was reviewed?
+- which target was reviewed?
+- who reviewed it?
+- what decision was made?
+- on what basis?
+- what evidence was considered?
+- when was it reviewed?
+
+
+================================================================================
+IMMUTABILITY / HISTORY PRINCIPLE
+================================================================================
+
+Historical review decisions should not be destructively erased.
+
+If later reconciliation changes identity understanding, that change should be
+represented through a future explicit reconciliation authority rather than
+silent history rewriting.
+
+
+================================================================================
+LAUNCH v1 AUTHORITY BOUNDARY
+================================================================================
+
+The first executable implementation should remain deliberately small.
+
+It may:
+
+- validate source existence
+- validate target existence
+- require authorized reviewer role
+- validate decision vocabulary
+- preserve review basis
+- preserve evidence summary
+- preserve reviewer identity
+- preserve reviewed_at
+- support idempotent read/review behavior
+- expose an ESTABLISHED target to trusted canonicalization flow
+
+It must not:
+
+- create OrganizationMember
+- assign ownership
+- assign stewardship
+- grant permission
+- invite teammates
+- determine eligibility
+- determine commerce
+- grant workspace entitlement
+- publish
+- mutate Directory
+- rewrite canonical Organization facts
+
+
+================================================================================
+CONTROLLED #15 INTENT
+================================================================================
+
+Current controlled test:
+
+OnboardingRecord #15
+
+Resolver result:
+REVIEW
+
+Candidate:
+Organization #2
+
+Evidence:
+exact normalized domain purpaws.ca
+
+The review authority may later establish:
+
+onboarding_record:15
+    ->
+organization:2
+
+only through an authorized review decision.
+
+No such decision is created by this architecture lock.
+
+
+================================================================================
+IMPLEMENTATION DISCIPLINE
+================================================================================
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+When evidence is insufficient:
+
+DEFER RATHER THAN GUESS.
+
+
+================================================================================
+LOCK
+================================================================================
+
+PURPAWS CANONICAL ORGANIZATION RESOLUTION REVIEW AUTHORITY v1 — LOCKED.

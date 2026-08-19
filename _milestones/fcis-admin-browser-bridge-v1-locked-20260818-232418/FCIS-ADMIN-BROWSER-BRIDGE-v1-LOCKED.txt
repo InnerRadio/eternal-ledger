@@ -1,0 +1,106 @@
+FCIS ADMIN BROWSER BRIDGE v1 — LOCKED
+
+Locked:
+20260818-232418
+
+LIVE EXTERNAL BROWSER ENTRY
+
+https://eternalledger.com/api/admin/fcis-desk.html
+
+LIVE BROWSER PATH
+
+/api/admin/fcis-desk.html
+
+LOGIN
+
+POST /api/cms/login
+
+NGINX maps this to internal FastAPI:
+
+POST /cms/login
+
+PRIVATE INTELLIGENCE
+
+GET /api/fcis/desk
+
+NGINX maps this to internal FastAPI:
+
+GET /fcis/desk
+
+TOKEN HANDLING
+
+sessionStorage only.
+
+Bearer token attached through Authorization header.
+
+No token in URL.
+No localStorage.
+No cookie shortcut.
+
+AUTHORIZATION
+
+FCIS Private Access Authority v1.
+
+Requirements:
+
+- authenticated bearer identity
+- live User record exists
+- live User status == active
+- live User role == admin
+
+LIVE DATABASE ROLE IS AUTHORITATIVE.
+
+DESK
+
+Dynamic read-only FCIS Intelligence Desk.
+
+Verified visually in the live browser.
+
+LABORATORY STATE
+
+Canonical contexts: 6
+Canonical relationships: 3
+Opportunity signals: 2
+Opportunity Cards: 2
+
+CURRENT INTERACTION
+
+INSPECT
+read-only
+
+NOT IMPLEMENTED
+
+WATCH
+DEVELOP
+DISMISS
+
+BOUNDARY
+
+Human review required.
+
+Correlation creates:
+- no canonical facts
+- no canonical relationships
+- no authorized actions
+
+Desk creates:
+- no workflow state
+- no public projection
+
+ARCHITECTURAL CHAIN
+
+Evidence
+→ Canonical Context
+→ Context Reader
+→ Correlation Engine
+→ Relationship Context
+→ Opportunity Card
+→ Private Intelligence Desk
+→ Authenticated Human Review
+
+NEXT HILL
+
+FCIS INSPECT v1
+
+Define what INSPECT reveals before granting
+any workflow mutation authority.

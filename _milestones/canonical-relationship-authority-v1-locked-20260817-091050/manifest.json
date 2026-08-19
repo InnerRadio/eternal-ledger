@@ -1,0 +1,16 @@
+{
+  "milestone": "canonical-relationship-authority-v1-locked-20260817-091050",
+  "locked_at": "20260817-091050",
+  "authority": "canonical_relationships",
+  "relationship_rows": 0,
+  "canonical_endpoint_v1": "organization -> organization",
+  "directory_parity": [
+    "founder-1",
+    "partner-1",
+    "partner-2",
+    "organization-2"
+  ],
+  "directory_12_superseded": true,
+  "partner_projection_changed": false,
+  "relationship_backfill_performed": false
+}

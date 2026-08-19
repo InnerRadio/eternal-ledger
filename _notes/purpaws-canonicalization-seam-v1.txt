@@ -1,0 +1,1102 @@
+PURPAWS CANONICALIZATION SEAM v1
+
+STATUS
+Defined for verification.
+Not yet locked.
+
+
+================================================================================
+PURPOSE
+================================================================================
+
+This document defines the canonical boundary between:
+
+transitional intake facts
+
+and:
+
+durable PurPaws network records, relationships, classifications, and public
+projections.
+
+Canonicalization is the controlled process by which facts collected during
+onboarding are interpreted under the governing PurPaws architecture and
+translated into durable network structure.
+
+This document defines architecture.
+
+It does not implement canonicalization.
+
+
+================================================================================
+GOVERNING ARCHITECTURE
+================================================================================
+
+This design is governed by the locked:
+
+1. PurPaws Canonical Network Ontology v1
+2. PurPaws Canonical Onboarding Mapping v1
+3. PurPaws Canonical Intake Contract v1
+4. PurPaws Canonical Intake Vocabulary v1
+5. PurPaws Participant / Organization Branching v1
+
+This seam may not redefine those layers.
+
+
+================================================================================
+CORE PRINCIPLE
+================================================================================
+
+Onboarding collects facts and intent.
+
+Canonicalization determines what durable network structure those facts imply.
+
+Publication determines whether an eligible public projection becomes visible.
+
+Directory aggregation consumes published projections.
+
+These are separate responsibilities.
+
+
+Conceptually:
+
+Onboarding
+    ↓
+Facts + Intent + Evidence
+    ↓
+Canonicalization
+    ↓
+Durable Entities / Records / Relationships
+    ↓
+Classification
+    ↓
+Eligibility
+    ↓
+Commerce Requirement
+    ↓
+Commerce Fulfillment
+    ↓
+Publication Entitlement
+    ↓
+Published Public Projection
+    ↓
+Projection Feed
+    ↓
+Directory Aggregation
+
+
+================================================================================
+ONBOARDINGRECORD BOUNDARY
+================================================================================
+
+OnboardingRecord remains transitional intake storage.
+
+It may preserve:
+
+- entry experience
+- participant-supplied facts
+- declarations
+- draft workspace content
+- verification state
+- intake evidence references
+- canonicalization references
+- processing state
+
+It must not become the permanent canonical identity store merely because the
+current implementation can publish directly from it.
+
+
+================================================================================
+CURRENT IMPLEMENTATION REALITY
+================================================================================
+
+The current implementation already contains one legitimate transition:
+
+OnboardingRecord
+    ↓
+verified email
+    ↓
+account completion
+    ↓
+User creation or User linkage
+    ↓
+OnboardingRecord.user_id
+
+This is a valid example of transitional intake becoming connected to a durable
+canonical record.
+
+The current Directory path behaves differently.
+
+For Directory records, publication currently changes the OnboardingRecord
+status to published and the public Directory may read payload_json directly.
+
+That behavior is transitional.
+
+Canonicalization v1 must provide the architectural replacement for that direct
+intake-to-Directory shortcut.
+
+
+================================================================================
+CANONICALIZATION AUTHORITY
+================================================================================
+
+Canonicalization is a backend domain responsibility.
+
+It is not a frontend responsibility.
+
+It must not be performed implicitly by:
+
+- a Directory renderer
+- a frontend onboarding card
+- a public profile component
+- a dashboard view
+- a URL path
+- a role label
+- a payment result
+
+The canonicalization authority evaluates intake facts under the locked
+architecture and determines what durable records and relationships should
+exist.
+
+
+================================================================================
+CANONICALIZATION INPUT
+================================================================================
+
+Canonicalization may consume:
+
+- OnboardingRecord identity
+- linked User identity
+- acting_capacity
+- entry experience / intent
+- participant declarations
+- organization facts
+- companion facts
+- event facts
+- memorial facts
+- creator facts
+- Partner intent
+- Founder intent
+- website evidence
+- uploaded evidence
+- review evidence
+- existing canonical records
+- existing relationships
+
+The existence of an intake field does not guarantee creation of a new
+canonical record.
+
+
+================================================================================
+CANONICALIZATION OUTPUT
+================================================================================
+
+Depending on the intake facts, canonicalization may create or connect:
+
+- User
+- Organization
+- User ↔ Organization relationship
+- Companion
+- User ↔ Companion relationship
+- Memorial
+- Event
+- Creator role / relationship
+- Partner relationship / collaboration status
+- Founder role / recognition status
+- Rescue-related canonical records
+- public projection records
+- classification records or fields
+- provenance links
+
+One intake may result in multiple related durable records.
+
+
+================================================================================
+CANONICALIZATION DOES NOT MEAN PUBLICATION
+================================================================================
+
+A canonical record may exist without being public.
+
+Therefore:
+
+canonical record exists
+    !=
+published
+
+canonical relationship exists
+    !=
+published
+
+organization exists
+    !=
+Directory listing
+
+Partner relationship exists
+    !=
+Partner profile published
+
+Memorial exists
+    !=
+Memorial public projection published
+
+Publication is a later entitlement and projection decision.
+
+
+================================================================================
+CANONICALIZATION DOES NOT MEAN ELIGIBILITY
+================================================================================
+
+Canonicalization records what exists.
+
+Eligibility determines whether the relevant participation qualifies under
+PurPaws rules.
+
+Therefore:
+
+Organization exists
+    +
+eligibility_status = review_pending
+
+is valid.
+
+Likewise:
+
+Partner relationship exists
+    +
+publication entitlement unavailable
+
+is valid.
+
+
+================================================================================
+CANONICALIZATION DOES NOT MEAN COMMERCE COMPLETION
+================================================================================
+
+Canonicalization must not wait for payment merely to establish that a real
+Organization or relationship exists.
+
+Commerce is downstream.
+
+For example:
+
+Organization
+    exists
+
+activity_nature
+    commercial
+
+eligibility_status
+    verified_commercial
+
+commerce_requirement
+    required
+
+commerce_status
+    unstarted
+
+may coexist.
+
+Commerce fulfillment controls the applicable entitlement, not the existence of
+the canonical Organization.
+
+
+================================================================================
+PERSON / ORGANIZATION CANONICALIZATION
+================================================================================
+
+When intake establishes that a person acts for an Organization:
+
+User
+    ↓
+Organization Relationship
+    ↓
+Organization
+
+must be preserved.
+
+The canonicalization process must not:
+
+- turn the User into the Organization
+- turn the Organization into the User
+- assign Organization commercial status to the User
+- infer Partner status solely because an Organization exists
+- assume one User can have only one Organization
+
+
+================================================================================
+ORGANIZATION DEDUPLICATION PRINCIPLE
+================================================================================
+
+Canonicalization must not blindly create a new Organization for every intake.
+
+Before durable Organization creation, implementation must eventually support
+appropriate matching or review against existing Organizations.
+
+Potential evidence may include:
+
+- organization name
+- website
+- domain
+- location
+- contact information
+- known people
+- FCIS evidence
+- prior intake references
+
+This document does not define an executable deduplication algorithm.
+
+That requires its own inspection and implementation cycle.
+
+
+================================================================================
+IDEMPOTENCY PRINCIPLE
+================================================================================
+
+Canonicalization must be safe to invoke more than once for the same intake.
+
+Repeated processing must not silently create duplicate:
+
+- Users
+- Organizations
+- Organization relationships
+- Companions
+- Memorials
+- Events
+- Partner relationships
+- Founder records
+- public projections
+
+Implementation must eventually provide durable canonicalization references or
+equivalent idempotency protection.
+
+
+================================================================================
+PROVENANCE PRINCIPLE
+================================================================================
+
+Canonicalization must preserve meaningful provenance.
+
+A durable record should be traceable, where applicable, to:
+
+- originating intake
+- participant declaration
+- supplied evidence
+- review evidence
+- canonicalization decision
+- resulting relationship
+- resulting public projection
+
+Canonicalization strengthens the network record.
+
+It must not erase the evidence that produced it.
+
+
+================================================================================
+DECLARATION VS DETERMINATION
+================================================================================
+
+The locked distinction remains:
+
+declared_activity_nature
+    =
+what the participant declared
+
+activity_nature
+    =
+what PurPaws determined
+
+Canonicalization may carry the declaration into the durable record while later
+review establishes activity_nature.
+
+The declaration must not be silently rewritten merely because the
+determination differs.
+
+
+================================================================================
+PUBLIC PROJECTION PRINCIPLE
+================================================================================
+
+Canonical entities are not themselves required to be the exact payload shape
+used by the frontend.
+
+A public projection is a publication-oriented representation of canonical
+records and relationships.
+
+For example:
+
+Organization
+    +
+Partner relationship
+    ↓
+Partner Profile Projection
+
+or:
+
+Organization
+    ↓
+Organization Profile Projection
+
+or:
+
+User
+    +
+Creator relationship
+    ↓
+Creator Profile Projection
+
+The projection is public presentation.
+
+It does not redefine canonical identity.
+
+
+================================================================================
+MULTI-PROJECTION FEED PRINCIPLE
+================================================================================
+
+The Directory may aggregate multiple separate public projection feeds.
+
+Examples include:
+
+- Organization Feed
+- Partner Feed
+- Creator Feed
+- Founder Feed
+- Companion Feed
+- Memorial Feed
+- Event Feed
+- other future projection feeds
+
+Each feed represents published projections appropriate to that public
+experience.
+
+A separate feed does not imply a separate canonical identity system.
+
+
+================================================================================
+PARTNER FEED PRINCIPLE
+================================================================================
+
+Partner remains a relationship / collaboration status.
+
+A published Partner Profile is a valid public projection derived from canonical
+records and relationships.
+
+Conceptually:
+
+Organization
+    +
+Partner relationship / status
+    +
+publication entitlement
+    ↓
+Partner Profile Projection
+    ↓
+Partner Feed
+    ↓
+Directory Aggregator
+
+This allows Partner profiles to feed the Directory directly through a distinct
+public feed without treating Partner as the underlying identity of the
+Organization.
+
+
+================================================================================
+ORGANIZATION FEED PRINCIPLE
+================================================================================
+
+A published Organization Profile may feed the Directory independently of the
+Partner feed.
+
+Conceptually:
+
+Organization
+    +
+publication entitlement
+    ↓
+Organization Profile Projection
+    ↓
+Organization Feed
+    ↓
+Directory Aggregator
+
+An Organization may therefore exist in the network without being a Partner.
+
+An Organization may later also acquire a Partner relationship.
+
+The feeds may reflect distinct public meanings while referencing the same
+canonical Organization.
+
+
+================================================================================
+DIRECTORY AGGREGATOR PRINCIPLE
+================================================================================
+
+The Directory consumes published projections.
+
+The Directory does not determine:
+
+- canonical identity
+- acting capacity
+- role
+- Partner status
+- Founder status
+- activity classification
+- eligibility
+- commerce requirement
+- commerce fulfillment
+
+Those meanings are resolved upstream.
+
+The Directory is an aggregation and discovery layer.
+
+
+================================================================================
+MULTIPLE PROJECTIONS
+================================================================================
+
+A canonical participant or Organization may legitimately support more than one
+public projection.
+
+For example, an Organization may have:
+
+Organization Profile Projection
+
+and:
+
+Partner Profile Projection
+
+if the relevant relationships and publication entitlements support both.
+
+These are separate public projections over shared canonical truth.
+
+They must not require duplicate Organization identity.
+
+
+================================================================================
+PUBLICATION AUTHORITY
+================================================================================
+
+Publication occurs after canonicalization.
+
+Publication authority evaluates whether a specific public projection may become
+visible.
+
+Possible dependencies may include:
+
+- email verification
+- eligibility
+- commerce requirement
+- commerce fulfillment
+- moderation
+- completeness
+- policy
+- projection-specific rules
+
+The exact entitlement logic requires a separate implementation design.
+
+
+================================================================================
+CANONICALIZATION FAILURE PRINCIPLE
+================================================================================
+
+If canonicalization cannot safely determine the durable target, the system
+should not guess.
+
+Possible outcomes may include:
+
+- canonicalized
+- canonicalization_pending
+- review_required
+- conflict_detected
+- insufficient_information
+
+These are conceptual outcomes only.
+
+Executable state vocabulary requires separate verification before
+implementation.
+
+
+================================================================================
+PARTIAL CANONICALIZATION
+================================================================================
+
+Canonicalization may legitimately succeed for one aspect of intake while
+another remains unresolved.
+
+Example:
+
+User
+    canonicalized
+
+Organization
+    canonicalized
+
+User ↔ Organization relationship
+    canonicalized
+
+activity_nature
+    uncertain
+
+eligibility_status
+    review_required
+
+This must not be treated as total failure.
+
+
+================================================================================
+EXISTING MODEL MAPPING PRINCIPLE
+================================================================================
+
+Existing models are implementation assets, not automatic canonical truth.
+
+Examples:
+
+User
+    already strongly aligns with account-backed person identity.
+
+OnboardingRecord
+    aligns with transitional intake.
+
+OrganizationMember
+    provides an existing User ↔ Organization relationship seam.
+
+PartnerOrganization
+    provides an existing organization-oriented record and may evolve toward
+    the canonical Organization concept.
+
+PublicProfile
+    provides an existing public-profile concept.
+
+FounderProfile
+    provides Founder-oriented projection / participation information.
+
+RescueProfile
+    remains subject to the previously locked mapping questions.
+
+No model replacement is authorized by this document.
+
+
+================================================================================
+CANONICALIZATION REFERENCE PRINCIPLE
+================================================================================
+
+Future implementation should make it possible to know whether an intake has
+already been canonicalized and which durable records resulted.
+
+Conceptually, this may include references such as:
+
+onboarding_id
+    ↓
+canonical User id
+
+onboarding_id
+    ↓
+canonical Organization id
+
+onboarding_id
+    ↓
+canonical relationship id
+
+onboarding_id
+    ↓
+canonical record ids
+
+The exact storage mechanism remains an implementation question.
+
+
+================================================================================
+MIGRATION PRINCIPLE
+================================================================================
+
+Existing published Directory records sourced directly from OnboardingRecord
+must not be destroyed abruptly.
+
+Migration should allow the working Directory to remain operational while
+canonical public projections are introduced.
+
+Conceptually:
+
+Legacy Onboarding Directory Feed
+        +
+New Canonical Projection Feeds
+        ↓
+Directory Aggregator
+
+followed by:
+
+canonicalization of legacy records
+        ↓
+verified projection parity
+        ↓
+retirement of direct OnboardingRecord publication feed
+
+The retirement point requires explicit verification.
+
+
+================================================================================
+NO BIG-BANG MIGRATION
+================================================================================
+
+Canonicalization should be introduced incrementally.
+
+The existing working path:
+
+Onboarding
+    ↓
+Verification
+    ↓
+Account
+    ↓
+Workspace
+    ↓
+Publish
+    ↓
+Directory
+
+must remain usable while canonicalization is added behind or alongside the
+existing process.
+
+Replacement occurs only after parity is proven.
+
+
+================================================================================
+FCIS PRINCIPLE
+================================================================================
+
+Canonicalization is a major FCIS strengthening point.
+
+Evidence arrives through intake.
+
+Canonicalization connects that evidence to durable entities and relationships.
+
+Review strengthens classification.
+
+Relationships strengthen the Opportunity Graph.
+
+Public projections expose appropriate parts of that intelligence publicly.
+
+The canonicalization seam therefore connects intake to the larger intelligence
+system without turning private evidence directly into public presentation.
+
+
+================================================================================
+WHITE-LABEL PRINCIPLE
+================================================================================
+
+Canonicalization is independent of PurPaws-specific frontend branding.
+
+A white-label implementation may use different:
+
+- onboarding names
+- public profile names
+- Directory names
+- role labels
+- visual design
+- publication wording
+
+while preserving the same canonical transition principles.
+
+
+================================================================================
+IMPLEMENTATION BOUNDARY
+================================================================================
+
+This document does NOT authorize immediate changes to:
+
+- database schema
+- models
+- OnboardingRecord
+- User
+- OrganizationMember
+- PartnerOrganization
+- PublicProfile
+- FounderProfile
+- RescueProfile
+- onboarding APIs
+- account-completion APIs
+- publication APIs
+- Directory APIs
+- frontend onboarding
+- frontend workspaces
+- public profiles
+- eligibility behavior
+- commerce behavior
+- payment behavior
+- migration behavior
+
+Each implementation change requires:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+
+================================================================================
+VERSION INDEPENDENCE
+================================================================================
+
+This architecture exists above individual frontend implementation versions.
+
+It must not depend on a specific /21/, /22/, or /23/ implementation.
+
+
+================================================================================
+STATUS
+================================================================================
+
+PURPAWS CANONICALIZATION SEAM v1 — LOCKED
+
+This architecture has been:
+
+- defined
+- inspected against existing OnboardingRecord behavior
+- inspected against existing User account-completion behavior
+- inspected against existing OrganizationMember behavior
+- inspected against existing PartnerOrganization behavior
+- inspected against existing public Directory aggregation
+- inspected against existing direct OnboardingRecord Directory publication
+- verified against the locked Canonical Network Ontology v1
+- verified against the locked Canonical Onboarding Mapping v1
+- verified against the locked Canonical Intake Contract v1
+- verified against the locked Canonical Intake Vocabulary v1
+- verified against the locked Participant / Organization Branching v1
+- reviewed for canonicalization authority
+- reviewed for publication separation
+- reviewed for eligibility separation
+- reviewed for commerce separation
+- reviewed for person / organization safety
+- reviewed for deduplication principles
+- reviewed for idempotency
+- reviewed for provenance preservation
+- reviewed for declaration vs determination
+- reviewed for public projection separation
+- reviewed for multi-projection feed architecture
+- reviewed for Partner Feed behavior
+- reviewed for Organization Feed behavior
+- reviewed for Directory aggregation boundaries
+- reviewed for multiple projections over shared canonical truth
+- reviewed for failure / partial canonicalization
+- reviewed for migration safety
+- reviewed for FCIS integration
+- reviewed for white-label compatibility
+- independently verified
+
+No remaining canonicalization-seam blockers were identified.
+
+This document now governs subsequent canonicalization implementation.
+
+
+LOCKED CANONICALIZATION PRINCIPLES
+
+- Onboarding collects facts and intent.
+
+- Canonicalization determines what durable network structure those facts imply.
+
+- Publication determines whether an eligible public projection becomes visible.
+
+- Directory aggregation consumes published projections.
+
+- OnboardingRecord remains transitional intake storage.
+
+- Canonicalization is a backend domain responsibility.
+
+- Canonicalization is not a frontend responsibility.
+
+- One intake may result in multiple durable records and relationships.
+
+- Canonicalization does not itself mean publication.
+
+- Canonicalization does not itself mean eligibility approval.
+
+- Canonicalization does not itself mean commerce completion.
+
+- User and Organization remain distinct canonical concepts.
+
+- Person ↔ Organization relationships must remain explicit.
+
+- Canonicalization must not blindly create duplicate Organizations.
+
+- Canonicalization must be safe to invoke repeatedly for the same intake.
+
+- Meaningful provenance must be preserved.
+
+- Participant declaration and PurPaws determination remain distinct.
+
+- Public projections represent canonical truth without redefining identity.
+
+- Separate public projection feeds may coexist over shared canonical truth.
+
+- Partner remains a relationship / collaboration status.
+
+- A Partner Profile may publish through a distinct Partner Feed.
+
+- An Organization Profile may publish through a distinct Organization Feed.
+
+- The same canonical Organization may support both projections where entitled.
+
+- The Directory consumes published projections and is not the authority for:
+  identity, roles, Partner status, classification, eligibility, or commerce.
+
+- Existing direct OnboardingRecord Directory publication is transitional.
+
+- Legacy and canonical projection feeds may coexist during migration.
+
+- Direct OnboardingRecord publication must not be retired until projection
+  parity has been verified.
+
+- Canonicalization may partially succeed while unresolved dimensions remain
+  pending or under review.
+
+- If durable canonical targets cannot be determined safely, the system must
+  not guess.
+
+- Canonicalization strengthens FCIS by connecting evidence to durable entities
+  and relationships without exposing private evidence directly.
+
+
+MULTI-PROJECTION FEED PRINCIPLE — LOCKED
+
+Conceptually:
+
+Canonical Truth
+    ↓
+Published Public Projections
+    ↓
+Multiple Projection Feeds
+    ↓
+Directory Aggregator
+
+Possible feeds include:
+
+- Organization Feed
+- Partner Feed
+- Creator Feed
+- Founder Feed
+- Companion Feed
+- Memorial Feed
+- Event Feed
+- future projection feeds
+
+A separate feed does not imply a separate canonical identity system.
+
+
+PARTNER FEED PRINCIPLE — LOCKED
+
+Conceptually:
+
+Organization
+    +
+Partner relationship / collaboration status
+    +
+publication entitlement
+    ↓
+Partner Profile Projection
+    ↓
+Partner Feed
+    ↓
+Directory Aggregator
+
+Partner is not the canonical identity of the Organization.
+
+
+ORGANIZATION FEED PRINCIPLE — LOCKED
+
+Conceptually:
+
+Organization
+    +
+publication entitlement
+    ↓
+Organization Profile Projection
+    ↓
+Organization Feed
+    ↓
+Directory Aggregator
+
+An Organization may exist without being a Partner.
+
+An Organization may later acquire a Partner relationship.
+
+Both projections may coexist where supported by the governing rules.
+
+
+MIGRATION PRINCIPLE — LOCKED
+
+The current working path must remain operational while canonicalization is
+introduced.
+
+Conceptually:
+
+Legacy Onboarding Directory Feed
+        +
+Canonical Projection Feeds
+        ↓
+Directory Aggregator
+
+Then:
+
+legacy record canonicalization
+        ↓
+projection parity verification
+        ↓
+explicit retirement decision
+        ↓
+retirement of direct OnboardingRecord Directory publication
+
+No big-bang migration is authorized.
+
+
+IMPLEMENTATION BOUNDARY
+
+This lock governs architecture.
+
+It does not itself authorize:
+
+- database schema changes
+- model changes
+- OnboardingRecord changes
+- User changes
+- OrganizationMember changes
+- PartnerOrganization changes
+- PublicProfile changes
+- FounderProfile changes
+- RescueProfile changes
+- onboarding API changes
+- account-completion API changes
+- publication API changes
+- Directory API changes
+- frontend changes
+- eligibility changes
+- commerce changes
+- payment changes
+- migration execution
+
+Each implementation change requires its own:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+Future changes to these governing canonicalization principles require a new
+version rather than silent mutation of v1.
+
+LOCKED.

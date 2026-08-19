@@ -1,0 +1,17 @@
+{
+  "milestone": "fcis-private-intelligence-v1-locked-20260817-124137",
+  "locked_at": "20260817-124137",
+  "authority": "FCIS Private Intelligence v1",
+  "relationship_reader": "backend/app/fcis/relationship_reader.py",
+  "private_briefing": "backend/app/fcis/briefing.py",
+  "canonical_relationships": 3,
+  "active_relationships": 2,
+  "pending_relationships": 1,
+  "alpha_relationships": 2,
+  "alpha_neighbors": 2,
+  "opportunity_candidates": 1,
+  "public_api_changed": false,
+  "database_schema_changed": false,
+  "database_data_changed": false,
+  "principle": "FCIS discovers opportunity. Humans authorize action."
+}

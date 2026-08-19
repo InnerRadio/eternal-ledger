@@ -1,0 +1,128 @@
+PURPAWS CANONICALIZER v1 — LOCKED
+
+LOCKED AT
+2026-08-15 02:18:32
+
+STATUS
+
+VERIFIED IMPLEMENTATION.
+
+SOURCE FILE
+
+backend/app/canonicalizer.py
+
+SHA256
+
+b2a05644e1a1da31b75bf8aada1891b98d9005e2c12ec8ba56e84a6691cc6994
+
+
+================================================================================
+LOCKED RESPONSIBILITY
+================================================================================
+
+canonicalize_directory_organization(
+    db,
+    onboarding_id
+)
+
+canonicalizes one supported PurPaws Directory OnboardingRecord into a canonical
+Organization using the existing PartnerOrganization implementation seam.
+
+
+================================================================================
+LOCKED SOURCE / TARGET VOCABULARY
+================================================================================
+
+source_type = onboarding_record
+
+target_type = organization
+
+The canonical target type is organization.
+
+PartnerOrganization is the current implementation model and must not redefine
+the canonical target vocabulary.
+
+
+================================================================================
+LOCKED EXECUTION ORDER
+================================================================================
+
+1. Load source OnboardingRecord.
+2. Require directory path.
+3. Require verified source.
+4. Require published source.
+5. Query canonicalization provenance first.
+6. If provenance exists, verify and reuse the target.
+7. If provenance does not exist, read supported source facts.
+8. Create the canonical Organization target.
+9. Flush to obtain target ID without committing.
+10. Create durable provenance.
+11. Flush so persistence / uniqueness failures surface.
+12. Caller owns commit or rollback.
+
+
+================================================================================
+LOCKED SAFETY PRINCIPLES
+================================================================================
+
+The canonicalizer does not perform:
+
+- cross-source entity resolution
+- name-based Organization matching
+- website-based Organization matching
+- fuzzy matching
+- automatic Organization merging
+- OrganizationMember creation
+- ownership inference
+- employment inference
+- volunteering inference
+- Partner inference
+- eligibility determination
+- commerce determination
+- publication
+- Directory mutation
+- frontend mutation
+- API exposure
+
+Same-source idempotency is anchored by canonicalization provenance.
+
+
+================================================================================
+TRANSACTION PRINCIPLE
+================================================================================
+
+The canonicalizer does not call db.commit().
+
+The caller owns the transaction.
+
+This permits target creation + provenance creation + verification to remain one
+logical transaction before commit.
+
+
+================================================================================
+FIRST VERIFIED EXECUTION
+================================================================================
+
+onboarding_record:12
+    ->
+organization:2
+
+First execution:
+
+created
+
+Second execution:
+
+reused
+
+The second execution returned the same canonical target.
+
+
+================================================================================
+FUTURE VERSION RULE
+================================================================================
+
+Changes to these locked canonicalizer semantics require explicit verification
+and a new locked version rather than silent mutation.
+
+LOCKED.

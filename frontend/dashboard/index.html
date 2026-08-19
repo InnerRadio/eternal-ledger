@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PurPaws | Dashboard</title>
+<link rel="stylesheet" href="./dashboard.css">
+</head>
+<body>
+
+<div class="dashboard-shell">
+
+    <aside class="left-rail">
+        <div class="brand">
+            <div class="brand-mark">PP</div>
+            <div>
+                <div class="brand-title">PurPaws</div>
+                <div class="brand-subtitle">Continuity Hub</div>
+            </div>
+        </div>
+
+        <section class="identity-card">
+            <div class="eyebrow">ACCOUNT OVERVIEW</div>
+            <h1>Welcome Back</h1>
+            <p id="accountName">Loading account...</p>
+        </section>
+
+        <nav class="dashboard-selector">
+            <button class="selector active" data-view="overview">Overview</button>
+            <button class="selector" data-view="member">Member</button>
+            <button class="selector" data-view="creator">Creator</button>
+            <button class="selector" data-view="rescue">Rescue</button>
+            <button class="selector" data-view="partner">Partner</button>
+            <button class="selector" data-view="organization">Organization</button>
+            <button class="selector" data-view="leaderboard">Leaderboard</button>
+        </nav>
+    </aside>
+
+    <main class="main-panel">
+        <header class="topbar">
+            <div>
+                <div class="eyebrow">DIGITAL CATHEDRAL</div>
+                <h2 id="viewTitle">Account Overview</h2>
+            </div>
+            <div class="status-pill">Screenshot Ready v1</div>
+        </header>
+
+        <section class="metric-grid">
+            <article class="metric-card">
+                <span>Network Members</span>
+                <strong id="metricMembers">—</strong>
+            </article>
+            <article class="metric-card">
+                <span>Organizations</span>
+                <strong id="metricOrganizations">—</strong>
+            </article>
+            <article class="metric-card">
+                <span>Campaigns</span>
+                <strong id="metricCampaigns">—</strong>
+            </article>
+            <article class="metric-card">
+                <span>Media Assets</span>
+                <strong id="metricMedia">—</strong>
+            </article>
+        </section>
+
+        <section class="content-grid">
+            <article class="panel wide">
+                <div class="panel-head">
+                    <div>
+                        <div class="eyebrow">NETWORK PULSE</div>
+                        <h3>Community Activity</h3>
+                    </div>
+                    <span class="panel-badge">Live Endpoint</span>
+                </div>
+                <div class="bar-chart" id="pulseChart">
+                    <div style="height:40%"><span>Members</span></div>
+                    <div style="height:24%"><span>Organizations</span></div>
+                    <div style="height:58%"><span>Media</span></div>
+                    <div style="height:34%"><span>Campaigns</span></div>
+                    <div style="height:70%"><span>Pulse</span></div>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head">
+                    <div>
+                        <div class="eyebrow">SELECTED VIEW</div>
+                        <h3 id="selectedViewHeading">Overview</h3>
+                    </div>
+                </div>
+                <div id="viewContent" class="view-content">
+                    Loading dashboard view...
+                </div>
+            </article>
+
+            <article class="panel wide">
+                <div class="panel-head">
+                    <div>
+                        <div class="eyebrow">LEADERBOARD</div>
+                        <h3>Platform Highlights</h3>
+                    </div>
+                    <span class="panel-badge">Deck Asset</span>
+                </div>
+                <div id="leaderboardList" class="leaderboard-list">
+                    <div class="leaderboard-row"><span>#1</span><strong>Founder Network</strong><em>Loading</em></div>
+                    <div class="leaderboard-row"><span>#2</span><strong>Partner Campaigns</strong><em>Loading</em></div>
+                    <div class="leaderboard-row"><span>#3</span><strong>Creator Activity</strong><em>Loading</em></div>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <aside class="right-rail">
+        <section class="ring-card">
+            <div class="pulse-ring">◉</div>
+            <div class="eyebrow">THE RING</div>
+            <h3>Network Pulse</h3>
+            <p>Protect. Remember. Rescue. Connect. Support.</p>
+        </section>
+
+        <section class="side-panel">
+            <div class="eyebrow">OPPORTUNITIES</div>
+            <h3>Featured Actions</h3>
+            <ul id="opportunityList">
+                <li>Review partner campaigns</li>
+                <li>Invite a founder</li>
+                <li>Explore leaderboard</li>
+            </ul>
+        </section>
+
+        <section class="side-panel">
+            <div class="eyebrow">CAMPAIGNS</div>
+            <h3>Partner Boards</h3>
+            <div id="campaignList" class="campaign-list">
+                <p>Loading campaigns...</p>
+            </div>
+        </section>
+    </aside>
+
+</div>
+
+<script src="./dashboard.js"></script>
+</body>
+</html>

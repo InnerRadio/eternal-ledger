@@ -1,0 +1,53 @@
+NETWORK COMMUNICATIONS WAVE 4D CONTACT RELAY ADMIN LOCKED
+
+Implemented:
+- GET /account/contact-relay
+- GET /account/contact-relay/{message_id}
+- POST /account/contact-relay/{message_id}/review
+- POST /account/contact-relay/{message_id}/resolve
+- Contact relay serializer
+- Contact relay access helper
+
+Verified:
+- eternal-ledger-api.service restarts successfully
+- OpenAPI exposes account contact relay inbox route
+- OpenAPI exposes account contact relay detail route
+- OpenAPI exposes account contact relay review route
+- OpenAPI exposes account contact relay resolve route
+- Admin token can view relay inbox
+- Admin token can view individual relay message
+- Admin token can review relay message
+- Admin token can resolve relay message
+- Final message status verified as resolved
+
+Endpoints:
+- /account/contact-relay
+- /account/contact-relay/{message_id}
+- /account/contact-relay/{message_id}/review
+- /account/contact-relay/{message_id}/resolve
+- /public/contact-relay
+
+Models:
+- ContactRelayMessage
+- CommunicationPermission
+
+Workflow:
+- public visitor submits relay-protected message
+- permission layer checks allow_contact_relay
+- message is stored as new
+- account/admin inbox can view message
+- message can be marked reviewed
+- message can be marked resolved
+
+Privacy:
+- Public recipient contact details remain hidden
+- Relay messages remain privacy_status=relay_protected
+- Blocked relay messages are not stored
+- Account-side access is authenticated
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

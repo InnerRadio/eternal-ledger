@@ -1,0 +1,42 @@
+PURPAWS CANONICAL PUBLICATION SCHEMA v1 — LOCKED
+
+STATUS
+
+VERIFIED IMPLEMENTATION.
+
+
+TABLE
+
+canonical_publications
+
+
+FIELDS
+
+id
+target_type
+target_id
+publication_status
+created_at
+updated_at
+
+
+DATABASE INVARIANT
+
+UNIQUE(
+    target_type,
+    target_id
+)
+
+
+MODEL
+
+CanonicalPublication
+
+
+MODEL HASH
+
+SHA256:
+ebda290b838772cec24b1fc9cbb4b9ddbc90504c1404fd042c3acb223ba4c9fd
+
+
+LOCKED.

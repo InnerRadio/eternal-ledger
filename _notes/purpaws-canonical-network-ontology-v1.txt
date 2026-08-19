@@ -1,0 +1,738 @@
+PURPAWS CANONICAL NETWORK ONTOLOGY v1
+
+STATUS
+Defined for verification.
+Not yet locked.
+
+
+================================================================================
+PURPOSE
+================================================================================
+
+This document defines the canonical conceptual structure of the PurPaws network.
+
+It exists to prevent frontend pages, onboarding paths, account roles, database
+models, commercial classifications, and public directory listing types from
+being treated as though they are the same kind of thing.
+
+PurPaws is a network of participants, companion animals, organizations,
+stories, relationships, activities, resources, and opportunities.
+
+The Directory is the discoverable projection of that network.
+
+FCIS is the intelligence system that understands and strengthens the network.
+
+The Opportunity Graph represents potential and actual value-producing
+relationships across the network.
+
+
+================================================================================
+GOVERNING PRINCIPLE
+================================================================================
+
+The database is not the Directory.
+
+The Directory is not an account role.
+
+An onboarding path is not necessarily an entity type.
+
+A public profile is not necessarily the canonical record.
+
+A commercial classification is not an identity.
+
+A participant may have multiple roles and relationships simultaneously.
+
+The architecture must therefore distinguish:
+
+1. Entities
+2. Roles and Relationships
+3. Classifications
+4. Records and Storytelling
+5. Projections and Experiences
+6. Intelligence
+
+
+================================================================================
+1. ENTITIES
+================================================================================
+
+Entities are things that can exist independently in the PurPaws network.
+
+Canonical entity concepts include:
+
+- Person
+- Organization
+- Companion
+- Event
+- Place / Resource
+- Campaign / Opportunity
+
+An entity may participate in multiple relationships and may appear through
+multiple public or private projections.
+
+An entity should not need to become a different entity merely because its
+role, eligibility, activity, or public presentation changes.
+
+
+================================================================================
+2. ROLES AND RELATIONSHIPS
+================================================================================
+
+Roles and relationships describe how entities participate in PurPaws or how
+they relate to one another.
+
+Current concepts include:
+
+- Caregiver / Steward
+- Creator
+- Founder
+- Partner
+- Affiliate
+- Member
+- Organization Member
+- Sponsor
+- Referrer
+- Rescue
+- Foster
+
+These concepts must not automatically be treated as mutually exclusive.
+
+A person may be:
+
+- a companion caregiver,
+- a Founder,
+- an Affiliate,
+- a Creator,
+- and a foster
+
+at the same time.
+
+An organization may participate as:
+
+- a rescue,
+- a Partner,
+- a sponsor,
+- a campaign participant,
+- or another community role
+
+without requiring separate canonical identities.
+
+Rescue and Foster remain deliberately flexible concepts.
+
+A rescue may be:
+
+- a legally incorporated not-for-profit organization,
+- an informal community organization,
+- a volunteer network,
+- or another animal-welfare participant.
+
+A foster may be:
+
+- an individual,
+- a household,
+- a volunteer associated with an organization,
+- or part of an informal rescue network.
+
+Their final implementation must preserve these distinctions rather than
+forcing legal status, activity, identity, and role into one field.
+
+
+================================================================================
+3. CLASSIFICATIONS
+================================================================================
+
+Classifications describe facts or administrative determinations about an
+entity or its participation.
+
+Current canonical classification concepts include:
+
+- Participant / Organization Type
+- Declared Activity Nature
+- Activity Nature
+- Eligibility Status
+- Eligibility Basis
+- Eligibility Review Source
+- Eligibility Review Reference
+- Eligibility Review Notes
+- Eligibility Reviewed At
+- Commerce Status
+- Verification Status
+- Publication Status
+
+The canonical activity and eligibility sequence is:
+
+Declared Activity Nature
+        ↓
+PurPaws Review
+        ↓
+Activity Nature
+        ↓
+Eligibility
+        ↓
+Commerce Status
+
+A participant's declaration is evidence, not automatically the final
+classification.
+
+PurPaws may verify a declaration using appropriate evidence such as the
+participant's public website or other reliable information.
+
+This allows community-serving rescues, fosters, volunteer groups, and similar
+participants to be evaluated according to what they actually do rather than
+only according to formal corporate registration.
+
+It also allows clearly commercial activities such as ordinary grooming,
+retail, veterinary commerce, manufacturing, and other for-profit activity to
+be classified appropriately.
+
+Verification may remain pending.
+
+Pending verification must be represented in the database so that review and
+follow-up can occur without requiring the founder to personally contact every
+participant.
+
+
+================================================================================
+4. RECORDS AND STORYTELLING
+================================================================================
+
+Records preserve information, history, evidence, activity, and stories
+connected to network entities.
+
+Current concepts include:
+
+- Memorial
+- Trail
+- Story
+- Photo / Media
+- Contribution
+- Need
+- Offer
+- Referral
+- Follow-up
+- Evidence
+- Note
+- AI Observation
+
+Records may connect multiple entities.
+
+They are not necessarily independent identities.
+
+
+================================================================================
+TRAILS PRINCIPLE
+================================================================================
+
+Trails are a first-class storytelling record in PurPaws.
+
+Trails are for the living.
+
+A Trail allows any type of eligible PurPaws participant to write and share
+stories about the life they are living with companion animals and within the
+PurPaws community.
+
+A Trail is not a Memorial.
+
+A Trail is not a Memorial Contribution.
+
+A Trail is not derived from a Memorial.
+
+A Trail does not require a Memorial in order to exist.
+
+The canonical distinction is:
+
+Trails
+    The stories we're still making together.
+
+Memorials
+    The stories we carry with us.
+
+A Trail is not the companion itself.
+
+It is an independently existing living story record authored by a PurPaws
+participant.
+
+A Trail may connect:
+
+- a Person / Author
+- a living Companion
+- a Place
+- an Event or Moment
+- a Rescue
+- a Foster
+- an Organization
+- Photos / Media
+- Other Companions
+- other relevant network entities
+
+Examples of Trail stories may include:
+
+- everyday life with a companion
+- morning rituals
+- walks
+- first hikes
+- recovery walks
+- adoption journeys
+- foster journeys
+- rescue journeys
+- rainy day adventures
+- road trips
+- outings
+- discoveries
+- community experiences
+- pet-friendly places
+- shared adventures
+- meaningful moments
+
+The author is itself a participant in the PurPaws network.
+
+The entities connected through the story are also part of the network.
+
+Therefore a Trail can contribute relationship evidence to FCIS and the
+Opportunity Graph while remaining, first and foremost, a human story.
+
+The public experience may simply present that meaningful story.
+
+FCIS may additionally understand the relationships expressed by the story.
+
+Therefore Trails serve both:
+
+- human storytelling
+- living history
+- community participation
+- network relationship evidence
+
+Trails must not be reduced to a generic blog feature.
+
+Trails must also not be implemented as an extension of Memorial
+Contributions merely because the current legacy /public/trails implementation
+projects Memorial Contribution records as Trails.
+
+The existing Contribution model remains conceptually associated with
+Memorial Contributions.
+
+The existing /public/trails implementation is therefore narrower than the
+canonical Trails concept defined here and must be evaluated separately before
+future Trails implementation work.
+
+No change to Contribution, Memorial, or the existing public Trails endpoint
+is authorized by this ontology definition.
+
+
+================================================================================
+5. PROJECTIONS AND EXPERIENCES
+================================================================================
+
+A projection is a public or operational representation of underlying network
+information.
+
+Current projections and experiences include:
+
+- Directory
+- Public Profile
+- Companion Profile
+- Memorial Page
+- Trail / Story Page
+- Opportunity Profile
+- Dashboard
+- Workspace
+
+A projection should not become the canonical identity merely because it is
+visible to the public.
+
+
+================================================================================
+DIRECTORY PRINCIPLE
+================================================================================
+
+The PurPaws Directory is the discoverable projection of the whole network.
+
+Its purpose is to list, discover, search, filter, and connect the appropriate
+public representations of PurPaws participants and participant types.
+
+The Directory is not merely:
+
+- a business directory
+- a Partner directory
+- a commercial directory
+- a rescue directory
+- a creator directory
+
+Those are filtered views of the larger PurPaws network.
+
+The existing architectural rule remains valid:
+
+- No new directory table.
+- Directory is an aggregation layer.
+
+The Directory should aggregate appropriate public-safe records from canonical
+network sources.
+
+Directory listing_type is a projection/discovery concept and must not be
+assumed to be identical to account role, legal identity, organization type,
+or activity nature.
+
+
+================================================================================
+6. INTELLIGENCE
+================================================================================
+
+FCIS means:
+
+Founding Community Intelligence System.
+
+FCIS treats network records as intelligence nodes and relationships as useful
+context.
+
+Its purpose includes:
+
+- correlating evidence
+- strengthening network records
+- understanding relationships
+- generating useful observations
+- supporting follow-up
+- discovering needs and offers
+- identifying opportunities
+- strengthening the Opportunity Graph
+
+Evidence may include:
+
+- participant-submitted information
+- public information
+- photographs
+- brochures
+- notes
+- referrals
+- interactions
+- Trails
+- relationships
+- follow-up observations
+
+
+================================================================================
+OPPORTUNITY GRAPH PRINCIPLE
+================================================================================
+
+The Opportunity Graph asks:
+
+How can these participants create value together?
+
+It is not limited to commercial transactions.
+
+Potential value may include:
+
+- rescue support
+- fostering
+- volunteering
+- storytelling
+- referrals
+- community participation
+- sponsorship
+- campaigns
+- services
+- education
+- resource sharing
+- discovery
+- collaboration
+- commerce where appropriate
+
+The Opportunity Graph is therefore built from relationships across the whole
+PurPaws network rather than only from Partner records.
+
+
+================================================================================
+PUBLIC DISCOVERY PRINCIPLE
+================================================================================
+
+This ontology preserves the existing Public Discovery Standard:
+
+Public discovery.
+Private communication.
+Platform relay.
+Auditable participation.
+
+Public projections must remain privacy-safe.
+
+Private account information, private contact routing, security information,
+and other protected data must not become public merely because an entity is
+discoverable through the Directory.
+
+
+================================================================================
+ONBOARDING PRINCIPLE
+================================================================================
+
+Onboarding should discover facts about a participant.
+
+It should not force participants to understand the internal PurPaws database
+architecture.
+
+Conceptually:
+
+Who / What Are You?
+        ↓
+What Do You Do?
+        ↓
+How Do You Participate?
+        ↓
+Community-Serving or Commercial?
+        ↓
+Eligibility / Review
+        ↓
+Account + Network Identity
+        ↓
+Workspace
+        ↓
+Publication
+        ↓
+Directory Projection
+
+Existing onboarding paths may remain useful experiences.
+
+However, an onboarding path must not automatically become the permanent
+canonical identity of the participant.
+
+
+================================================================================
+COMMUNITY-SERVING AND COMMERCIAL PARTICIPATION
+================================================================================
+
+PurPaws distinguishes community-serving participation from commercial
+participation.
+
+Formal not-for-profit incorporation is useful evidence but is not the only
+possible basis for community-serving eligibility.
+
+Examples that may require review include:
+
+- informal rescue groups
+- independent fosters
+- volunteer animal-welfare groups
+- community initiatives
+
+Clearly commercial participants may include:
+
+- groomers
+- veterinary businesses
+- pet stores
+- pet-food manufacturers
+- other for-profit businesses
+
+Commercial classification and access rules belong to eligibility / commerce
+logic.
+
+They must not redefine the participant's canonical identity.
+
+
+================================================================================
+EXISTING MODEL → CANONICAL CONCEPT MAPPING
+================================================================================
+
+The following is an architectural mapping, not a database migration.
+
+User
+    Account-backed person / identity foundation.
+
+OrganizationMember
+    Relationship between a User and an Organization.
+
+PartnerOrganization
+    Existing organization record.
+    Candidate for evolution toward the canonical Organization concept.
+    Do not rename or replace until dependencies are fully inspected.
+
+PublicProfile
+    Public projection/profile information.
+    Not the canonical person itself.
+
+FounderProfile
+    Founder recognition / participation projection.
+    Founder is primarily a role/status relationship.
+
+RescueProfile
+    Existing rescue-oriented record.
+    Final canonical mapping remains open pending dependency inspection.
+
+RescueAnimal
+    Companion-related rescue record.
+    Final relationship to canonical Companion remains open pending inspection.
+
+Memorial
+    Storytelling / remembrance record connected to companion identity and
+    stewardship.
+
+Trail
+    First-class living-story record.
+    Authored by a PurPaws participant.
+    Independent of Memorials and Memorial Contributions.
+    May preserve connections to a living Companion, author, place, event,
+    rescue, foster, organization, media, and other relevant network entities.
+
+PartnerCampaign
+    Campaign / Opportunity-related entity.
+
+PartnerTaxonomyCategory
+    Existing classification taxonomy.
+
+PartnerTaxonomyAssignment
+    Existing relationship between organization/campaign and taxonomy.
+
+OnboardingRecord
+    Intake / transitional record used while participant identity and
+    workspace information are being established.
+
+Public Directory
+    Aggregated public projection.
+    Not a canonical database entity.
+
+
+================================================================================
+OPEN QUESTIONS
+================================================================================
+
+The following remain intentionally unresolved until inspected:
+
+1. Whether PartnerOrganization should evolve into or be supplemented by a
+   generalized Organization model.
+
+2. Exact canonical mapping of RescueProfile.
+
+3. Exact canonical mapping of RescueAnimal to Companion.
+
+4. Whether Creator should remain primarily account-role based or become a
+   relationship / participation record.
+
+5. Whether Partner should remain represented through PartnerOrganization or
+   become a relationship/classification attached to Organization.
+
+6. How Founder status should eventually relate to generalized participant
+   relationships.
+
+7. How Trails should connect to canonical Companion records as the companion
+   architecture evolves.
+
+8. How existing Partner taxonomy should evolve into broader PurPaws network
+   taxonomy without destroying useful existing work.
+
+These questions are IMPLEMENTATION OPEN.
+
+They are not blockers to Canonical Network Ontology v1 because the governing
+conceptual distinctions are already defined.
+
+They must be resolved by inspection before any structural replacement,
+migration, merger, renaming, or implementation that depends upon them.
+
+
+================================================================================
+IMPLEMENTATION BOUNDARIES
+================================================================================
+
+This ontology does NOT authorize immediate database restructuring.
+
+Specifically, this document does not authorize:
+
+- renaming PartnerOrganization
+- deleting existing profile models
+- merging tables
+- replacing onboarding paths
+- changing existing API contracts
+- changing Directory response shapes
+- changing payment or eligibility behavior
+- changing taxonomy structures
+
+Those actions require their own:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+cycle.
+
+
+================================================================================
+WHITE-LABEL PRINCIPLE
+================================================================================
+
+PurPaws architecture must remain modular and capable of supporting future
+white-label communities.
+
+Canonical network concepts must therefore remain separate from:
+
+- PurPaws-specific page layouts
+- version directories
+- frontend route names
+- temporary onboarding experiences
+- presentation-specific listing types
+
+Shared intelligence and network architecture should be reusable without
+requiring a white-label implementation to reproduce PurPaws presentation
+choices.
+
+
+================================================================================
+STATUS
+================================================================================
+
+PURPAWS CANONICAL NETWORK ONTOLOGY v1 — LOCKED
+
+The ontology has been:
+
+- defined
+- inspected against the existing backend
+- compared with existing architectural notes
+- corrected where implementation history conflicted with canonical meaning
+- independently verified
+- reviewed for ontology blockers
+
+No remaining ontology blockers were identified.
+
+The unresolved questions documented above are IMPLEMENTATION OPEN and require
+their own Inspect → Understand → Replace / Add → Verify → Lock cycle before
+structural changes are made.
+
+This document is now the governing conceptual reference for subsequent:
+
+- onboarding architecture
+- participant and organization architecture
+- Companion architecture
+- Trails architecture
+- Directory architecture
+- eligibility and commerce architecture
+- FCIS
+- Opportunity Graph
+- public discovery
+- white-label network architecture
+
+Canonical principles locked in v1 include:
+
+- PurPaws is the network.
+- Directory is the discoverable public projection of the whole network.
+- Directory is not a canonical participant type.
+- Participants, records, roles, relationships, classifications, projections,
+  and intelligence are distinct architectural concepts.
+- Commercial status is not identity.
+- Community-serving eligibility is not limited to formal not-for-profit
+  incorporation.
+- Frontend declarations and verified backend determinations are distinct.
+- Trails are first-class living-story records.
+- Trails are for the living.
+- Memorials preserve remembered continuity.
+- Memorial Contributions remain distinct from Trails.
+- FCIS means Founding Community Intelligence System.
+- The Opportunity Graph operates across the whole PurPaws network.
+- Canonical architecture must remain modular and white-label capable.
+
+LOCKED.
+
+Future changes to these governing principles require a new version of the
+Canonical Network Ontology rather than silent mutation of v1.

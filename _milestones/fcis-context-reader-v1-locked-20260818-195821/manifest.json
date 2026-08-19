@@ -1,0 +1,18 @@
+{
+  "milestone": "fcis-context-reader-v1-locked-20260818-195821",
+  "locked_at": "20260818-195821",
+  "module": "backend/app/fcis/context_reader.py",
+  "authority": "FCIS Context Reader v1",
+  "active_context_rows": 6,
+  "canonical_relationship_rows": 3,
+  "canonical_provenance_rows": 4,
+  "canonical_publication_rows": 1,
+  "partner_organization_rows": 5,
+  "factual_index_verified": true,
+  "inference_generated": false,
+  "database_changed": false,
+  "public_exposure": false,
+  "briefing_changed": false,
+  "relationship_reader_changed": false,
+  "next_hill": "FCIS Correlation Engine v1"
+}

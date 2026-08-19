@@ -1,0 +1,116 @@
+FCIS — PRIVATE ROUTE v1
+LOCKED
+
+PURPOSE
+
+Provide authenticated, authorized, read-only browser access to
+the FCIS Private Intelligence Desk.
+
+ROUTE
+
+GET /fcis/desk
+
+ROUTER
+
+backend/app/fcis/routes.py
+
+REGISTRATION
+
+backend/app/main.py
+
+AUTHENTICATION
+
+Existing bearer-token authority.
+
+AUTHORIZATION
+
+FCIS Private Access Authority v1.
+
+Requirements:
+
+- authenticated identity
+- live User record exists
+- live User status == active
+- live User role == admin
+
+CURRENT AUTHORIZED ROLE
+
+admin
+
+CURRENT VERIFIED ACTIVE ADMINS
+
+2
+
+VERIFIED BEHAVIOR
+
+active admin:
+200 HTML
+
+active member:
+403
+
+forged token admin claim against live member:
+403
+
+invalid bearer token:
+401
+
+anonymous request:
+rejected
+
+RENDERING
+
+Dynamic HTML from:
+
+backend/app/fcis/desk.py
+
+Desk consumes current structured FCIS Opportunity Cards.
+
+READ-ONLY CONTRACT
+
+WATCH:
+not implemented
+
+DEVELOP:
+not implemented
+
+DISMISS:
+not implemented
+
+workflow writes:
+none
+
+canonical facts created:
+0
+
+relationships created:
+0
+
+actions authorized:
+0
+
+PUBLIC BOUNDARY
+
+public_api.py unchanged.
+
+No /public/fcis route exists.
+
+FCIS intelligence remains private.
+
+RESPONSE POLICY
+
+Cache-Control: no-store
+
+X-FCIS-Private: true
+
+NEXT HILL
+
+FCIS Admin Browser Bridge v1.
+
+Goal:
+
+Inspect the existing admin frontend login and bearer-token storage
+mechanism and connect an Intelligence Desk entry point without
+weakening authentication.
+
+The browser bridge must reuse the existing token authority.

@@ -1,0 +1,268 @@
+FCIS ADMIN HUMAN REVIEW CONTROL v1 — LOCKED
+
+Locked at:
+20260819-011459 UTC
+
+
+PURPOSE
+=======
+
+Expose Human Review controls inside the private FCIS Inspect
+experience while preserving authentication authority in the
+parent Admin Browser Bridge.
+
+
+VISIBLE CONTROLS
+================
+
+INVESTIGATE
+HOLD
+DISMISS
+
+The internal review vocabulary still includes:
+
+new
+investigating
+held
+dismissed
+
+"new" is not exposed as an operator button in v1.
+
+
+BROWSER TRANSPORT
+=================
+
+Inspect iframe
+→
+postMessage
+→
+Parent Admin Browser Bridge
+→
+sessionStorage bearer token
+→
+POST /api/fcis/review/{card_id}
+→
+Private Human Review Route
+→
+Human Review Write Authority
+→
+AuditLog
+→
+Parent Browser Bridge
+→
+postMessage result
+→
+Inspect iframe
+
+
+TOKEN BOUNDARY
+==============
+
+Bearer token enters Inspect iframe:
+NO
+
+sessionStorage access from Inspect renderer:
+NO
+
+Authorization header construction in Inspect renderer:
+NO
+
+Bearer ownership:
+PARENT ADMIN BROWSER BRIDGE ONLY
+
+
+SRCDOC TRANSPORT
+================
+
+The Inspect interface is rendered using iframe.srcdoc.
+
+A transport correction was required so Human Review postMessage
+traffic could cross the srcdoc iframe boundary.
+
+The parent continues to verify the exact source window:
+
+event.source === deskFrame.contentWindow
+
+The child continues to verify the exact parent window:
+
+event.source === window.parent
+
+
+FIRST VERIFIED BROWSER-PATH WRITE
+=================================
+
+Human action:
+
+HOLD
+
+Target Opportunity Card:
+
+need-offer:3:4:1:3
+
+Review identity:
+
+need-offer-review:1:3
+
+Review ID:
+
+1
+
+Transition:
+
+investigating
+→
+held
+
+Browser feedback:
+
+Human Review saved: HELD
+
+
+DURABLE RESULT
+==============
+
+Human Review rows:
+
+1
+→
+1
+
+Audit Logs:
+
+13
+→
+14
+
+Human Review audit history:
+
+3
+→
+4
+
+Latest AuditLog:
+
+14
+
+Current disposition:
+
+held
+
+
+CURRENT REVIEW
+==============
+
+Review ID:
+1
+
+Need context ID:
+1
+
+Offer context ID:
+3
+
+Surfaced card:
+need-offer:3:4:1:3
+
+Disposition:
+held
+
+Reviewer user ID:
+1
+
+Reviewer email:
+admin@eternalledger.com
+
+Reviewer role:
+admin
+
+Reviewed at:
+2026-08-19 01:10:43.469800
+
+Created at:
+2026-08-19 00:34:16.668608
+
+Updated at:
+2026-08-19 01:10:43.469800
+
+
+CURRENT DURABLE BASELINE
+========================
+
+fcis_human_reviews:
+1
+
+audit_logs:
+14
+
+canonical_contexts:
+6
+
+canonical_relationships:
+3
+
+canonicalization_provenance:
+4
+
+canonical_publications:
+1
+
+partner_organizations:
+5
+
+users:
+8
+
+
+HUMAN / CANONICAL BOUNDARY
+==========================
+
+Human Review represents:
+HUMAN JUDGMENT
+
+Human Review is canonical truth:
+NO
+
+Canonical context creation:
+NO
+
+Canonical relationship creation:
+NO
+
+Canonical relationship mutation:
+NO
+
+Action authorization:
+NO
+
+Outreach authorization:
+NO
+
+Publication authorization:
+NO
+
+Public projection:
+NO
+
+
+PUBLIC BOUNDARY
+===============
+
+Public Human Review endpoint:
+NONE
+
+Public Human Review projection:
+NONE
+
+
+NEXT HILL
+=========
+
+FCIS Human Review State Presentation v1
+
+Potential next work:
+
+- show current Human Review disposition on Inspect
+- visually indicate selected current state
+- preserve read-only evidence presentation
+- optionally expose reviewer note entry
+- do not create action authorization yet

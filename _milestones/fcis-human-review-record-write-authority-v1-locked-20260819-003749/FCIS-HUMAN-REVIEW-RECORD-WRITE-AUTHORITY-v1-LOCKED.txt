@@ -1,0 +1,244 @@
+FCIS HUMAN REVIEW RECORD + WRITE AUTHORITY v1 — LOCKED
+
+Locked at:
+20260819-003749 UTC
+
+
+PURPOSE
+=======
+
+Provide durable current-state human judgment about an
+FCIS-discovered canonical Need ↔ Offer alignment while
+keeping human judgment explicitly separate from canonical truth.
+
+
+MODEL
+=====
+
+FCISHumanReview
+
+Durable table:
+
+fcis_human_reviews
+
+
+IDENTITY
+========
+
+One current Human Review record per canonical context pair:
+
+need_context_id + offer_context_id
+
+Unique constraint:
+
+uq_fcis_human_review_context_pair
+
+
+CURRENT SYNTHETIC LABORATORY RECORD
+===================================
+
+Review ID:
+1
+
+Review identity:
+need-offer-review:1:3
+
+Need Canonical Context:
+1
+
+Offer Canonical Context:
+3
+
+Surfaced Opportunity Card:
+need-offer:3:4:1:3
+
+Signal:
+event_photography
+
+Current disposition:
+held
+
+Current Human Review rows:
+1
+
+
+CURRENT-STATE SEMANTICS
+=======================
+
+Create test:
+
+0 Human Review rows
+→
+1 Human Review row
+
+Initial disposition:
+investigating
+
+Update test:
+
+1 Human Review row
+→
+1 Human Review row
+
+Updated disposition:
+held
+
+The same durable review record was retained.
+
+created_at:
+PRESERVED
+
+reviewed_at:
+REFRESHED
+
+updated_at:
+POPULATED
+
+Duplicate review row:
+NO
+
+
+AUDIT HISTORY
+=============
+
+Append-only AuditLog history is required for every durable
+Human Review mutation.
+
+Current Human Review audit rows:
+2
+
+History:
+
+1.
+create_fcis_human_review
+disposition=investigating
+
+2.
+update_fcis_human_review
+disposition=held
+
+Audit target:
+
+target_type = fcis_human_review
+target_id = 1
+
+
+DISPOSITION VOCABULARY
+======================
+
+new
+investigating
+held
+dismissed
+
+
+WRITE AUTHORITY
+===============
+
+backend/app/fcis/review_authority.py
+
+Authority version:
+
+fcis_human_review_authority_v1
+
+Review schema version:
+
+fcis_human_review_v1
+
+
+WRITE BEHAVIOR
+==============
+
+Create:
+one Human Review record for a previously unseen canonical
+Need / Offer pair.
+
+Update:
+mutate the existing current Human Review record for the pair.
+
+Every durable write produces an append-only AuditLog event.
+
+
+HUMAN / CANONICAL BOUNDARY
+==========================
+
+Human Review represents:
+HUMAN JUDGMENT
+
+Human Review is canonical truth:
+NO
+
+Human Review may create canonical context:
+NO
+
+Human Review may create canonical relationships:
+NO
+
+Human Review may mutate canonical relationships:
+NO
+
+Human Review may authorize external action:
+NO
+
+Human Review may authorize outreach:
+NO
+
+Human Review may authorize publication:
+NO
+
+Human Review may create public projection:
+NO
+
+
+DURABLE BASELINE
+================
+
+fcis_human_reviews:
+1
+
+audit_logs:
+12
+
+canonical_contexts:
+6
+
+canonical_relationships:
+3
+
+canonicalization_provenance:
+4
+
+canonical_publications:
+1
+
+partner_organizations:
+5
+
+users:
+8
+
+
+EXPOSURE
+========
+
+Human Review write route:
+NONE
+
+Public Human Review exposure:
+NONE
+
+Browser write control:
+NONE
+
+
+NEXT HILL
+=========
+
+FCIS Private Human Review Route v1
+
+The next hill may expose the already-proven Human Review
+authority through an authenticated, active-admin-only private
+route.
+
+Browser controls remain unauthorized until the route itself is
+implemented and independently verified.

@@ -1,0 +1,760 @@
+PURPAWS CANONICAL ONBOARDING MAPPING v1
+
+STATUS
+Defined for verification.
+Not yet locked.
+
+
+================================================================================
+PURPOSE
+================================================================================
+
+This document maps the existing PurPaws onboarding entry experiences to the
+locked PurPaws Canonical Network Ontology v1.
+
+It does not redesign the onboarding interface.
+
+It defines what each onboarding choice means underneath the interface so that
+frontend paths do not accidentally become canonical identity types.
+
+The governing rule is:
+
+Onboarding discovers facts and intent.
+
+It does not define the ontology.
+
+
+================================================================================
+GOVERNING FLOW
+================================================================================
+
+The canonical onboarding lifecycle is:
+
+Entry Experience
+        ↓
+Intake / OnboardingRecord
+        ↓
+Email Verification
+        ↓
+Account / User
+        ↓
+Canonical Entity / Record
+        ↓
+Canonical Roles / Relationships
+        ↓
+Classifications
+        ↓
+Workspace
+        ↓
+Publication
+        ↓
+Public Projection
+        ↓
+Directory Discovery where appropriate
+
+
+================================================================================
+ONBOARDINGRECORD PRINCIPLE
+================================================================================
+
+OnboardingRecord is transitional intake state.
+
+Its purpose includes:
+
+- preserving the selected entry experience
+- collecting starter information
+- preserving unfinished workspace information
+- supporting email verification
+- linking intake to the eventual User
+- preserving onboarding progress
+- supporting resumable onboarding
+
+OnboardingRecord must not become the permanent canonical identity merely
+because it contains useful payload_json information.
+
+Publishing an OnboardingRecord alone is not the intended final architecture
+for canonical participants and records.
+
+Canonical records should eventually be created or connected deliberately.
+
+
+================================================================================
+ENTRY EXPERIENCE PRINCIPLE
+================================================================================
+
+An onboarding path is a user experience.
+
+It is not automatically:
+
+- an entity type
+- an account role
+- a database table
+- a Directory listing type
+- a commercial classification
+
+A friendly onboarding choice may create or connect several canonical concepts.
+
+For example:
+
+"Add a Companion"
+
+may mean:
+
+- create a Companion entity
+- connect the User as caregiver / steward
+- create or enable a Companion workspace
+- eventually expose a Companion public projection
+
+The participant does not need to understand those internal distinctions.
+
+
+================================================================================
+1. COMPANION
+================================================================================
+
+CURRENT ENTRY EXPERIENCE
+
+Add a Companion / Companion Profile
+
+
+CANONICAL MEANING
+
+Companion is a canonical Entity.
+
+
+EXPECTED CANONICAL RESULTS
+
+The Companion onboarding experience should eventually:
+
+- identify or create the User / participant
+- create a Companion entity
+- create a caregiver / steward relationship between participant and Companion
+- preserve Companion-specific starter information
+- create or enable a Companion workspace
+- allow later publication through a Companion Profile projection
+
+
+DIRECTORY RELATIONSHIP
+
+A published Companion may become discoverable through the PurPaws Directory
+when the applicable privacy and publication rules allow it.
+
+The Companion does not become a "directory" entity.
+
+
+================================================================================
+2. DIRECTORY
+================================================================================
+
+CURRENT ENTRY EXPERIENCE
+
+Directory Listing
+
+
+CANONICAL MEANING
+
+Directory is NOT a canonical entity.
+
+Directory is NOT a participant type.
+
+Directory is NOT a role.
+
+Directory is the discoverable public projection of the PurPaws network.
+
+
+CURRENT LEGACY BEHAVIOR
+
+The current implementation allows:
+
+Directory onboarding
+        ↓
+OnboardingRecord
+        ↓
+workspace draft
+        ↓
+published OnboardingRecord
+        ↓
+Directory reads payload_json directly
+
+This behavior successfully established the first complete onboarding-to-public
+publication loop.
+
+It is now considered transitional architecture.
+
+
+TARGET CANONICAL BEHAVIOR
+
+A participant should not need to onboard "as a Directory."
+
+Instead, onboarding should discover:
+
+- who or what the participant is
+- whether an Organization is involved
+- what the participant does
+- how the participant participates
+- relevant activity nature
+- relevant eligibility
+- relevant commerce status
+- what record or workspace is being created
+
+The resulting canonical records may then appear in the Directory.
+
+
+MIGRATION PRINCIPLE
+
+The current Directory path must not be abruptly removed before replacement
+behavior is designed and verified.
+
+It may remain temporarily as a legacy entry experience while canonical intake
+routing is implemented.
+
+Its permanent role as a canonical path should end.
+
+
+================================================================================
+3. MEMORIAL
+================================================================================
+
+CURRENT ENTRY EXPERIENCE
+
+Companion Memorial
+
+
+CANONICAL MEANING
+
+Memorial is a canonical remembrance / storytelling Record.
+
+
+EXPECTED CANONICAL RESULTS
+
+The Memorial onboarding experience should eventually:
+
+- identify or create the User / participant
+- create or connect the relevant companion identity where appropriate
+- create a Memorial record
+- establish stewardship / authorship relationships
+- preserve Memorial-specific starter information
+- create or enable a Memorial workspace
+- allow publication through a Memorial Page projection
+
+
+TRAILS BOUNDARY
+
+Memorials and Trails remain distinct.
+
+Memorials preserve remembered continuity.
+
+Trails preserve living continuity.
+
+Memorial Contributions remain separate from Trails.
+
+
+================================================================================
+4. CREATOR
+================================================================================
+
+CURRENT ENTRY EXPERIENCE
+
+Creator Profile
+
+
+CANONICAL MEANING
+
+Creator is primarily a participation Role / Status associated with a Person
+participant.
+
+Creator should not automatically create a second person identity.
+
+
+EXPECTED CANONICAL RESULTS
+
+The Creator onboarding experience should eventually:
+
+- identify or create the User / Person participant
+- establish Creator participation / role
+- collect Creator-specific public profile information
+- create or enable a Creator workspace
+- create or update the appropriate public profile projection
+
+
+DIRECTORY RELATIONSHIP
+
+A Creator's public projection may appear as a filtered view of the whole
+Directory.
+
+Creator is not itself a separate Directory.
+
+
+IMPLEMENTATION OPEN
+
+The exact future representation of Creator participation remains subject to
+its own inspection.
+
+The existing User.role implementation must not be replaced until dependencies
+are inspected.
+
+
+================================================================================
+5. EVENT
+================================================================================
+
+CURRENT ENTRY EXPERIENCE
+
+Event
+
+
+CANONICAL MEANING
+
+Event is a canonical Entity.
+
+
+EXPECTED CANONICAL RESULTS
+
+The Event onboarding experience should eventually:
+
+- identify or create the organizing participant
+- create an Event entity
+- establish organizer / steward relationships
+- preserve Event starter information
+- create or enable an Event workspace
+- support publication through an Event public projection
+
+
+DIRECTORY RELATIONSHIP
+
+Appropriate public Events may become discoverable through the network
+Directory or other PurPaws discovery experiences.
+
+
+================================================================================
+6. PARTNER
+================================================================================
+
+CURRENT ENTRY EXPERIENCE
+
+Partner Application
+
+
+CANONICAL MEANING
+
+Partner is primarily a Relationship / Status.
+
+Partner is not the canonical identity of the participant.
+
+Partner is not synonymous with commercial participant.
+
+Commercial participants may or may not become Partners.
+
+Partners may participate for many different collaborative reasons.
+
+Examples may include:
+
+- sponsorship
+- campaigns
+- referrals
+- resource support
+- institutional cooperation
+- community initiatives
+- strategic collaboration
+- other forms of network participation
+
+A Partner relationship may involve commercial, community-serving,
+institutional, or other participants.
+
+In many cases, a Partner onboarding experience will involve an Organization.
+
+
+EXPECTED CANONICAL RESULTS
+
+The Partner onboarding experience should eventually:
+
+- identify or create the User / participant
+- identify or create the relevant Organization where applicable
+- establish Organization membership
+- collect organization type / activity information
+- establish Partner participation where appropriate
+- apply activity nature classification
+- apply eligibility logic
+- apply commerce logic
+- create or enable the appropriate Organization / Partner workspace
+
+
+COMMERCIAL PARTICIPATION
+
+Commercial status is not identity.
+
+For-profit commercial participants may be valid PurPaws participants while
+also requiring a commercial package before applicable participation or
+publication is enabled.
+
+
+COMMUNITY-SERVING PARTICIPATION
+
+Formal legal not-for-profit registration is useful evidence but is not the
+only possible basis for community-serving eligibility.
+
+Examples requiring flexible review may include:
+
+- informal rescue groups
+- fosters
+- volunteer groups
+- community animal-welfare initiatives
+
+
+IMPLEMENTATION OPEN
+
+The exact future relationship between PartnerOrganization and the generalized
+canonical Organization concept remains implementation-open.
+
+No PartnerOrganization rename or migration is authorized by this mapping.
+
+
+================================================================================
+7. FOUNDER
+================================================================================
+
+CURRENT ENTRY EXPERIENCE
+
+Founder
+
+
+CANONICAL MEANING
+
+Founder is primarily a Role / Status / recognition relationship attached to a
+participant.
+
+Founder is not necessarily a separate canonical participant species.
+
+
+EXPECTED CANONICAL RESULTS
+
+The Founder onboarding experience should eventually:
+
+- identify or create the User / participant
+- establish Founder status / recognition
+- preserve Founder-specific information
+- create or enable the applicable Founder experience
+- support public Founder recognition where appropriate
+
+
+DIRECTORY RELATIONSHIP
+
+Founder may be a discovery filter, badge, recognition state, or public
+projection within the larger network.
+
+Founder is not a separate Directory.
+
+
+================================================================================
+ACTIVITY NATURE
+================================================================================
+
+Activity nature is a Classification.
+
+It should be discovered during onboarding where relevant.
+
+The canonical sequence remains:
+
+Declared Activity Nature
+        ↓
+PurPaws Review
+        ↓
+Activity Nature
+        ↓
+Eligibility
+        ↓
+Commerce Status
+
+
+DECLARED ACTIVITY NATURE
+
+This records what the participant tells PurPaws.
+
+It is not automatically the final verified determination.
+
+
+ACTIVITY NATURE
+
+This records the PurPaws classification after appropriate review.
+
+
+================================================================================
+ELIGIBILITY
+================================================================================
+
+Eligibility is not identity.
+
+Examples may include:
+
+- eligible
+- review_pending
+- commercial
+- other future defined states
+
+Eligibility review may use appropriate public evidence such as a participant
+or organization's website.
+
+Pending eligibility must remain visible to PurPaws for follow-up.
+
+
+================================================================================
+COMMERCE
+================================================================================
+
+Commerce status is not identity.
+
+Commercial participants may be required to complete a package / payment
+experience.
+
+Community-serving participants may qualify for access without charge.
+
+Commerce routing should occur because of classification and eligibility,
+not because a participant has been falsely defined as a different entity type.
+
+
+================================================================================
+RESCUE AND FOSTER
+================================================================================
+
+Rescue and Foster require flexible canonical treatment.
+
+They must not be inferred solely from formal legal status.
+
+A Rescue may be:
+
+- an Organization
+- an informal community group
+- a volunteer network
+- another animal-welfare participant
+
+A Foster may be:
+
+- a Person
+- a household
+- an Organization member
+- part of an informal network
+
+Future onboarding should collect enough facts to represent these participants
+accurately without forcing them into a false legal category.
+
+
+================================================================================
+DIRECTORY PUBLICATION PRINCIPLE
+================================================================================
+
+Directory publication should eventually occur from canonical public
+projections.
+
+The target flow is:
+
+Canonical Entity / Record
+        ↓
+Roles / Relationships
+        ↓
+Classification
+        ↓
+Verification / Eligibility
+        ↓
+Publication State
+        ↓
+Public Projection
+        ↓
+Directory Aggregation
+
+The Directory should not depend permanently on published OnboardingRecord
+payload_json as a canonical source.
+
+
+================================================================================
+CURRENT IMPLEMENTATION REALITY
+================================================================================
+
+The current backend:
+
+- supports seven onboarding path values
+- creates OnboardingRecord intake records
+- performs email verification
+- creates a User account
+- issues Affiliate ID / referral information
+- supports resumable payload_json workspace drafts
+- currently publishes only the Directory path
+- currently exposes published Directory OnboardingRecord payloads directly
+  through the Directory aggregation
+
+The current onboarding flow does NOT yet create from onboarding:
+
+- PartnerOrganization
+- OrganizationMember
+- PublicProfile
+- FounderProfile
+- RescueProfile
+
+Those missing transitions represent the canonicalization seam to be designed.
+
+
+================================================================================
+CURRENT FRONTEND REALITY
+================================================================================
+
+The current frontend presents seven onboarding choices:
+
+- Companion
+- Directory
+- Memorial
+- Creator
+- Event
+- Partner
+- Founder
+
+Only the Directory intake currently contains implemented payload fields.
+
+The other path intake modules are placeholders / unfinished experiences.
+
+This is advantageous.
+
+The canonical architecture can be implemented before those unfinished paths
+become structurally coupled to the legacy Directory model.
+
+
+================================================================================
+IMPLEMENTATION ORDER — PROPOSED
+================================================================================
+
+This mapping does not authorize implementation yet.
+
+After verification and lock, the recommended implementation sequence is:
+
+1. Define canonical intake facts shared across participants.
+
+2. Define participant / organization branching.
+
+3. Introduce Declared Activity Nature where relevant.
+
+4. Define eligibility and commerce routing.
+
+5. Define canonical record creation / connection after account verification.
+
+6. Preserve OnboardingRecord as resumable transitional intake.
+
+7. Redirect workspace behavior toward canonical records.
+
+8. Replace legacy Directory publication from OnboardingRecord with canonical
+   public projections.
+
+9. Implement remaining onboarding entry experiences against the canonical
+   model.
+
+10. Retire the legacy "Directory as identity/path" behavior only after the
+    replacement flow is verified.
+
+
+================================================================================
+IMPLEMENTATION BOUNDARIES
+================================================================================
+
+This document does NOT authorize immediate changes to:
+
+- backend models
+- database schema
+- onboarding API contracts
+- onboarding cards
+- workspace behavior
+- Directory response shape
+- commerce logic
+- payment logic
+- PartnerOrganization
+- RescueProfile
+- FounderProfile
+- PublicProfile
+- User.role
+
+Each implementation change requires its own:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+
+================================================================================
+STATUS
+================================================================================
+
+PURPAWS CANONICAL ONBOARDING MAPPING v1 — LOCKED
+
+This mapping has been:
+
+- defined
+- verified against the locked Canonical Network Ontology v1
+- verified against the observed onboarding implementation
+- corrected where conceptual distinctions required clarification
+- reviewed for Directory, Partner, commerce, eligibility, Rescue / Foster,
+  Memorial, Trails, and canonicalization boundaries
+- independently verified
+
+No remaining mapping blockers were identified.
+
+This document now governs subsequent onboarding implementation.
+
+Locked principles include:
+
+- Onboarding discovers facts and intent.
+- Onboarding does not define the ontology.
+- OnboardingRecord is transitional intake state.
+- An onboarding path is a user experience, not automatically an entity type.
+- Directory is not a canonical participant type.
+- Directory is the discoverable public projection of the PurPaws network.
+- The legacy Directory path may remain temporarily during migration but must
+  not remain the permanent canonical onboarding identity.
+- Companion maps to a canonical Companion entity.
+- Memorial maps to a remembrance / storytelling record.
+- Creator maps primarily to participation role / status.
+- Event maps to a canonical Event entity.
+- Partner maps primarily to a relationship / collaboration status.
+- Partner is not synonymous with commercial participant.
+- Commercial participants may or may not become Partners.
+- Founder maps primarily to role / recognition status.
+- Activity Nature is a classification.
+- Eligibility is not identity.
+- Commerce status is not identity.
+- Community-serving participation may qualify for access without charge.
+- Formal not-for-profit registration is not the only possible basis for
+  community-serving eligibility.
+- Rescue and Foster require flexible canonical treatment.
+- Memorials and Trails remain distinct.
+- Memorial Contributions remain separate from Trails.
+- Directory publication should eventually derive from canonical public
+  projections rather than published OnboardingRecord payload_json.
+- Canonicalization after onboarding must be designed deliberately rather than
+  inferred from the selected frontend path.
+- Architecture remains modular and version-independent.
+
+The implementation questions that remain must be resolved through their own:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+cycle.
+
+Future changes to these governing onboarding principles require a new version
+of the Canonical Onboarding Mapping rather than silent mutation of v1.

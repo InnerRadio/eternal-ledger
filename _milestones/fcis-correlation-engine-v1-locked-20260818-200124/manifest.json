@@ -1,0 +1,19 @@
+{
+  "milestone": "fcis-correlation-engine-v1-locked-20260818-200124",
+  "locked_at": "20260818-200124",
+  "authority": "FCIS Correlation Engine v1",
+  "module": "backend/app/fcis/correlation.py",
+  "correlation_rule": "active need.context_key == active offer.context_key",
+  "private_correlations": 2,
+  "event_photography_signal": true,
+  "promotional_support_signal": true,
+  "relationship_context_attached": true,
+  "canonical_facts_created": 0,
+  "relationships_created": 0,
+  "actions_authorized": 0,
+  "human_review_required": true,
+  "database_changed": false,
+  "public_exposure": false,
+  "briefing_changed": false,
+  "next_hill": "FCIS Private Briefing v2"
+}

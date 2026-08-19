@@ -1,0 +1,226 @@
+FCIS HUMAN REVIEW STATE PRESENTATION v1 — LOCKED
+
+Locked at UTC:
+20260819-013605
+
+
+PURPOSE
+=======
+
+Present the current durable Human Review state inside
+the private FCIS Inspect experience.
+
+This presentation is read-only.
+
+
+READ PATH
+=========
+
+fcis_human_reviews
+→
+get_human_review()
+→
+assemble_inspect_detail()
+→
+detail["human_review"]
+→
+render_inspect_detail()
+→
+CURRENT HUMAN REVIEW
+
+
+BROWSER PRESENTATION VERIFICATION
+=================================
+
+The durable-state presentation mechanism was verified
+in the live browser after a FastAPI service restart.
+
+At that verification moment the durable state was:
+
+HELD
+
+The browser showed:
+
+CURRENT HUMAN REVIEW
+
+Disposition:
+HELD
+
+Reviewed by:
+admin@eternalledger.com
+
+Reviewed at:
+2026-08-19 01:10:43.469800
+
+
+SUBSEQUENT HUMAN REVIEW CHANGE
+==============================
+
+After that successful presentation verification,
+Human Review #1 was legitimately updated again.
+
+AuditLog #15 records:
+
+disposition=investigating
+
+Current durable state at lock time:
+
+INVESTIGATING
+
+This later Human Review mutation does NOT invalidate
+the presentation verification.
+
+The presentation reads current durable state rather
+than embedding a fixed disposition.
+
+
+CURRENT DURABLE REVIEW
+======================
+
+Review ID:
+1
+
+Need context ID:
+1
+
+Offer context ID:
+3
+
+Surfaced card:
+need-offer:3:4:1:3
+
+Current disposition:
+investigating
+
+Reviewer user ID:
+1
+
+Reviewer email:
+admin@eternalledger.com
+
+Reviewer role:
+admin
+
+Reviewer note:
+None
+
+Reviewed at:
+2026-08-19 01:31:05.696164
+
+Created at:
+2026-08-19 00:34:16.668608
+
+Updated at:
+2026-08-19 01:31:05.696164
+
+
+AUDIT HISTORY
+=============
+
+Human Review AuditLog IDs:
+
+11
+12
+13
+14
+15
+
+Disposition sequence:
+
+INVESTIGATING
+→
+HELD
+→
+INVESTIGATING
+→
+HELD
+→
+INVESTIGATING
+
+Audit history is append-only.
+
+AuditLog #15 is preserved.
+
+
+CURRENT DATABASE BASELINE
+=========================
+
+fcis_human_reviews:
+1
+
+audit_logs:
+15
+
+canonical_contexts:
+6
+
+canonical_relationships:
+3
+
+canonicalization_provenance:
+4
+
+canonical_publications:
+1
+
+partner_organizations:
+5
+
+users:
+8
+
+
+PRESENTATION BOUNDARY
+=====================
+
+Human Review state read:
+YES
+
+Human Review mutation by presentation:
+NO
+
+Audit row created by presentation:
+NO
+
+Canonical fact creation:
+NO
+
+Canonical context creation:
+NO
+
+Canonical relationship creation:
+NO
+
+Canonical relationship mutation:
+NO
+
+Action authorization:
+NO
+
+Outreach authorization:
+NO
+
+Publication authorization:
+NO
+
+Public projection:
+NO
+
+
+KNOWN PRESENTATION FOLLOW-UP
+============================
+
+Transient browser submission feedback can visually
+persist independently from CURRENT HUMAN REVIEW.
+
+CURRENT HUMAN REVIEW is the durable-state presentation.
+
+Transient feedback cleanup is a separate presentation
+correction and is NOT part of this locked hill.
+
+
+LOCK STATUS
+===========
+
+FCIS HUMAN REVIEW STATE PRESENTATION v1
+VERIFIED + LOCKED

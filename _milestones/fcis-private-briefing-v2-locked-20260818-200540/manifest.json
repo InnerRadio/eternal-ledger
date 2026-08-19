@@ -1,0 +1,18 @@
+{
+  "milestone": "fcis-private-briefing-v2-locked-20260818-200540",
+  "locked_at": "20260818-200540",
+  "authority": "FCIS Private Briefing v2",
+  "module": "backend/app/fcis/briefing.py",
+  "private_intelligence_signals": 2,
+  "identity_context_verified": true,
+  "canonical_context_verified": true,
+  "relationship_context_verified": true,
+  "correlation_hypotheses_verified": true,
+  "human_review_required": true,
+  "canonical_facts_created": 0,
+  "relationships_created": 0,
+  "actions_authorized": 0,
+  "database_changed": false,
+  "public_exposure": false,
+  "next_hill": "FCIS Private Intelligence Desk v1"
+}

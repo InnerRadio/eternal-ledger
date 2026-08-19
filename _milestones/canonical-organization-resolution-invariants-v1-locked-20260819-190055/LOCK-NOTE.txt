@@ -1,0 +1,16 @@
+PURPAWS CANONICAL ORGANIZATION RESOLUTION INVARIANTS v1
+STATUS: LOCKED
+
+Source: /var/www/eternal-ledger-github/_notes/purpaws-canonical-organization-resolution-invariants-v1.txt
+SHA256: 672fd1ad305a675275f1e7a66ab72337231a05070fba2bef88bb8bdbfef58917
+
+Runtime files modified: 0
+Backend runtime modified: NO
+Frontend modified: NO
+Database modified: NO
+Services restarted: NO
+Directory modified: NO
+
+NEXT:
+Inspect current executable canonicalizer against this locked resolver boundary.
+Then add the smallest Organization Resolver authority required.

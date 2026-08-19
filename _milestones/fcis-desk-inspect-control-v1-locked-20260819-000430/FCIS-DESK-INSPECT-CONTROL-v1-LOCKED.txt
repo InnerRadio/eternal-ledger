@@ -1,0 +1,128 @@
+FCIS DESK INSPECT CONTROL v1 — LOCKED
+
+Locked at:
+20260819-000430 UTC
+
+PURPOSE
+-------
+Connect the read-only Opportunity Card INSPECT control in the
+FCIS Private Intelligence Desk to the authenticated private
+Inspect Detail route without exposing the bearer token to the
+Desk iframe.
+
+VERIFIED FLOW
+-------------
+Private Intelligence Desk
+→ Opportunity Card
+→ INSPECT
+→ card_id
+→ iframe postMessage
+→ parent Browser Bridge
+→ session-scoped bearer token
+→ authenticated GET /api/fcis/inspect/{card_id}
+→ dynamic Inspect Detail HTML
+→ iframe.srcdoc
+
+BROWSER ENTRY
+-------------
+/api/admin/fcis-desk.html
+
+INTERNAL ROUTES
+---------------
+GET /fcis/desk
+GET /fcis/inspect/{card_id}
+
+EXTERNAL INSPECT ROUTE
+----------------------
+GET /api/fcis/inspect/{card_id}
+
+AUTHORIZATION
+-------------
+Existing bearer authentication
+FCIS Private Access Authority v1
+Allowed role: admin
+Live database role remains authoritative.
+
+SANDBOX CONTRACT
+----------------
+sandbox="allow-same-origin allow-scripts"
+
+The Desk iframe may execute the minimal script required to send
+the Opportunity Card ID to the parent Browser Bridge.
+
+The bearer token is NOT passed into the iframe.
+
+TOKEN BOUNDARY
+--------------
+Storage: sessionStorage
+Token in URL: NO
+Token in Desk iframe: NO
+Cookie shortcut: NO
+Authenticated Inspect fetch occurs in parent Browser Bridge.
+
+INSPECT AUTHORITY
+-----------------
+Inspect Detail schema:
+fcis_inspect_detail_v1
+
+Inspect View schema:
+fcis_inspect_view_v1
+
+CANONICAL BOUNDARY
+------------------
+Inspect rereads canonical context and evidence.
+Inspect does not create canonical facts.
+Inspect does not create relationships.
+Inspect does not authorize actions.
+Inspect does not persist workflow.
+
+LABORATORY BASELINE
+-------------------
+Canonical contexts: 6
+Canonical relationships: 3
+Canonicalization provenance: 4
+Canonical publications: 1
+Partner organizations: 5
+Users: 8
+Opportunity Cards: 2
+
+LIVE BROWSER VERIFICATION
+-------------------------
+VERIFIED BY HUMAN OPERATOR.
+
+The INSPECT control was clicked in the live private
+Intelligence Desk after the sandbox correction.
+
+The private Inspect Detail view rendered successfully and showed:
+
+- Opportunity Signal
+- Why FCIS Surfaced This
+- Need Evidence
+- Offer Evidence
+- Canonical Assertions
+- Evidence Type
+- Evidence Source IDs
+- Evidence References
+- Evidence Notes
+- Synthetic test evidence disclosure
+- Canonical Relationship Context
+
+The synthetic evidence was explicitly labelled:
+
+SYNTHETIC TEST EVIDENCE — NOT A REAL-WORLD ASSERTION
+
+SAFETY BOUNDARY
+---------------
+Read-only: YES
+Workflow persisted: NO
+Canonical facts created: 0
+Relationships created: 0
+Actions authorized: 0
+Database changed by Inspect: NO
+Public exposure: NONE
+
+NEXT HILL
+---------
+FCIS Human Review Workflow v1 — DESIGN / INSPECTION FIRST
+
+No review decision persistence is authorized by this milestone.

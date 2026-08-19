@@ -1,0 +1,97 @@
+FCIS — OPPORTUNITY CARD ASSEMBLER v1
+LOCKED
+
+PURPOSE
+
+Transform verified private FCIS correlation hypotheses into
+structured, read-only Opportunity Cards.
+
+MODULE
+
+backend/app/fcis/opportunity_cards.py
+
+SCHEMA
+
+fcis_opportunity_card_v1
+
+VERIFIED CARDS
+
+1.
+
+card_id:
+need-offer:3:4:1:3
+
+Alpha ↔ Beta
+signal:
+event_photography
+
+relationship:
+active partner / community_partnership
+
+caution:
+none
+
+
+2.
+
+card_id:
+need-offer:4:5:4:5
+
+Beta ↔ Gamma
+signal:
+promotional_support
+
+relationship:
+pending partner / strategic_partnership
+
+caution:
+present
+
+
+BOUNDARY
+
+Opportunity Cards are presentation objects.
+
+They do NOT:
+
+- create canonical facts
+- create canonical context
+- create canonical relationships
+- authorize actions
+- persist workflow state
+- publish intelligence
+
+display_status = new
+
+This status is display-only.
+
+PUBLIC EXPOSURE
+
+NONE.
+
+NEXT HILL
+
+FCIS Private Intelligence Desk v1.
+
+The first Desk renderer will be read-only.
+
+It may visually provide:
+
+INSPECT
+
+but must not persist WATCH / DEVELOP / DISMISS until a
+workflow authority exists.
+
+ARCHITECTURAL FLOW
+
+Canonical Facts
+    ↓
+Readers
+    ↓
+Correlation Engine
+    ↓
+Opportunity Card Assembler
+    ↓
+Private Intelligence Desk
+    ↓
+Human Review

@@ -1,0 +1,89 @@
+FCIS — SYNTHETIC CONTEXT FIXTURE v1
+LOCKED
+
+PURPOSE
+
+Provide a durable, explicitly synthetic laboratory for
+context-driven FCIS intelligence development.
+
+THIS DATA IS NOT REAL-WORLD EVIDENCE.
+
+ORGANIZATIONS
+
+3 — FCIS Test Organization Alpha
+4 — FCIS Test Organization Beta
+5 — FCIS Test Organization Gamma
+
+CONTEXT FIXTURE
+
+ALPHA
+
+NEED
+event_photography
+scope: event
+
+OFFER
+community_audience
+scope: network
+
+BETA
+
+OFFER
+event_photography
+scope: event
+
+NEED
+promotional_support
+scope: campaign
+
+GAMMA
+
+OFFER
+promotional_support
+scope: campaign
+
+CAPABILITY
+sponsorship
+scope: network
+
+CONTEXT ROWS
+
+6
+
+RELATIONSHIP LABORATORY
+
+3 canonical relationships remain unchanged.
+
+PUBLIC BOUNDARY
+
+No CanonicalContext public import.
+No Canonical Context public endpoint.
+No public exposure of this private context authority.
+
+PRIVATE INTELLIGENCE
+
+Existing private intelligence behavior remains unchanged.
+
+briefing.py does not yet read CanonicalContext.
+relationship_reader.py does not read CanonicalContext.
+
+ARCHITECTURAL PRINCIPLE
+
+Context Reader reports canonical context truth.
+
+Correlation Engine proposes opportunity hypotheses.
+
+Private Briefing determines what deserves human attention.
+
+Humans authorize action.
+
+NEXT HILL
+
+FCIS Context Reader v1.
+
+Then:
+
+FCIS Correlation Engine v1.
+
+Only after those modules are independently verified should
+the Private Intelligence Briefing consume correlation results.

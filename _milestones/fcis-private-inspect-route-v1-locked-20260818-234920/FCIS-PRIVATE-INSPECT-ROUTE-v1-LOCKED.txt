@@ -1,0 +1,126 @@
+FCIS PRIVATE INSPECT ROUTE v1 — LOCKED
+
+Locked:
+20260818-234920
+
+PURPOSE
+
+Provide authenticated, admin-only, read-only detailed
+inspection of one current FCIS Opportunity Card.
+
+ROUTE
+
+GET /fcis/inspect/{card_id}
+
+EXTERNAL NGINX PATH
+
+GET /api/fcis/inspect/{card_id}
+
+AUTHORIZATION
+
+FCIS Private Access Authority v1.
+
+Requirements:
+
+- authenticated bearer identity
+- live User record
+- active account
+- role == admin
+
+CARD RESOLUTION
+
+The route rebuilds current Opportunity Cards and matches
+the requested stable card_id.
+
+No Opportunity Card workflow record is persisted.
+
+UNKNOWN / STALE CARD
+
+404 FCIS Opportunity Card not found.
+
+INSPECTION AUTHORITY
+
+backend/app/fcis/inspect.py
+
+The Opportunity Card supplies:
+
+- card_id
+- Need Canonical Context ID
+- Offer Canonical Context ID
+- correlation summary
+- relationship context
+- human question
+- safety boundary
+
+Canonical context is reread through the existing
+FCIS Context Reader by context ID.
+
+INSPECT VIEW
+
+backend/app/fcis/inspect_view.py
+
+Displays:
+
+- participants
+- signal
+- why FCIS surfaced the signal
+- Need canonical assertion
+- Need evidence
+- Offer canonical assertion
+- Offer evidence
+- canonical relationship context
+- caution
+- human question
+- safety boundary
+
+SYNTHETIC EVIDENCE
+
+Synthetic fixture evidence is explicitly labelled as
+synthetic and not a real-world assertion.
+
+Synthetic evidence_source_id is not represented as an
+independently resolvable source record.
+
+SAFETY
+
+Read only.
+
+Creates:
+
+- no canonical facts
+- no canonical context
+- no relationships
+- no workflow state
+- no authorized action
+- no public projection
+
+VERIFIED
+
+Current Opportunity Cards: 2
+Canonical Context rows read by inspection: 4
+
+Active admin:
+200
+
+Active non-admin:
+403
+
+Anonymous:
+401
+
+Unknown / stale card:
+404
+
+Existing Desk regression:
+PASS
+
+Database changed:
+NO
+
+Public API changed:
+NO
+
+NEXT HILL
+
+Wire the existing Desk INSPECT control to the
+authenticated Private Inspect Route.

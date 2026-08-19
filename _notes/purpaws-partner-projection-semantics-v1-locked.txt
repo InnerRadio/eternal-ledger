@@ -1,0 +1,53 @@
+PURPAWS PARTNER PROJECTION SEMANTICS v1 — LOCKED
+
+Locked:
+2026-08-16T20:38:39.226340Z
+
+Design:
+/var/www/eternal-ledger-github/_notes/purpaws-partner-projection-semantics-v1.txt
+
+SHA256:
+5cc1517aae47e1c9aff78c25c785e6f3c59ab974c4bd897d16252438bce03697
+
+VERIFIED SEMANTICS
+
+Partner is not identity.
+
+Canonical Organization remains identity authority.
+
+Partner is a relationship projection arising from explicit
+qualifying relationship authority.
+
+Qualifying bases may include:
+
+- Founder membership
+- sponsorship
+- community partnership
+- strategic partnership
+- campaign partnership
+- network partnership
+
+Commerce is separate from Partner relationship semantics.
+
+Canonical publication is separate from Partner relationship
+semantics.
+
+Historical PartnerOrganization / partner_organizations rows
+do not automatically establish canonical Partner relationships.
+
+partner-1 and partner-2 receive no invented relationship basis.
+
+Existing legacy Partner projections remain transitional until
+explicit evidence or future migration establishes qualifying
+Partner relationship authority.
+
+NO DATABASE SCHEMA AUTHORIZED BY THIS LOCK.
+NO PARTNER RELATIONSHIP TABLE CREATED BY THIS LOCK.
+NO LEGACY MIGRATION AUTHORIZED BY THIS LOCK.
+NO PARTNER CLASSIFICATION AUTHORIZED BY THIS LOCK.
+NO API CHANGE AUTHORIZED BY THIS LOCK.
+NO DIRECTORY CHANGE AUTHORIZED BY THIS LOCK.
+
+NEXT:
+
+PARTNER RELATIONSHIP AUTHORITY v1

@@ -1,0 +1,111 @@
+FCIS — CANONICAL CONTEXT WRITE AUTHORITY v1
+LOCKED
+
+PURPOSE
+
+Provide the controlled write gate for CanonicalContext assertions.
+
+IMPLEMENTATION
+
+backend/app/context_authority.py
+
+PRIMARY FUNCTION
+
+create_canonical_context(...)
+
+V1 SUBJECT CONTRACT
+
+organization subjects only
+
+The subject must:
+
+- exist as PartnerOrganization
+- have established CanonicalizationProvenance
+
+V1 CONTEXT TYPES
+
+need
+offer
+capability
+interest
+goal
+constraint
+resource
+preference
+availability
+requirement
+
+V1 CONTEXT STATUSES
+
+pending
+active
+inactive
+expired
+revoked
+
+VALIDATIONS VERIFIED
+
+- unsupported subject types rejected
+- missing organizations rejected
+- noncanonical organizations rejected
+- invalid subject ids rejected
+- blank context types rejected
+- unsupported context types rejected
+- blank context keys rejected
+- invalid context statuses rejected
+- missing evidence source types rejected
+- invalid evidence source ids rejected
+- expiry before effective date rejected
+
+DUPLICATE SEMANTICS
+
+Equivalent evidence-backed assertions are reused deterministically.
+
+NULL evidence_source_id is also deduplicated by the write authority
+because SQLite UNIQUE semantics allow multiple NULL values.
+
+TRANSACTION CONTRACT
+
+The authority performs db.flush().
+
+Caller owns:
+
+commit
+rollback
+
+ROLLBACK INTEGRATION VERIFIED
+
+Valid transient context creation succeeded.
+Duplicate reuse succeeded.
+NULL evidence-id reuse succeeded.
+All validation branches passed.
+
+The transaction was rolled back.
+
+DURABLE POST-TEST STATE
+
+canonical_contexts: 0
+canonical_relationships: 3
+canonicalization_provenance: 4
+canonical_publications: 1
+partner_organizations: 5
+
+No durable synthetic context exists yet.
+
+PUBLIC BOUNDARY
+
+No CanonicalContext import in public_api.py.
+No Canonical Context public endpoint.
+No public projection semantics changed.
+
+PRIVATE INTELLIGENCE
+
+Unchanged.
+
+NEXT HILL
+
+FCIS Synthetic Context Fixture v1.
+
+Only after this lock may Alpha / Beta / Gamma receive committed
+synthetic Needs / Offers / Capabilities for the Opportunity Engine
+laboratory.

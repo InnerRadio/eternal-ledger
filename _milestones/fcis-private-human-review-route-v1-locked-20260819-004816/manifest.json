@@ -1,0 +1,63 @@
+{
+  "milestone": "fcis-private-human-review-route-v1-locked-20260819-004816",
+  "locked_at": "20260819-004816",
+  "authority": "FCIS Private Human Review Route v1",
+  "internal_route": "POST /fcis/review/{card_id}",
+  "external_route": "POST /api/fcis/review/{card_id}",
+  "authentication": "existing bearer token",
+  "authorization": "FCIS Private Access Authority v1",
+  "allowed_roles": [
+    "admin"
+  ],
+  "review_schema_version": "fcis_human_review_v1",
+  "review_authority_version": "fcis_human_review_authority_v1",
+  "supported_dispositions": [
+    "new",
+    "investigating",
+    "held",
+    "dismissed"
+  ],
+  "current_card_required": true,
+  "unknown_card_status": 404,
+  "failure_boundaries": {
+    "anonymous": 401,
+    "invalid_token": 401,
+    "active_non_admin": 403,
+    "forged_admin_claim": 403,
+    "malformed_body": 422,
+    "invalid_disposition": 400,
+    "unknown_stale_card": 404
+  },
+  "successful_write_status": 200,
+  "successful_transition": "held -> investigating",
+  "current_review_id": 1,
+  "current_review_identity": "need-offer-review:1:3",
+  "current_disposition": "investigating",
+  "human_review_rows": 1,
+  "audit_log_rows": 13,
+  "human_review_audit_history_rows": 3,
+  "canonical_context_rows": 6,
+  "canonical_relationship_rows": 3,
+  "direct_route_database_writes": false,
+  "canonical_fact_creation": false,
+  "relationship_creation": false,
+  "relationship_mutation": false,
+  "action_authorization": false,
+  "public_projection": false,
+  "public_exposure": false,
+  "browser_write_control": false,
+  "hashes": {
+    "backend/app/fcis/routes.py": "8674c158779452909dd5602878e14275c1560f7bd976a9ce1e78d56ef17a3368",
+    "backend/app/fcis/review_authority.py": "5c33481b8acf202f3b6e6dd0d7310a4ccee9c4bbcaea68708be05ff16111e145",
+    "backend/app/fcis/review_contract.py": "7a69b37d3d5b6c1279551a451e5e14548c0c0550c7493b9bad6d77a9fac2adcf",
+    "backend/app/fcis/access.py": "959ba76e8d95a520be34ec690bbe7d30bb4916f6cc9648a5d49317023e52c243",
+    "backend/app/fcis/opportunity_cards.py": "643b26bf2733f8de357b11d2542d270181e3962a1723e04643c32dea5eaa59b5",
+    "backend/app/models.py": "dd914aebe475988819b8bc30b9599c5c9b06a2f576a30084b7049862218b7608",
+    "backend/app/cms/audit.py": "a0f50050f0517c43b88373622b0a9785a746236a23193ddc95a55400f56e473d",
+    "backend/app/cms/security.py": "5ae196456da1251f4782b64482ee6d923ed70c8e94c58ccfc98f35bcc04cd789",
+    "backend/app/main.py": "59af414631fc74470e44d466dc34dd70770b397c668491ab88e8a064fbaefcea",
+    "backend/app/public_api.py": "20ec3586a50422ff62c1862bcc367e97f788fdf3d5206a904409fec2d11f557f",
+    "eternal_ledger.db": "944169b4fb843d8052990a32aeac64722c2bfaa31caf204d7a78c2e01cd8b107"
+  },
+  "next_hill": "FCIS Admin Human Review Control v1"
+}

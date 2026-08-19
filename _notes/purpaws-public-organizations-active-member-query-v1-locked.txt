@@ -1,0 +1,73 @@
+PURPAWS PUBLIC ORGANIZATIONS ACTIVE MEMBER QUERY v1 — LOCKED
+
+STATUS
+
+VERIFIED REPAIR.
+
+
+================================================================================
+DEFECT
+================================================================================
+
+The legacy /public/organizations route attempted to calculate:
+
+active_member_count
+
+using a multi-model query containing:
+
+OrganizationMember
+RescueProfile
+RescueAnimal
+PublicProfile
+
+The query referenced:
+
+PublicProfile.organization_id
+
+but PublicProfile has no organization_id field.
+
+
+================================================================================
+CORRECT SEMANTICS
+================================================================================
+
+active_member_count belongs to OrganizationMember.
+
+Correct query:
+
+OrganizationMember.organization_id == organization.id
+
+AND
+
+OrganizationMember.status == active
+
+
+================================================================================
+BOUNDARY
+================================================================================
+
+No RescueProfile relationship was inferred.
+
+No RescueAnimal relationship was inferred.
+
+No PublicProfile relationship was inferred.
+
+No canonical publication behavior changed.
+
+No canonical feed behavior changed.
+
+No database data changed.
+
+
+================================================================================
+IMPLEMENTATION HASH
+================================================================================
+
+backend/app/public_api.py
+
+SHA256:
+
+0c0985ade2c80e3a7f777d55b2d09ac66eb08d4bf6d797ce1c42af66dadac37a
+
+
+LOCKED.

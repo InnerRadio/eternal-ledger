@@ -1,0 +1,90 @@
+PURPAWS CANONICAL PUBLICATION STATE v1 — LOCKED
+
+STATUS
+
+VERIFIED AND LOCKED.
+
+
+================================================================================
+CORE INVARIANTS
+================================================================================
+
+EXISTENCE != PUBLICATION
+
+CANONICALIZATION != PUBLICATION
+
+PROVENANCE != PUBLICATION
+
+ACTIVE STATUS != PUBLICATION
+
+ELIGIBILITY != PUBLICATION
+
+COMMERCE != PUBLICATION
+
+PARTNER RELATIONSHIP != PUBLICATION
+
+
+================================================================================
+PUBLICATION AUTHORITY
+================================================================================
+
+Canonical publication authority is explicit and durable.
+
+Canonical table:
+
+canonical_publications
+
+Required fields:
+
+id
+target_type
+target_id
+publication_status
+created_at
+updated_at
+
+Database invariant:
+
+UNIQUE(
+    target_type,
+    target_id
+)
+
+
+================================================================================
+FIRST TARGET
+================================================================================
+
+organization:2
+
+
+================================================================================
+SOURCE DESIGN HASH
+================================================================================
+
+SHA256:
+3003339abd7ff5be71ce1377f5633b2d4f8a3431be9baa8fe464a77690237918
+
+
+================================================================================
+IMPLEMENTATION AUTHORITY
+================================================================================
+
+This verified lock authorizes the controlled v1 implementation of:
+
+canonical_publications
+
+and the first controlled canonical publication of:
+
+organization:2
+
+No API replacement.
+No Directory replacement.
+No frontend changes.
+No legacy retirement.
+No OrganizationMember creation.
+No eligibility determination.
+No commerce determination.
+
+
+LOCKED.

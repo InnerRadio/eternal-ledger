@@ -1,0 +1,57 @@
+PURPAWS — CANONICAL ORGANIZATION RESOLUTION REVIEW MODEL + MIGRATION v1
+
+LOCKED AT
+2026-08-19T21:05:11.316678+00:00
+
+MODEL
+backend/app/models.py
+
+MODEL SHA256
+d411c6ca63e178db9fff9d64234dd279862ad8b38dc42c244277788ffd379339
+
+TABLE
+canonical_organization_resolution_reviews
+
+SEMANTICS
+Append-only historical organization-resolution review judgments.
+
+CURRENT-EFFECTIVE STATE
+Derived by:
+ORDER BY reviewed_at DESC, id DESC
+
+DECISIONS
+ESTABLISHED
+NOT_SAME
+DEFERRED
+
+LOOKUP INDEXES
+(source_type, source_id)
+(source_type, source_id, target_type, target_id)
+(target_type, target_id)
+(reviewer_user_id)
+
+INDEX UNIQUENESS
+All four lookup indexes are NON-UNIQUE.
+
+FORBIDDEN
+No UNIQUE(source_type, source_id,target_type,target_id).
+
+AUTHORITY BOUNDARY
+Review history != canonicalization provenance.
+Review history != relationship authority.
+Review history != permission authority.
+Review history != publication authority.
+Review history != reconciliation authority.
+
+LOCK STATE
+Model exists.
+Table exists.
+Four non-unique indexes exist.
+Review row count = 0.
+No review authority execution has occurred.
+No controlled #15 review artifact has been created.
+
+NEXT
+Implement executable review authority against this locked durable model.
+Then create the first controlled historical review artifact only after
+authority verification.

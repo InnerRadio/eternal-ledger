@@ -1,0 +1,108 @@
+PURPAWS CANONICAL ORGANIZATION PROJECTION v1 — LOCKED
+
+STATUS
+
+VERIFIED AND LOCKED.
+
+Canonical Organization Projection v1 now governs implementation of canonical
+Organization public projection.
+
+
+================================================================================
+LOCKED PRINCIPLES
+================================================================================
+
+1. Canonical Organization existence is not publication.
+
+2. Canonicalization provenance is not publication authority.
+
+3. PartnerOrganization.status = active is not canonical publication authority.
+
+4. The Directory remains downstream.
+
+5. The Directory consumes published projections.
+
+6. Canonical Organization facts come from the canonical Organization target.
+
+7. Presentation data is separate from canonical Organization identity.
+
+8. contact_email is not automatically public.
+
+9. Legacy publication remains operational during canonical parity testing.
+
+10. A canonical Organization projection feed may operate beside the legacy
+    feed.
+
+11. The canonical feed must not silently replace /public/organizations or the
+    legacy Directory aggregation.
+
+12. Explicit durable publication authority is required before permanent
+    canonical public projection.
+
+13. Publication authority must remain separate from:
+
+    - canonical identity
+    - provenance
+    - eligibility
+    - commerce requirement
+    - commerce fulfillment
+    - Partner relationship
+
+
+================================================================================
+FIRST CANONICAL TARGET
+================================================================================
+
+organization:2
+
+Canonical provenance:
+
+onboarding_record:12
+    ->
+organization:2
+
+organization:2 is NOT automatically canonically published merely because it:
+
+- exists
+- is active
+- has provenance
+
+
+================================================================================
+SOURCE DESIGN HASH
+================================================================================
+
+SHA256:
+61cc70dd3ae8221c2a5de45cd0c9307267e642387d286f28d23d8f4d014bcb82
+
+
+================================================================================
+IMPLEMENTATION BOUNDARY
+================================================================================
+
+This lock does not itself:
+
+- change database schema
+- create publication state
+- create publication rows
+- repurpose PublicProfile
+- replace APIs
+- replace /public/organizations
+- replace Directory feeds
+- migrate onboarding payload
+- migrate presentation data
+- change frontend
+- change payment behavior
+
+
+================================================================================
+NEXT
+================================================================================
+
+Define, verify, and lock explicit Canonical Publication State v1.
+
+Only after publication state exists may the first permanent canonical
+Organization projection feed be activated.
+
+
+LOCKED.

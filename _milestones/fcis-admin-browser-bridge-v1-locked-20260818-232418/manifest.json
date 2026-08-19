@@ -1,0 +1,32 @@
+{
+  "milestone": "fcis-admin-browser-bridge-v1-locked-20260818-232418",
+  "locked_at": "20260818-232418",
+  "authority": "FCIS Admin Browser Bridge v1",
+  "browser_entry": "/api/admin/fcis-desk.html",
+  "login_endpoint": "POST /api/cms/login",
+  "private_desk_endpoint": "GET /api/fcis/desk",
+  "internal_login_endpoint": "POST /cms/login",
+  "internal_desk_endpoint": "GET /fcis/desk",
+  "token_storage": "sessionStorage",
+  "token_in_url": false,
+  "cookie_auth": false,
+  "authorization_header": true,
+  "allowed_roles": [
+    "admin"
+  ],
+  "live_database_role_authoritative": true,
+  "dynamic_desk": true,
+  "desk_read_only": true,
+  "canonical_context_rows": 6,
+  "canonical_relationship_rows": 3,
+  "opportunity_signals": 2,
+  "opportunity_cards": 2,
+  "human_review_required": true,
+  "workflow_persisted": false,
+  "canonical_facts_created_by_correlation": 0,
+  "relationships_created_by_correlation": 0,
+  "actions_authorized": 0,
+  "public_exposure": false,
+  "live_browser_verified": true,
+  "next_hill": "FCIS INSPECT v1"
+}

@@ -1,0 +1,72 @@
+PUBLIC DIRECTORY WAVE 5D DISCOVERY METRICS LOCKED
+
+Implemented:
+- Public directory metrics helper
+- Founder discovery metrics
+- Creator discovery metrics
+- Rescue discovery metrics
+- Partner / Organization discovery metrics
+- Directory list records use enriched metrics
+- Directory detail records use enriched metrics
+
+Verified:
+- eternal-ledger-api.service restarts successfully
+- /public/directory returns founder metrics
+- /public/directory returns partner metrics
+- /public/directory/founder/1 returns founder metrics
+- /public/directory/partner/1 returns partner metrics
+- Detail and list records remain aligned
+- Metrics use confirmed existing model fields only
+- Metrics remain public-safe
+
+Endpoint:
+- /public/directory
+- /public/directory/{listing_type}/{listing_id}
+
+Metric Sources:
+- FounderProfile
+- PublicProfile
+- MediaAsset
+- RescueAnimal
+- OrganizationMember
+- AffiliateCampaign
+
+Founder Metrics:
+- founder_since
+- founder_type
+- founder_level
+
+Creator Metrics:
+- published_media_count
+- public_profile_status
+- verification_status
+
+Rescue Metrics:
+- animal_count
+- available_animal_count
+
+Partner / Organization Metrics:
+- active_member_count
+- active_campaign_count
+
+Privacy:
+- Excludes email
+- Excludes contact_email
+- Excludes referral_code
+- Excludes affiliate_id
+- Excludes private account details
+- Excludes security data
+
+Purpose:
+- Enables richer Founder Wall cards
+- Enables richer Creator Directory cards
+- Enables richer Rescue Directory cards
+- Enables richer Partner Directory cards
+- Supports future sorting, ranking, reputation, and public discovery UI
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

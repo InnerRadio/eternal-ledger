@@ -1,0 +1,51 @@
+{
+  "milestone": "fcis-synthetic-context-fixture-v1-locked-20260817-150158",
+  "locked_at": "20260817-150158",
+  "fixture": "FCIS Synthetic Context Fixture v1",
+  "synthetic_organizations": {
+    "Alpha": 3,
+    "Beta": 4,
+    "Gamma": 5
+  },
+  "canonical_context_rows": 6,
+  "canonical_relationship_rows": 3,
+  "canonical_provenance_rows": 4,
+  "canonical_publication_rows": 1,
+  "partner_organization_rows": 5,
+  "context_fixture": [
+    {
+      "organization": "Alpha",
+      "type": "need",
+      "key": "event_photography"
+    },
+    {
+      "organization": "Alpha",
+      "type": "offer",
+      "key": "community_audience"
+    },
+    {
+      "organization": "Beta",
+      "type": "offer",
+      "key": "event_photography"
+    },
+    {
+      "organization": "Beta",
+      "type": "need",
+      "key": "promotional_support"
+    },
+    {
+      "organization": "Gamma",
+      "type": "offer",
+      "key": "promotional_support"
+    },
+    {
+      "organization": "Gamma",
+      "type": "capability",
+      "key": "sponsorship"
+    }
+  ],
+  "public_exposure": false,
+  "private_intelligence_changed": false,
+  "synthetic_only": true,
+  "next_hill": "FCIS Context Reader v1"
+}

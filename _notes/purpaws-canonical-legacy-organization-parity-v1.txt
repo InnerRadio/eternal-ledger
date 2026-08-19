@@ -1,0 +1,184 @@
+PURPAWS CANONICAL ↔ LEGACY ORGANIZATION PROJECTION PARITY v1
+
+STATUS
+
+PARITY INSPECTION COMPLETE.
+
+DEFINED FOR REVIEW.
+NOT YET LOCKED.
+
+
+================================================================================
+LEGACY REPAIR PREREQUISITE
+================================================================================
+
+The legacy /public/organizations active-member query was repaired and
+independently verified before parity comparison.
+
+Repair lock:
+
+purpaws-public-organizations-active-member-query-v1-locked.txt
+
+
+================================================================================
+VISIBILITY SET
+================================================================================
+
+Legacy public Organization IDs:
+
+[2, 1]
+
+Canonical public Organization IDs:
+
+[2]
+
+Shared:
+
+[2]
+
+Legacy only:
+
+[1]
+
+Canonical only:
+
+[]
+
+
+================================================================================
+INTERPRETATION
+================================================================================
+
+organization:1 is legacy-only because:
+
+- operational status = active
+- explicit canonical publication authority = absent
+
+This is an intentional publication-authority difference, not an identity
+parity failure.
+
+
+organization:2 appears in both feeds because:
+
+- operational status = active
+- explicit canonical publication authority = published
+
+
+================================================================================
+CORE FACT PARITY — organization:2
+================================================================================
+
+id: PASS
+organization_name: PASS
+organization_type: PASS
+project: PASS
+website_url: PASS
+location: PASS
+created_at: PASS
+
+
+================================================================================
+STATUS SEMANTICS
+================================================================================
+
+Legacy record status:
+
+active
+
+
+Canonical record status:
+
+published
+
+
+Legacy uses operational Organization status.
+
+Canonical uses explicit publication status.
+
+These values answer different questions and must not be conflated.
+
+
+================================================================================
+CANONICAL-ONLY PUBLICATION METADATA
+================================================================================
+
+canonical_publication:
+
+id = 1
+status = published
+
+
+================================================================================
+METRICS
+================================================================================
+
+active_member_count:
+
+legacy = 0
+canonical = 0
+
+PARITY: PASS
+
+
+================================================================================
+RECORD SHAPE
+================================================================================
+
+Shared record keys:
+
+['id', 'identity', 'metrics', 'organization', 'profile', 'status', 'type']
+
+
+Legacy-only record keys:
+
+[]
+
+
+Canonical-only record keys:
+
+['canonical_publication']
+
+
+================================================================================
+CURRENT PARITY RESULT
+================================================================================
+
+CORE IDENTITY / ORGANIZATION FACT PARITY:
+
+PASS
+
+
+METRIC PARITY:
+
+PASS
+
+
+VISIBILITY SET PARITY:
+
+INTENTIONALLY DIFFERENT
+
+
+STATUS SEMANTIC PARITY:
+
+INTENTIONALLY DIFFERENT
+
+
+CANONICAL PUBLICATION METADATA:
+
+INTENTIONALLY CANONICAL-ONLY
+
+
+================================================================================
+NEXT
+================================================================================
+
+Inspect the Public Directory Organization record shape and define a
+multi-feed aggregation seam that can consume canonical published Organization
+records without:
+
+- changing canonical Organization identity
+- copying presentation fields into canonical core
+- silently retiring legacy publication
+- duplicating the same Organization in Directory results
+
+Verify before implementation.

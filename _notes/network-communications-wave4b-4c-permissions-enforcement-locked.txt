@@ -1,0 +1,70 @@
+NETWORK COMMUNICATIONS WAVE 4B / 4C LOCKED
+
+Implemented:
+- CommunicationPermission model
+- communication_permissions database table
+- Default permissions seeded for existing founder and partner listings
+- Contact relay permission enforcement
+- POST /public/contact-relay now checks CommunicationPermission.allow_contact_relay
+
+Verified:
+- communication_permissions table exists
+- Default founder permission exists
+- Default partner permission exists
+- Allowed relay message stores successfully
+- Disabled relay permission blocks contact message
+- Blocked contact message is not stored
+- Founder relay permission restored after blocked test
+- eternal-ledger-api.service restarts successfully
+
+Endpoints:
+- POST /public/contact-relay
+
+Models:
+- ContactRelayMessage
+- CommunicationPermission
+
+Design:
+- Communication permissions attach to listing_type + listing_id
+- Permissions do not attach directly to account role
+- Multi-role identities can have different communication settings per listing
+- Directory listing becomes the public communication target
+- Contact relay remains privacy-protected
+
+Permission Fields:
+- allow_contact_relay
+- allow_founder_inquiries
+- allow_creator_inquiries
+- allow_rescue_inquiries
+- allow_partner_inquiries
+- allow_organization_inquiries
+- auto_accept
+- status
+
+Privacy:
+- Recipient email is not exposed
+- Recipient contact_email is not exposed
+- Recipient affiliate_id is not exposed
+- Recipient referral_code is not exposed
+- Private account details are not exposed
+- Blocked messages are not stored
+
+Current Verified Records:
+- founder listing id 1 has allow_contact_relay enabled
+- partner listing id 1 has allow_contact_relay enabled
+
+Future Extensions:
+- Contact Relay Admin Queue
+- Recipient Dashboard Inbox
+- Internal Messaging
+- Notifications
+- Anti-spam/rate limiting
+- Authenticated sender_user_id support
+- Permission editing dashboard
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

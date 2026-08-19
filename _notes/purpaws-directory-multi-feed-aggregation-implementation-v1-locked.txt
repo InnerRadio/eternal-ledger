@@ -1,0 +1,237 @@
+PURPAWS DIRECTORY MULTI-FEED AGGREGATION IMPLEMENTATION v1 — LOCKED
+
+LOCKED AT
+
+2026-08-16 19:55:15
+
+
+================================================================================
+STATUS
+================================================================================
+
+VERIFIED IMPLEMENTATION.
+
+
+================================================================================
+CONTROLLED SCOPE
+================================================================================
+
+Aggregation is active only for the unfiltered multi-feed Directory:
+
+listing_type = None
+
+
+Explicit legacy filters remain unchanged:
+
+listing_type = directory
+
+listing_type = organization
+
+
+================================================================================
+FIRST SOURCE SUPERSESSION
+================================================================================
+
+Legacy source projection:
+
+directory-12
+
+
+Canonical provenance:
+
+onboarding_record:12
+        ->
+organization:2
+
+
+Canonical publication:
+
+organization:2
+        ->
+canonical_publication:1
+        ->
+published
+
+
+Aggregated result:
+
+organization-2
+
+
+directory-12 is no longer emitted as an independent identity in the
+multi-feed Directory.
+
+
+================================================================================
+CANONICAL IDENTITY
+================================================================================
+
+Aggregated Directory identity:
+
+id = organization-2
+
+listing_id = 2
+
+listing_type = organization
+
+source = canonical_organizations
+
+
+Canonical Organization fields control:
+
+name
+location
+project
+website_url
+organization_name
+
+
+================================================================================
+PRESENTATION SUPPLEMENTATION
+================================================================================
+
+Approved onboarding presentation is preserved from directory-12:
+
+headline
+description
+category
+logo_media_asset_id
+logo_file_path
+cover_media_asset_id
+cover_file_path
+created_at
+updated_at
+published_from
+
+
+This presentation does not mutate canonical Organization core.
+
+
+================================================================================
+PARTNER PROJECTION
+================================================================================
+
+partner-2 remains present and unchanged.
+
+partner-1 remains present and unchanged.
+
+No Partner projection was automatically collapsed.
+
+
+================================================================================
+UNRELATED DIRECTORY RECORDS
+================================================================================
+
+founder-1 remains unchanged.
+
+No Creator or Rescue aggregation behavior was introduced.
+
+
+================================================================================
+NO BLIND MERGE
+================================================================================
+
+No name matching.
+
+No website matching.
+
+No fuzzy matching.
+
+Source supersession is driven by canonicalization_provenance.
+
+
+================================================================================
+SEARCH / RANKING SEAM
+================================================================================
+
+Aggregation occurs before:
+
+search
+featured filtering
+ranking
+sorting
+pagination
+
+Therefore downstream Directory behavior operates on the aggregated result.
+
+
+================================================================================
+DATABASE SAFETY
+================================================================================
+
+Organizations:
+
+2 -> 2
+
+
+Canonical publications:
+
+1 -> 1
+
+
+Canonicalization provenance:
+
+1 -> 1
+
+
+OrganizationMember:
+
+1 -> 1
+
+
+ZERO DATABASE DRIFT:
+
+PASS
+
+
+================================================================================
+IMPLEMENTATION
+================================================================================
+
+backend/app/public_api.py
+
+
+SHA256:
+
+20ec3586a50422ff62c1862bcc367e97f788fdf3d5206a904409fec2d11f557f
+
+
+================================================================================
+RESULTING MULTI-FEED DIRECTORY
+================================================================================
+
+BEFORE:
+
+founder-1
+partner-1
+partner-2
+directory-12
+
+
+AFTER:
+
+founder-1
+partner-1
+partner-2
+organization-2
+
+
+Same total number of Directory results.
+
+One transitional source identity has been replaced by its canonical published
+Organization identity.
+
+
+================================================================================
+NEXT
+================================================================================
+
+Verify the live HTTP Directory response.
+
+Then evaluate Partner projection semantics separately before any Partner /
+Organization collapsing.
+
+No Partner auto-collapse is authorized by this lock.
+
+
+LOCKED.

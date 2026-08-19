@@ -1,0 +1,39 @@
+PUBLIC DIRECTORY WAVE 5C DETAIL ENDPOINT LOCKED
+
+Implemented:
+- GET /public/directory/{listing_type}/{listing_id}
+- Public directory detail endpoint
+- Detail records include same shape as directory listing records
+- Detail records include profile, metrics, communication, actions, and privacy-safe public fields
+
+Verified:
+- eternal-ledger-api.service restarts successfully
+- OpenAPI exposes /public/directory
+- OpenAPI exposes /public/directory/{listing_type}/{listing_id}
+- /public/directory/founder/1 returns active founder detail
+- /public/directory/partner/1 returns active partner detail
+- /public/directory/founder/999 returns not found error
+- Detail responses exclude email, referral_code, affiliate_id, contact_email, security data, and private account details
+
+Endpoint:
+- /public/directory/{listing_type}/{listing_id}
+
+Supported Listing Types:
+- founder
+- creator
+- rescue
+- partner
+- organization
+
+Purpose:
+- Enables public detail pages for Founder Wall, Creator Directory, Rescue Directory, Partner Directory, Organization Directory, and future white-label communities
+- Keeps list and detail response shapes aligned
+- Preserves privacy-safe discovery architecture
+- Supports frontend routing from directory cards to profile/detail pages
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

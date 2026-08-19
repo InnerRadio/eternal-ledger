@@ -1,0 +1,55 @@
+PUBLIC DIRECTORY WAVE 5G-A TAXONOMY DEFINITIONS LOCKED
+
+Implemented:
+- PartnerTaxonomyCategory model
+- partner_taxonomy_categories database table
+- Hierarchical taxonomy structure using parent_id
+- Admin-manageable category/subcategory foundation
+- Partner taxonomy seed v1
+
+Verified:
+- python3 -m py_compile backend/app/models.py
+- partner_taxonomy_categories table exists
+- 15 parent categories seeded
+- 80 subcategories seeded
+- 95 total taxonomy records created
+- Parent categories ordered by sort_order
+
+Model:
+- PartnerTaxonomyCategory
+
+Table:
+- partner_taxonomy_categories
+
+Parent Categories:
+- Veterinary
+- Food & Nutrition
+- Rescue & Welfare
+- Training & Behaviour
+- Grooming & Care
+- Pet Services
+- Retail
+- Memorial & Legacy
+- Media & Creators
+- Technology
+- Insurance & Financial
+- Breeders & Kennels
+- Travel & Hospitality
+- Education & Certification
+- Community & Advocacy
+
+Purpose:
+- Defines the commercial partner ecosystem
+- Supports membership onboarding
+- Supports partner dashboards
+- Supports directory filtering
+- Supports discovery search
+- Supports future deck positioning
+- Supports admin-managed taxonomy expansion
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

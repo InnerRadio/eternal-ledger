@@ -1,0 +1,177 @@
+PURPAWS CONTROLLED CANONICALIZATION INVOCATION v1 — LOCKED
+
+LOCKED AT
+2026-08-15 02:26:25
+
+
+================================================================================
+PURPOSE
+================================================================================
+
+Provide an explicit protected backend doorway for canonicalization without
+coupling canonicalization to onboarding publication, frontend behavior, or the
+public Directory.
+
+
+================================================================================
+ROUTE
+================================================================================
+
+POST
+
+/cms/canonicalization/onboarding/{onboarding_id}/organization
+
+
+================================================================================
+AUTHORIZATION
+================================================================================
+
+Authentication:
+
+require_active_account
+
+Additional v1 authorization:
+
+current_user.role must equal admin
+
+Non-admin invocation returns HTTP 403 before canonicalization is called.
+
+
+================================================================================
+EXECUTION
+================================================================================
+
+The route delegates canonical semantics to:
+
+backend/app/canonicalizer.py
+
+function:
+
+canonicalize_directory_organization
+
+The route owns:
+
+commit
+rollback
+
+The canonicalizer continues to own:
+
+source validation
+provenance-first lookup
+canonical target creation
+same-source idempotent reuse
+
+
+================================================================================
+FIRST CONTROLLED ROUTE TEST
+================================================================================
+
+Source:
+
+onboarding_record:12
+
+Existing canonical target:
+
+organization:2
+
+Existing provenance:
+
+canonicalization_provenance:1
+
+Controlled admin invocation returned:
+
+action = reused
+target_type = organization
+target_id = 2
+provenance_id = 1
+
+
+================================================================================
+ZERO-DRIFT VERIFICATION
+================================================================================
+
+Organization count:
+
+2 -> 2
+
+Provenance count:
+
+1 -> 1
+
+OrganizationMember count:
+
+1 -> 1
+
+No new Organization was created.
+
+No duplicate provenance was created.
+
+No OrganizationMember relationship was invented.
+
+
+================================================================================
+PUBLICATION BOUNDARY
+================================================================================
+
+This controlled invocation is not automatically triggered by:
+
+- onboarding creation
+- email verification
+- account creation
+- workspace save
+- onboarding publication
+- Directory rendering
+
+Canonicalization remains an explicit backend operation.
+
+
+================================================================================
+IMPLEMENTATION FILES
+================================================================================
+
+backend/app/cms/canonicalization.py
+
+SHA256:
+886145512b678e592ee7ca6ba075671e09ea6530110ff79042211bf412831d55
+
+
+backend/app/main.py
+
+SHA256:
+c96e82f40a2f3680b4c8815dcdb03bf9782a78b0b9532ebd17de20d553fbbc11
+
+
+backend/app/canonicalizer.py
+
+SHA256:
+b2a05644e1a1da31b75bf8aada1891b98d9005e2c12ec8ba56e84a6691cc6994
+
+
+================================================================================
+UNCHANGED SURFACES
+================================================================================
+
+No frontend changes.
+
+No Directory behavior changes.
+
+No onboarding workflow changes.
+
+No payment changes.
+
+No OrganizationMember changes.
+
+No historical migration.
+
+
+================================================================================
+NEXT
+================================================================================
+
+The controlled invocation layer may now be used to canonicalize additional
+supported sources under the locked canonicalization contracts.
+
+Canonical public projection remains a separate future implementation step.
+
+
+LOCKED.

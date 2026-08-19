@@ -1,0 +1,58 @@
+NETWORK COMMUNICATIONS WAVE 4A CONTACT RELAY LOCKED
+
+Implemented:
+- ContactRelayMessage model
+- contact_relay_messages database table
+- POST /public/contact-relay
+
+Verified:
+- python3 -m py_compile backend/app/public_api.py backend/app/models.py
+- eternal-ledger-api.service restarts successfully
+- POST /public/contact-relay returns status received
+- contact_relay_messages stores relay-protected public contact messages
+- Database verification confirms stored message record
+
+Endpoint:
+- /public/contact-relay
+
+Version:
+- network-communications-contact-relay-v1
+
+Design:
+- Contact Relay sits beneath Public Directory
+- Public visitors can submit contact messages without seeing private recipient contact information
+- Messages are stored for review/routing
+- Recipient private email/contact details remain hidden
+- Contact relay can attach to public directory listings through source_listing_type and source_listing_id
+
+Supported Recipient Types:
+- founder
+- creator
+- rescue
+- partner
+- organization
+
+Privacy:
+- Recipient email is not exposed
+- Recipient contact_email is not exposed
+- Recipient referral_code is not exposed
+- Recipient affiliate_id is not exposed
+- Private account details are not exposed
+- Relay messages are marked privacy_status=relay_protected
+
+Future Extensions:
+- Contact relay dashboard
+- Admin review queue
+- Recipient notification layer
+- Communication permissions
+- Internal messaging
+- Public anti-spam controls
+- Captcha / rate limits
+- Authenticated sender_user_id support
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

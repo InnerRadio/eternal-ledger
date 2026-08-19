@@ -1,0 +1,291 @@
+PURPAWS CANONICAL PUBLICATION STATE v1
+
+STATUS
+
+Defined for verification.
+Not yet locked.
+
+
+================================================================================
+PURPOSE
+================================================================================
+
+Canonical Publication State v1 defines explicit durable authority for whether a
+canonical target may be projected publicly.
+
+It answers:
+
+May this canonical target be projected publicly?
+
+
+================================================================================
+CORE SEPARATIONS
+================================================================================
+
+EXISTENCE != PUBLICATION
+
+CANONICALIZATION != PUBLICATION
+
+PROVENANCE != PUBLICATION
+
+ACTIVE STATUS != PUBLICATION
+
+ELIGIBILITY != PUBLICATION
+
+COMMERCE != PUBLICATION
+
+PARTNER RELATIONSHIP != PUBLICATION
+
+
+================================================================================
+GENERIC TARGET
+================================================================================
+
+Publication authority refers to:
+
+target_type
+target_id
+
+Example:
+
+target_type = organization
+target_id   = 2
+
+The publication record does not become the Organization.
+
+It governs projection authority for the Organization.
+
+
+================================================================================
+PUBLICATION STATUS
+================================================================================
+
+V1 publication states:
+
+unpublished
+published
+
+Absence of a canonical publication record means:
+
+not canonically published
+
+Publication must therefore be affirmative.
+
+
+================================================================================
+DURABLE TABLE
+================================================================================
+
+Canonical table name:
+
+canonical_publications
+
+
+Required fields:
+
+id
+target_type
+target_id
+publication_status
+created_at
+updated_at
+
+
+================================================================================
+IDEMPOTENCY
+================================================================================
+
+There must be at most one publication-authority row per canonical target.
+
+Database invariant:
+
+UNIQUE(
+    target_type,
+    target_id
+)
+
+Repeated publication of the same target must reuse the same authority row.
+
+
+================================================================================
+POLYMORPHIC BOUNDARY
+================================================================================
+
+target_type is generic.
+
+Therefore target_id cannot use one fixed foreign key to one canonical target
+table.
+
+Application logic must verify that the target exists according to target_type.
+
+
+================================================================================
+FIRST CONTROLLED TARGET
+================================================================================
+
+organization:2
+
+
+Before publication:
+
+organization:2 exists
+
+canonicalization_provenance:1 exists
+
+canonical publication authority does not exist
+
+
+First controlled publication:
+
+organization:2
+    ->
+publication_status = published
+
+
+Second controlled publication:
+
+organization:2
+    ->
+same canonical publication authority
+
+
+================================================================================
+SUCCESS TEST
+================================================================================
+
+The first controlled publication must result in:
+
+- exactly one canonical publication row
+- target_type = organization
+- target_id = 2
+- publication_status = published
+
+The second controlled publication must:
+
+- reuse the same publication row
+- create no duplicate publication
+- leave organization count unchanged
+- leave provenance count unchanged
+- leave OrganizationMember count unchanged
+- leave organization:2 facts unchanged
+
+
+================================================================================
+PUBLIC PROJECTION RULE
+================================================================================
+
+A canonical Organization may enter the canonical Organization projection feed
+only when:
+
+1. the canonical Organization exists;
+
+2. explicit publication authority exists;
+
+3. publication_status = published;
+
+4. only approved public-safe fields are projected.
+
+
+================================================================================
+DIRECTORY RULE
+================================================================================
+
+The architecture is:
+
+evidence
+    ↓
+canonicalization
+    ↓
+canonical entity
+    ↓
+explicit publication authority
+    ↓
+public projection
+    ↓
+Directory aggregation
+
+
+================================================================================
+LEGACY PARITY
+================================================================================
+
+Canonical publication does not retire legacy publication.
+
+The canonical projection feed must first be implemented separately.
+
+Parity must be independently verified.
+
+Legacy retirement requires explicit future approval.
+
+
+================================================================================
+RELATIONSHIP SAFETY
+================================================================================
+
+Publication does not create:
+
+ownership
+employment
+volunteering
+administration
+representation
+stewardship
+OrganizationMember
+Partner relationship
+
+
+================================================================================
+ELIGIBILITY / COMMERCE SAFETY
+================================================================================
+
+Publication does not determine or modify:
+
+eligibility_status
+commerce_requirement
+commerce_status
+payment status
+
+
+================================================================================
+IMPLEMENTATION BOUNDARY
+================================================================================
+
+This design does NOT yet authorize:
+
+- models.py changes
+- database schema changes
+- canonical_publications table creation
+- publication row creation
+- API changes
+- frontend changes
+- Directory changes
+- legacy retirement
+- historical migration
+
+
+================================================================================
+NEXT
+================================================================================
+
+Verify this design.
+
+Then lock it.
+
+Then implement:
+
+canonical_publications
+
+and perform the first controlled publication of:
+
+organization:2
+
+
+================================================================================
+STATUS
+================================================================================
+
+Canonical Publication State v1 has been DEFINED.
+
+It has NOT yet been locked.
+
+Only after verification should implementation begin.

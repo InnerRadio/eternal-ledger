@@ -1,0 +1,1444 @@
+PURPAWS CANONICAL INTAKE VOCABULARY v1
+
+STATUS
+Defined for verification.
+Not yet locked.
+
+
+================================================================================
+PURPOSE
+================================================================================
+
+This document defines the semantic vocabulary used by the PurPaws Canonical
+Intake Contract.
+
+It is governed by:
+
+- PurPaws Canonical Network Ontology v1
+- PurPaws Canonical Onboarding Mapping v1
+- PurPaws Canonical Intake Contract v1
+
+All three governing documents are locked.
+
+This vocabulary exists to prevent different semantic concepts from being
+collapsed into overloaded status fields or frontend path labels.
+
+
+================================================================================
+GOVERNING PRINCIPLE
+================================================================================
+
+PurPaws must preserve the difference between:
+
+1. how a person is acting during intake
+2. what the participant declares about an activity
+3. what PurPaws determines about that activity
+4. whether the relevant participation is eligible
+5. whether a commercial condition applies
+6. the fulfillment state of that commercial condition
+
+These are six separate semantic dimensions:
+
+acting_capacity
+
+declared_activity_nature
+
+activity_nature
+
+eligibility_status
+
+commerce_requirement
+
+commerce_status
+
+They must not be silently substituted for one another.
+
+
+================================================================================
+1. ACTING CAPACITY
+================================================================================
+
+FIELD
+
+acting_capacity
+
+
+QUESTION ANSWERED
+
+On whose behalf, or in what immediate capacity, is this person completing
+this intake?
+
+
+SEMANTIC TYPE
+
+Intake context.
+
+
+NOT
+
+acting_capacity is NOT:
+
+- permanent participant identity
+- canonical entity type
+- participant role
+- relationship status
+- activity classification
+- eligibility status
+- commerce requirement
+- commerce status
+- Directory type
+
+
+CANONICAL CONCEPTUAL VALUES
+
+self
+
+    The person is acting for themselves.
+
+organization
+
+    The person is acting for an organization, institution, business,
+    association, rescue, or other organized entity.
+
+informal_group
+
+    The person is acting for a group that may not have a formal legal or
+    organizational structure.
+
+household
+
+    The person is acting in a household / family context.
+
+companion
+
+    The person is acting in relation to a companion animal.
+
+organizer_steward
+
+    The person is acting as the immediate organizer or steward of the thing
+    being created or submitted.
+
+other
+
+    The intake does not fit an established acting-capacity value and requires
+    additional facts or future classification.
+
+
+================================================================================
+ACTING CAPACITY IS NOT ROLE
+================================================================================
+
+The following concepts must NOT automatically become acting_capacity values:
+
+- caregiver
+- steward
+- owner
+- family member
+- foster
+- organization member
+- organization administrator
+- organizer
+- creator
+- founder
+- partner
+- sponsor
+- collaborator
+- author
+
+These are candidate canonical roles or relationships.
+
+Example:
+
+acting_capacity = organization
+
+may later produce:
+
+Organization
+        +
+OrganizationMember relationship
+        +
+administrator role
+
+Another example:
+
+acting_capacity = companion
+
+may later produce:
+
+Companion
+        +
+caregiver / steward relationship
+
+The intake context and resulting canonical relationship must remain distinct.
+
+
+================================================================================
+ACTING CAPACITY IS NOT COMMERCIAL STATUS
+================================================================================
+
+The following must never be acting_capacity values merely because they
+describe the participant or activity:
+
+- commercial
+- community_serving
+- mixed
+- verified_commercial
+- verified_community
+- partner
+- founder
+
+A person acting for a commercial Organization still has:
+
+acting_capacity = organization
+
+The Organization's activity and eligibility are classified separately.
+
+
+================================================================================
+2. DECLARED ACTIVITY NATURE
+================================================================================
+
+FIELD
+
+declared_activity_nature
+
+
+QUESTION ANSWERED
+
+How does the participant describe the nature of the relevant activity?
+
+
+SEMANTIC TYPE
+
+Participant declaration / evidence.
+
+
+CANONICAL CONCEPTUAL VALUES
+
+community_serving
+
+    The participant declares that the relevant activity primarily serves a
+    community, welfare, rescue, foster, charitable, volunteer, public-benefit,
+    or similar non-commercial purpose.
+
+commercial
+
+    The participant declares that the relevant activity primarily involves
+    commercial products, services, sales, paid business activity, or another
+    commercial purpose.
+
+mixed
+
+    The participant declares that the relevant activity contains meaningful
+    community-serving and commercial characteristics.
+
+uncertain
+
+    The participant cannot reasonably determine which declaration best
+    describes the activity.
+
+
+================================================================================
+DECLARATION PRINCIPLE
+================================================================================
+
+declared_activity_nature records what the participant told PurPaws.
+
+It is evidence.
+
+It is not automatically PurPaws' final classification.
+
+It must not be overwritten merely because PurPaws later reaches a different
+determination.
+
+Example:
+
+declared_activity_nature = community_serving
+
+may coexist with:
+
+activity_nature = commercial
+
+if review evidence supports that determination.
+
+Preserving both values protects the evidence history.
+
+
+================================================================================
+DECLARATION IS NOT LEGAL STATUS
+================================================================================
+
+declared_activity_nature must not force participants to claim a legal status
+they do not possess.
+
+For example:
+
+community_serving
+
+does not necessarily mean:
+
+- registered charity
+- incorporated not-for-profit
+- legally registered rescue
+
+An informal rescue, foster network, volunteer initiative, or individual
+community-serving activity may truthfully declare community_serving without
+claiming formal legal status.
+
+
+================================================================================
+3. ACTIVITY NATURE
+================================================================================
+
+FIELD
+
+activity_nature
+
+
+QUESTION ANSWERED
+
+After review, how does PurPaws classify the relevant activity?
+
+
+SEMANTIC TYPE
+
+Reviewed PurPaws classification.
+
+
+CANONICAL CONCEPTUAL VALUES
+
+unclassified
+
+    PurPaws has not yet made an activity classification.
+
+community_serving
+
+    PurPaws determines that the relevant activity qualifies as
+    community-serving for the applicable PurPaws purpose.
+
+commercial
+
+    PurPaws determines that the relevant activity is commercial for the
+    applicable PurPaws purpose.
+
+mixed
+
+    PurPaws determines that meaningful community-serving and commercial
+    characteristics coexist and that the activity requires the corresponding
+    mixed-treatment policy.
+
+uncertain
+
+    Available evidence is insufficient to make a reliable classification.
+
+
+================================================================================
+ACTIVITY CLASSIFICATION PRINCIPLE
+================================================================================
+
+activity_nature is a PurPaws determination.
+
+It must remain separate from:
+
+declared_activity_nature
+
+The normal evidence relationship is:
+
+Participant Declaration
+        ↓
+declared_activity_nature
+        ↓
+Evidence / Review
+        ↓
+activity_nature
+
+The values may agree.
+
+The values may differ.
+
+A difference is not itself an error.
+
+
+================================================================================
+UNCLASSIFIED VS UNCERTAIN
+================================================================================
+
+unclassified means:
+
+PurPaws has not yet performed or completed the relevant classification.
+
+uncertain means:
+
+PurPaws has reviewed the available evidence but cannot yet make a reliable
+community-serving / commercial / mixed determination.
+
+These states must not be treated as synonyms.
+
+
+================================================================================
+4. ELIGIBILITY STATUS
+================================================================================
+
+FIELD
+
+eligibility_status
+
+
+QUESTION ANSWERED
+
+What is the current PurPaws participation-review state for the relevant
+participant, entity, relationship, or activity?
+
+
+SEMANTIC TYPE
+
+Participation eligibility state.
+
+
+CANONICAL CONCEPTUAL VALUES
+
+unclassified
+
+    No eligibility determination has yet been initiated or established.
+
+review_pending
+
+    Eligibility review is expected or underway and has not yet reached a
+    final determination.
+
+verified_community
+
+    PurPaws has verified the applicable participation as eligible under
+    community-serving conditions.
+
+verified_commercial
+
+    PurPaws has verified the applicable participation as eligible under
+    commercial conditions.
+
+review_required
+
+    Existing information is insufficient, conflicting, exceptional, or
+    otherwise requires additional human or system review before eligibility
+    can be finalized.
+
+
+================================================================================
+ELIGIBILITY IS NOT ACTIVITY NATURE
+================================================================================
+
+activity_nature answers:
+
+What kind of activity is this?
+
+eligibility_status answers:
+
+What is the state / result of PurPaws participation review?
+
+Therefore:
+
+activity_nature = commercial
+
+does not itself mean:
+
+eligibility_status = verified_commercial
+
+A review may still be pending.
+
+
+================================================================================
+REVIEW_PENDING VS REVIEW_REQUIRED
+================================================================================
+
+review_pending means:
+
+The ordinary eligibility determination has not yet finished.
+
+review_required means:
+
+The case requires additional review beyond an ordinary unresolved state.
+
+They must not be treated as synonyms.
+
+
+================================================================================
+ELIGIBILITY SCOPE
+================================================================================
+
+eligibility_status applies to the relevant canonical subject.
+
+It must not automatically become a global User-account status.
+
+For example:
+
+User
+    active
+
+Companion
+    publishable under its applicable rules
+
+Trails participation
+    available under its applicable rules
+
+Organization
+    eligibility_status = review_pending
+
+may all coexist.
+
+An unresolved Organization review must not unnecessarily freeze unrelated
+participation by the person representing it.
+
+
+================================================================================
+ELIGIBILITY IS NOT REJECTION
+================================================================================
+
+Neither:
+
+unclassified
+
+nor:
+
+review_pending
+
+nor:
+
+review_required
+
+means that the participant has been rejected.
+
+A future rejection / ineligible state must not be invented implicitly.
+
+If PurPaws requires such a state, it must be deliberately defined and
+verified before implementation.
+
+
+================================================================================
+5. COMMERCE REQUIREMENT
+================================================================================
+
+FIELD
+
+commerce_requirement
+
+
+QUESTION ANSWERED
+
+Does a commercial condition apply to the relevant participation entitlement?
+
+
+SEMANTIC TYPE
+
+Commerce-requirement determination.
+
+
+CANONICAL CONCEPTUAL VALUES
+
+unclassified
+
+    PurPaws has not yet determined whether a commercial condition applies.
+
+not_required
+
+    No commercial package, payment condition, or other commercial fulfillment
+    requirement applies to the relevant entitlement.
+
+required
+
+    A commercial package, payment condition, or other commercial fulfillment
+    requirement applies to the relevant entitlement.
+
+
+================================================================================
+COMMERCE REQUIREMENT IS A DETERMINATION
+================================================================================
+
+commerce_requirement records whether a commercial condition applies.
+
+It does not describe whether that condition has been fulfilled.
+
+Therefore:
+
+commerce_requirement = required
+
+may coexist with any applicable commerce fulfillment state such as:
+
+commerce_status = unstarted
+
+commerce_status = pending
+
+commerce_status = complete
+
+The requirement should remain historically understandable even after the
+commercial condition has been satisfied.
+
+
+================================================================================
+COMMERCE REQUIREMENT IS NOT IDENTITY
+================================================================================
+
+commerce_requirement must not be used as:
+
+- participant identity
+- organization identity
+- Partner status
+- activity nature
+- eligibility status
+- account verification status
+
+A commercial Organization may or may not be a Partner.
+
+A Partner may or may not be commercial.
+
+
+================================================================================
+6. COMMERCE STATUS
+================================================================================
+
+FIELD
+
+commerce_status
+
+
+QUESTION ANSWERED
+
+What is the current fulfillment state of the applicable commercial condition?
+
+
+SEMANTIC TYPE
+
+Commerce-fulfillment state.
+
+
+CANONICAL CONCEPTUAL VALUES
+
+not_applicable
+
+    No commerce fulfillment workflow applies because the relevant commercial
+    requirement has been determined to be not required.
+
+unstarted
+
+    A commercial requirement applies, but its fulfillment workflow has not
+    yet begun.
+
+pending
+
+    Fulfillment of the applicable commercial condition has begun or remains
+    incomplete.
+
+complete
+
+    The applicable commercial condition has been completed.
+
+
+================================================================================
+COMMERCE STATUS DEPENDS ON COMMERCE REQUIREMENT
+================================================================================
+
+The normal relationship is:
+
+commerce_requirement = not_required
+        ↓
+commerce_status = not_applicable
+
+
+or:
+
+commerce_requirement = required
+        ↓
+commerce_status = unstarted
+        ↓
+commerce_status = pending
+        ↓
+commerce_status = complete
+
+commerce_requirement and commerce_status must remain separate.
+
+The requirement describes whether the obligation exists.
+
+The status describes the fulfillment state of that obligation.
+
+
+================================================================================
+UNSTARTED VS PENDING
+================================================================================
+
+unstarted means:
+
+PurPaws has determined that a commercial requirement applies, but no
+fulfillment workflow has yet begun.
+
+pending means:
+
+The applicable commercial fulfillment workflow has begun or otherwise remains
+incomplete.
+
+They must not be treated as synonyms.
+
+
+================================================================================
+COMPLETE
+================================================================================
+
+complete means:
+
+The commercial condition required for the applicable entitlement has been
+satisfied.
+
+It does not necessarily mean:
+
+- permanent lifetime payment
+- permanent organization eligibility
+- Partner status
+- Founder status
+- account verification
+- all future commercial obligations are satisfied
+
+The scope and duration of commercial completion belong to the applicable
+commercial agreement / entitlement.
+
+
+================================================================================
+COMMERCE REQUIREMENT / STATUS SCOPE
+================================================================================
+
+Both commerce_requirement and commerce_status apply to the relevant
+participation entitlement.
+
+They must not automatically become global User-account states.
+
+A person may therefore have unrelated PurPaws participation while an
+Organization they represent has:
+
+commerce_requirement = required
+
+and:
+
+commerce_status = pending
+
+without globally disabling that person's unrelated account activity.
+
+
+================================================================================
+6. EMAIL VERIFICATION — EXISTING SEPARATE SYSTEM
+================================================================================
+
+Existing:
+
+verification_status
+
+remains conceptually associated with email / account verification.
+
+It is deliberately NOT part of the six canonical intake vocabulary dimensions.
+
+The distinction is:
+
+verification_status
+        =
+Does this participant control the submitted email / account identity?
+
+eligibility_status
+        =
+What is the participation-review state?
+
+commerce_requirement
+        =
+Does a commercial condition apply?
+
+commerce_status
+        =
+What is the fulfillment state of that commercial condition?
+
+These systems must remain separate.
+
+
+================================================================================
+7. CANONICAL STATE RELATIONSHIPS
+================================================================================
+
+The following examples illustrate valid combinations.
+
+
+EXAMPLE A — COMMUNITY-SERVING ORGANIZATION
+
+acting_capacity = organization
+
+declared_activity_nature = community_serving
+
+activity_nature = community_serving
+
+eligibility_status = verified_community
+
+commerce_requirement = not_required
+
+commerce_status = not_applicable
+
+
+EXAMPLE B — COMMERCIAL ORGANIZATION
+
+acting_capacity = organization
+
+declared_activity_nature = commercial
+
+activity_nature = commercial
+
+eligibility_status = verified_commercial
+
+commerce_requirement = required
+
+commerce_status = unstarted
+
+then:
+
+commerce_status = pending
+
+then:
+
+commerce_status = complete
+
+
+EXAMPLE C — DECLARATION REQUIRES REVIEW
+
+acting_capacity = organization
+
+declared_activity_nature = community_serving
+
+activity_nature = uncertain
+
+eligibility_status = review_required
+
+commerce_requirement = unclassified
+
+commerce_status = not_applicable
+
+
+EXAMPLE D — ORDINARY REVIEW PENDING
+
+acting_capacity = organization
+
+declared_activity_nature = uncertain
+
+activity_nature = unclassified
+
+eligibility_status = review_pending
+
+commerce_requirement = unclassified
+
+commerce_status = not_applicable
+
+
+EXAMPLE E — PERSON WITH UNRELATED PENDING ORGANIZATION
+
+Person / User:
+    account active
+    email verified
+
+Companion:
+    governed by Companion publication rules
+
+Trails:
+    governed by Trails participation rules
+
+Organization:
+    activity_nature = unclassified
+    eligibility_status = review_pending
+    commerce_requirement = unclassified
+    commerce_status = not_applicable
+
+The pending Organization does not globally classify or disable the Person.
+
+
+================================================================================
+8. CANONICAL TRANSITION PRINCIPLES
+================================================================================
+
+These are semantic transition principles.
+
+They are not yet database constraints or executable state machines.
+
+
+DECLARED ACTIVITY
+
+Participant supplies:
+
+declared_activity_nature
+
+The original declaration should remain historically preservable if later
+changed or reviewed.
+
+
+ACTIVITY NATURE
+
+Typical conceptual progression:
+
+unclassified
+        ↓
+community_serving
+
+or:
+
+unclassified
+        ↓
+commercial
+
+or:
+
+unclassified
+        ↓
+mixed
+
+or:
+
+unclassified
+        ↓
+uncertain
+
+An uncertain classification may later become:
+
+community_serving
+commercial
+mixed
+
+
+ELIGIBILITY
+
+Typical conceptual progression:
+
+unclassified
+        ↓
+review_pending
+        ↓
+verified_community
+
+or:
+
+unclassified
+        ↓
+review_pending
+        ↓
+verified_commercial
+
+A case needing additional examination may progress:
+
+review_pending
+        ↓
+review_required
+        ↓
+review_pending
+        ↓
+verified_community / verified_commercial
+
+
+COMMERCE REQUIREMENT
+
+Typical community-serving determination:
+
+unclassified
+        ↓
+not_required
+
+Typical commercial determination:
+
+unclassified
+        ↓
+required
+
+
+COMMERCE STATUS
+
+Where commerce_requirement = not_required:
+
+not_applicable
+
+Where commerce_requirement = required:
+
+unstarted
+        ↓
+pending
+        ↓
+complete
+
+Exact executable transition rules require separate implementation
+verification.
+
+
+================================================================================
+9. FORBIDDEN CONFLATIONS
+================================================================================
+
+The following semantic substitutions are forbidden:
+
+acting_capacity = commercial
+
+acting_capacity = founder
+
+acting_capacity = partner
+
+acting_capacity = creator
+
+declared_activity_nature = verified_community
+
+declared_activity_nature = verified_commercial
+
+activity_nature = partner
+
+activity_nature = founder
+
+eligibility_status = email_verified
+
+eligibility_status = paid
+
+commerce_requirement = partner
+
+commerce_requirement = founder
+
+commerce_requirement = email_verified
+
+commerce_status = partner
+
+commerce_status = commercial
+
+commerce_status = required
+
+commerce_status = not_required
+
+commerce_status = founder
+
+commerce_status = email_verified
+
+
+Likewise, the following assumptions are forbidden:
+
+commercial
+        =
+Partner
+
+Partner
+        =
+commercial
+
+community_serving
+        =
+registered not-for-profit
+
+review_pending
+        =
+rejected
+
+review_required
+        =
+rejected
+
+email verified
+        =
+eligible
+
+workspace access
+        =
+publication entitlement
+
+commerce requirement
+        =
+activity identity
+
+commerce complete
+        =
+permanent identity
+
+
+================================================================================
+10. SOURCE OF AUTHORITY
+================================================================================
+
+Each vocabulary has a different source of authority.
+
+
+acting_capacity
+
+Source:
+Participant intake context.
+
+
+declared_activity_nature
+
+Source:
+Participant declaration.
+
+
+activity_nature
+
+Source:
+PurPaws classification based on available evidence and review.
+
+
+eligibility_status
+
+Source:
+PurPaws participation review.
+
+
+commerce_requirement
+
+Source:
+PurPaws commerce / entitlement determination.
+
+
+commerce_status
+
+Source:
+PurPaws commerce / fulfillment process.
+
+
+verification_status
+
+Source:
+Existing email / account verification process.
+
+
+================================================================================
+11. EVIDENCE PRESERVATION
+================================================================================
+
+The canonical vocabulary must preserve the difference between:
+
+what was declared
+
+and:
+
+what was determined.
+
+This is important to FCIS.
+
+Evidence should strengthen the intelligence record without silently rewriting
+the historical claim that produced it.
+
+Conceptually:
+
+Declaration
+        ↓
+Evidence
+        ↓
+Observation
+        ↓
+Assessment
+        ↓
+Classification
+        ↓
+Eligibility
+        ↓
+Commerce Requirement
+        ↓
+Commerce Fulfillment
+        ↓
+Entitlement
+
+Future implementation should preserve sufficient provenance to understand how
+a determination was reached.
+
+
+================================================================================
+12. FRONTEND LANGUAGE PRINCIPLE
+================================================================================
+
+Canonical vocabulary is system language.
+
+Frontend language may be warmer, clearer, and more human.
+
+For example, the frontend does not necessarily need to ask:
+
+"What is your declared_activity_nature?"
+
+It may instead ask a clear question such as:
+
+"Which best describes what you do?"
+
+Likewise:
+
+acting_capacity = organization
+
+may be represented to the participant as:
+
+"I'm here for an organization or group."
+
+Canonical vocabulary must remain stable even when frontend wording evolves.
+
+
+================================================================================
+13. WHITE-LABEL PRINCIPLE
+================================================================================
+
+These semantic concepts must remain independent of PurPaws-specific frontend
+branding.
+
+A future white-label deployment may use different:
+
+- labels
+- onboarding cards
+- descriptions
+- visual design
+- participant-facing terminology
+
+while retaining the same canonical meanings beneath them.
+
+
+================================================================================
+14. IMPLEMENTATION STATUS
+================================================================================
+
+The values defined here are proposed canonical implementation vocabulary.
+
+This version now separates commercial requirement from commercial fulfillment:
+
+commerce_requirement
+        =
+whether a commercial condition applies
+
+commerce_status
+        =
+the fulfillment state of that applicable condition
+
+They are NOT yet executable enums.
+
+They are NOT yet database constraints.
+
+They are NOT yet API validation rules.
+
+They are NOT yet frontend option values.
+
+They are NOT yet state-machine rules.
+
+Before implementation, this vocabulary must be verified against:
+
+- the locked Canonical Network Ontology v1
+- the locked Canonical Onboarding Mapping v1
+- the locked Canonical Intake Contract v1
+- existing backend model defaults
+- existing database values
+- existing API behavior
+- existing frontend behavior
+
+Any implementation conflict must be inspected before this vocabulary is
+locked.
+
+
+================================================================================
+IMPLEMENTATION BOUNDARIES
+================================================================================
+
+This document does NOT authorize immediate changes to:
+
+- database schema
+- database values
+- backend models
+- API contracts
+- API validation
+- onboarding behavior
+- publication behavior
+- eligibility workflow
+- commerce-requirement determination
+- commerce workflow
+- payment logic
+- frontend forms
+- frontend cards
+- frontend modules
+- dashboards
+- workspaces
+- Directory response shape
+
+Each implementation change requires its own:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+
+================================================================================
+STATUS
+================================================================================
+
+PURPAWS CANONICAL INTAKE VOCABULARY v1 — LOCKED
+
+This vocabulary has been:
+
+- defined
+- inspected against existing backend and frontend usage
+- inspected against existing database values
+- verified against the locked Canonical Network Ontology v1
+- verified against the locked Canonical Onboarding Mapping v1
+- verified against the locked Canonical Intake Contract v1
+- reviewed for acting-capacity semantics
+- reviewed for participant declaration vs PurPaws determination
+- reviewed for activity classification
+- reviewed for eligibility semantics
+- reviewed for commerce requirement semantics
+- reviewed for commerce fulfillment semantics
+- reviewed for email-verification separation
+- reviewed for FCIS evidence preservation
+- reviewed for frontend / system-language separation
+- reviewed for white-label compatibility
+- reviewed for version independence
+- independently verified
+
+No remaining vocabulary blockers were identified.
+
+This document now governs subsequent canonical intake implementation.
+
+LOCKED SEMANTIC DIMENSIONS
+
+1. acting_capacity
+
+   Describes the immediate intake context in which the person is acting.
+
+   It is not participant identity, role, relationship, activity
+   classification, eligibility, or commerce state.
+
+
+2. declared_activity_nature
+
+   Records what the participant declares about the relevant activity.
+
+   The declaration is evidence and must remain distinguishable from the later
+   PurPaws determination.
+
+
+3. activity_nature
+
+   Records the reviewed PurPaws classification of the relevant activity.
+
+   It must remain distinct from declared_activity_nature.
+
+
+4. eligibility_status
+
+   Records the state or result of PurPaws participation review for the
+   applicable participant, entity, relationship, or activity.
+
+   It must not automatically become a global User-account status.
+
+
+5. commerce_requirement
+
+   Records whether a commercial condition applies to the applicable
+   participation entitlement.
+
+   Canonical conceptual states:
+
+   - unclassified
+   - not_required
+   - required
+
+
+6. commerce_status
+
+   Records the fulfillment state of an applicable commercial condition.
+
+   Canonical conceptual states:
+
+   - not_applicable
+   - unstarted
+   - pending
+   - complete
+
+
+EMAIL VERIFICATION REMAINS SEPARATE
+
+verification_status remains conceptually associated with email / account
+verification and is not one of the six canonical intake dimensions.
+
+
+LOCKED COMMERCE PRINCIPLE
+
+commerce_requirement answers:
+
+Does a commercial obligation apply?
+
+commerce_status answers:
+
+What is the fulfillment state of that obligation?
+
+Therefore:
+
+commerce_requirement = required
+
+may persist while commerce_status progresses through:
+
+unstarted
+    ↓
+pending
+    ↓
+complete
+
+Likewise:
+
+commerce_requirement = not_required
+
+normally corresponds to:
+
+commerce_status = not_applicable
+
+
+LOCKED EVIDENCE PRINCIPLE
+
+PurPaws must preserve the distinction between:
+
+what was declared
+
+and:
+
+what was determined.
+
+Conceptually:
+
+Declaration
+    ↓
+Evidence
+    ↓
+Observation
+    ↓
+Assessment
+    ↓
+Classification
+    ↓
+Eligibility
+    ↓
+Commerce Requirement
+    ↓
+Commerce Fulfillment
+    ↓
+Entitlement
+
+This distinction supports FCIS provenance and prevents later determinations
+from silently erasing the evidence that preceded them.
+
+
+IMPLEMENTATION BOUNDARY
+
+The vocabulary is now governing architecture.
+
+It does not itself create:
+
+- executable enums
+- database constraints
+- API validation
+- frontend choices
+- executable state machines
+- payment behavior
+- entitlement behavior
+
+Those require their own controlled implementation cycles.
+
+Future changes to these governing semantic meanings require a new version of
+the Canonical Intake Vocabulary rather than silent mutation of v1.
+
+LOCKED.

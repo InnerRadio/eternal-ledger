@@ -1,0 +1,226 @@
+PURPAWS CANONICAL ORGANIZATION PROJECTION FEED v1 — LOCKED
+
+LOCKED AT
+
+2026-08-15 02:51:36
+
+
+================================================================================
+ROUTE
+================================================================================
+
+GET
+
+/public/canonical/organizations
+
+
+================================================================================
+PUBLICATION AUTHORITY
+================================================================================
+
+CanonicalPublication.target_type = organization
+
+AND
+
+CanonicalPublication.publication_status = published
+
+
+PartnerOrganization.status is NOT canonical publication authority.
+
+
+================================================================================
+FIRST VERIFIED PUBLIC RECORD
+================================================================================
+
+organization:2
+
+organization_name:
+
+PurPaws Testing
+
+
+canonical publication:
+
+canonical_publication:1
+
+
+publication status:
+
+published
+
+
+================================================================================
+EXCLUSION PROOF
+================================================================================
+
+organization:1
+
+operational status:
+
+active
+
+canonical publication:
+
+absent
+
+canonical feed result:
+
+EXCLUDED
+
+
+This verifies that operational active status alone cannot place an
+Organization into the canonical public feed.
+
+
+================================================================================
+PRIVACY
+================================================================================
+
+Public Organization projection keys are limited to:
+
+id
+organization_name
+organization_type
+project
+website_url
+location
+created_at
+
+
+Canonical publication metadata exposes only:
+
+id
+status
+
+
+The record does NOT expose:
+
+contact_name
+contact_email
+notes
+eligibility_status
+eligibility_basis
+commerce_requirement
+commerce_status
+internal OrganizationMember details
+
+
+================================================================================
+FILTERS
+================================================================================
+
+project = PurPaws:
+
+organization:2 INCLUDED
+
+
+organization_type = Network:
+
+organization:2 INCLUDED
+
+
+organization_type = pet_food_company:
+
+organization:1 remains EXCLUDED because it lacks explicit canonical
+publication authority.
+
+
+================================================================================
+LEGACY PARITY MODE
+================================================================================
+
+Existing route:
+
+/public/organizations
+
+remains unchanged.
+
+Legacy route SHA256 before:
+
+25e72f169df167501c85d35eb42166cb547f7138b5ab8331e011748889be7767
+
+Legacy route SHA256 after:
+
+25e72f169df167501c85d35eb42166cb547f7138b5ab8331e011748889be7767
+
+MATCH:
+
+PASS
+
+
+Legacy and canonical feeds therefore coexist.
+
+
+================================================================================
+DATABASE SAFETY
+================================================================================
+
+Organizations:
+
+2 -> 2
+
+
+Canonical publications:
+
+1 -> 1
+
+
+Canonicalization provenance:
+
+1 -> 1
+
+
+OrganizationMember:
+
+1 -> 1
+
+
+ZERO DATABASE DRIFT:
+
+PASS
+
+
+================================================================================
+IMPLEMENTATION
+================================================================================
+
+backend/app/public_api.py
+
+
+SHA256:
+
+28d01adf1365867f7a4c2adb9b425425fb11d43b5178a4e62e3184bb3aef45a8
+
+
+================================================================================
+CANONICAL PUBLIC CHAIN
+================================================================================
+
+onboarding_record:12
+        |
+        v
+organization:2
+        |
+        +---- canonicalization_provenance:1
+        |
+        v
+canonical_publication:1
+        |
+        v
+published
+        |
+        v
+/public/canonical/organizations
+
+
+================================================================================
+NEXT
+================================================================================
+
+Compare the canonical Organization projection with legacy discovery behavior.
+
+Then introduce canonical published feeds into Directory multi-feed aggregation
+without silently retiring legacy feeds.
+
+
+LOCKED.

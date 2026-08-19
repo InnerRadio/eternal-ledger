@@ -1,0 +1,25 @@
+PUBLIC DISCOVERY WAVE 1 LOCKED
+
+Implemented:
+- GET /public/organizations
+- GET /public/campaigns
+- GET /public/opportunities
+
+Verified:
+- OpenAPI registration confirmed
+- curl tests successful
+- public-safe organization records
+- public-safe campaign records
+- public-safe opportunity records
+
+Privacy:
+- email excluded
+- referral_code excluded
+- private enrollments excluded
+- clicks/conversions/commissions excluded
+- internal member details excluded
+- private contact fields excluded
+
+Foundation:
+- Identity Layer v2 foundation locked
+- Public Discovery Standard v1 created

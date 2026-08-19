@@ -1,0 +1,65 @@
+PUBLIC DIRECTORY WAVE 5F SEARCH FILTERING LOCKED
+
+Implemented:
+- Public directory search parameter
+- Featured-only filter
+- Sort parameter
+- Limit parameter
+- Offset parameter
+- Count and total_count response metadata
+
+Verified:
+- eternal-ledger-api.service restarts successfully
+- OpenAPI exposes listing_type, location, project, search, featured_only, sort, limit, offset
+- /public/directory?search=Ravi returns matching founder
+- /public/directory?featured_only=1 returns featured records
+- /public/directory?sort=name&limit=1 returns one sorted record
+- /public/directory?sort=ranking&offset=1&limit=1 returns paginated ranking results
+
+Endpoint:
+- /public/directory
+
+Filters:
+- listing_type
+- location
+- project
+- search
+- featured_only
+
+Sorting:
+- ranking
+- name
+- newest
+- priority
+
+Pagination:
+- limit
+- offset
+
+Response Metadata:
+- count
+- total_count
+
+Purpose:
+- Enables searchable public directory frontend
+- Enables Founder Wall filtering
+- Enables Creator / Rescue / Partner directory filtering
+- Enables featured sections
+- Enables ranked discovery lists
+- Enables paginated public discovery views
+- Supports future unified public search
+
+Privacy:
+- Excludes email
+- Excludes contact_email
+- Excludes referral_code
+- Excludes affiliate_id
+- Excludes private account details
+- Excludes security data
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

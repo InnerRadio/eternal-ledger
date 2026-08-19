@@ -1,0 +1,587 @@
+PURPAWS DIRECTORY MULTI-FEED AGGREGATION SEAM v1
+
+STATUS
+
+Defined for verification.
+
+Not yet locked.
+
+
+====================================================================================================
+PURPOSE
+====================================================================================================
+
+Directory Multi-Feed Aggregation Seam v1 defines how multiple public projection
+feeds may contribute to one PurPaws Directory without redefining canonical
+identity or emitting duplicate logical records.
+
+
+====================================================================================================
+CORE PRINCIPLE
+====================================================================================================
+
+FEED != IDENTITY
+
+PROJECTION != IDENTITY
+
+DIRECTORY != IDENTITY AUTHORITY
+
+The Directory consumes projections.
+
+Canonical entities remain the durable identity authority.
+
+
+====================================================================================================
+FIRST AGGREGATION CASE
+====================================================================================================
+
+organization:2 appears in:
+
+legacy Organization feed
+
+and
+
+canonical Organization feed
+
+The Directory must NOT emit two logical Organization results for
+organization:2.
+
+
+====================================================================================================
+CANONICAL DEDUPLICATION KEY
+====================================================================================================
+
+For canonical Organizations:
+
+    ("organization", canonical_organization_id)
+
+Example:
+
+    ("organization", 2)
+
+This key must not be derived from:
+
+- organization name
+- website URL
+- location
+- email
+- fuzzy similarity
+- feed source
+
+
+====================================================================================================
+CANONICAL PRECEDENCE
+====================================================================================================
+
+When a canonical published Organization projection exists, canonical identity
+is authoritative.
+
+Canonical identity determines:
+
+- target type
+- target id
+- durable Organization facts
+
+Legacy projection may not override canonical identity.
+
+
+====================================================================================================
+TRANSITIONAL LEGACY PRESERVATION
+====================================================================================================
+
+Legacy-only Directory records may remain visible during migration.
+
+Example:
+
+organization:1
+
+is operationally active in the legacy feed but does not currently possess
+canonical publication authority.
+
+This condition is transitional.
+
+It must not be silently interpreted as canonical publication.
+
+
+====================================================================================================
+CANONICAL + LEGACY COLLISION
+====================================================================================================
+
+When both canonical and legacy Organization projections refer to the same
+canonical Organization:
+
+1. create one aggregation bucket using canonical identity;
+
+2. use canonical Organization facts as identity/core facts;
+
+3. preserve canonical publication authority;
+
+4. allow specifically approved legacy presentation data to supplement the
+   aggregated result when canonical presentation data does not yet exist;
+
+5. emit one logical Organization Directory record.
+
+
+====================================================================================================
+PRESENTATION SUPPLEMENTATION
+====================================================================================================
+
+Presentation supplementation is not canonicalization.
+
+Fields such as:
+
+- headline
+- description
+- logo
+- cover
+- gallery
+- badges
+- profile presentation metadata
+
+may be supplied by a presentation/profile projection layer during migration.
+
+They must not be copied into canonical Organization core merely to satisfy
+Directory rendering.
+
+
+====================================================================================================
+NO BLIND MERGE
+====================================================================================================
+
+The aggregator must not merge Organizations based on:
+
+- equal names
+- similar names
+- equal websites
+- similar websites
+- equal locations
+- fuzzy matching
+
+Cross-source entity resolution remains a separate problem.
+
+
+====================================================================================================
+SOURCE SUPERSESSION / PROJECTION COEXISTENCE
+====================================================================================================
+
+Source supersession and projection coexistence answer different questions.
+
+
+SOURCE SUPERSESSION QUESTION
+
+Has a transitional source/intake projection been canonically resolved into a
+durable canonical entity?
+
+This question is answered by canonical provenance.
+
+Example:
+
+    onboarding_record:12
+            ->
+    organization:2
+
+
+Because this correspondence is explicitly recorded, the aggregator does NOT
+need to infer identity from:
+
+- equal name
+- equal website
+- equal location
+- equal email
+- fuzzy similarity
+
+
+CANONICAL PUBLICATION QUESTION
+
+May the canonical target be publicly projected?
+
+This question is answered by canonical publication authority.
+
+For the first live case:
+
+    organization:2
+            ->
+    canonical_publication:1
+            ->
+    published
+
+
+SOURCE SUPERSESSION RULE
+
+When all of the following are true:
+
+1. a legacy Directory/intake projection originates from a source record;
+
+2. canonical provenance explicitly maps that source record to a canonical
+   target;
+
+3. the canonical target has explicit published canonical publication
+   authority;
+
+then the transitional source/intake projection must not continue to behave as
+an independent identity competing with the canonical target.
+
+Instead:
+
+- canonical identity becomes authoritative;
+- approved presentation data from the transitional source may supplement the
+  canonical projection;
+- the intake/source projection may be suppressed as a duplicate identity in
+  aggregated Directory output;
+- the provenance relationship must remain preserved.
+
+
+FIRST LIVE SOURCE SUPERSESSION CASE
+
+Legacy intake projection:
+
+    directory-12
+
+Source:
+
+    onboarding_record:12
+
+Canonical provenance:
+
+    onboarding_record:12
+            ->
+    organization:2
+
+Canonical publication:
+
+    organization:2
+            ->
+    canonical_publication:1
+            ->
+    published
+
+Therefore:
+
+    directory-12
+
+is a transitional source projection of the canonically resolved and published:
+
+    organization:2
+
+It must not require name matching or fuzzy deduplication.
+
+
+PRESENTATION PRESERVATION
+
+Source supersession does not mean source presentation must be discarded.
+
+The transitional source may contain presentation fields not yet represented in
+canonical Organization core, including:
+
+- headline
+- description
+- category
+- logo reference
+- cover reference
+- created / updated presentation metadata
+
+Approved presentation values may supplement the aggregated canonical
+Directory result.
+
+This does not move those fields into canonical Organization identity.
+
+
+PROJECTION COEXISTENCE QUESTION
+
+Does another public projection represent a genuinely different semantic
+experience or relationship?
+
+This question is NOT answered merely by shared canonical Organization identity.
+
+Example:
+
+    Partner projection
+    Organization projection
+
+may legitimately coexist if Partner is intentionally exposed as a separate
+public relationship/projection experience.
+
+
+PARTNER CAUTION
+
+The current Public Directory emits PartnerOrganization rows as:
+
+    partner-N
+
+during an unfiltered Directory request.
+
+Therefore:
+
+    partner-2
+
+must NOT automatically be suppressed solely because:
+
+    organization:2
+
+exists.
+
+Before collapsing Partner and Organization projections, the implementation
+must establish that they represent the same intended Directory experience.
+
+Partner is not Organization identity.
+
+
+GOVERNING DISTINCTION
+
+Source supersession is provenance-driven.
+
+Projection coexistence is semantics-driven.
+
+
+V1 FIRST AGGREGATION RULE
+
+For the first controlled implementation:
+
+    directory-12
+        +
+    canonical organization:2
+
+may be collapsed into one canonical Organization aggregation bucket because
+canonical provenance explicitly proves their source-to-target relationship.
+
+The handling of:
+
+    partner-2
+        +
+    organization:2
+
+must remain a separate projection-semantics decision.
+
+Do not collapse them merely because both reference the same Organization.
+
+
+====================================================================================================
+PROJECTION TYPE COEXISTENCE
+====================================================================================================
+
+One Organization may participate in multiple projection types.
+
+Examples:
+
+Organization projection
+Partner projection
+Founder projection
+Creator relationship projection
+
+Different projection types must not automatically collapse merely because they
+reference the same Organization.
+
+Separate projection type does not mean separate identity.
+
+
+====================================================================================================
+PARTNER FEED RULE
+====================================================================================================
+
+Partner is a relationship / projection concern.
+
+Partner is not Organization identity.
+
+A published Partner projection may coexist with a published Organization
+projection for the same canonical Organization.
+
+Directory presentation may choose to expose both experiences when their
+listing semantics are intentionally different.
+
+
+====================================================================================================
+PUBLICATION AUTHORITY
+====================================================================================================
+
+Canonical projection visibility is controlled by explicit canonical publication
+authority.
+
+Operational status such as:
+
+active
+
+does not become canonical publication authority.
+
+
+====================================================================================================
+AGGREGATION ORDER
+====================================================================================================
+
+Conceptual v1 order:
+
+1. collect legacy projection candidates;
+
+2. collect canonical published projection candidates;
+
+3. establish canonical aggregation keys where canonical identity is known;
+
+4. collapse same-type duplicate Organization projections into one bucket;
+
+5. prefer canonical core facts;
+
+6. supplement presentation only from explicitly permitted transitional sources;
+
+7. preserve genuinely different projection types;
+
+8. emit Directory records.
+
+
+====================================================================================================
+ORGANIZATION:2 EXPECTED RESULT
+====================================================================================================
+
+Inputs:
+
+legacy Organization projection
+canonical Organization projection
+
+Canonical identity:
+
+organization:2
+
+Expected Directory result:
+
+ONE logical Organization listing.
+
+
+====================================================================================================
+ORGANIZATION:1 EXPECTED TRANSITIONAL RESULT
+====================================================================================================
+
+Inputs:
+
+legacy Organization projection only
+
+Canonical publication:
+
+absent
+
+Expected v1 migration behavior:
+
+legacy listing may remain visible until explicit migration / retirement
+decision.
+
+It must not be labeled canonically published.
+
+
+====================================================================================================
+DIRECTORY RECORD IDENTITY
+====================================================================================================
+
+The aggregated Directory must maintain an explicit distinction between:
+
+Directory presentation identity
+
+and
+
+canonical target identity.
+
+A future aggregated record should be capable of carrying internal semantics
+equivalent to:
+
+listing_type
+listing_id
+canonical_target_type
+canonical_target_id
+projection_source
+
+Exact public response fields require separate implementation verification.
+
+
+====================================================================================================
+NO SILENT CUTOVER
+====================================================================================================
+
+Introducing aggregation does not automatically retire:
+
+legacy /public/organizations
+
+legacy Directory organization contribution
+
+legacy presentation sources
+
+Retirement requires explicit parity and migration approval.
+
+
+====================================================================================================
+FCIS
+====================================================================================================
+
+The aggregation seam strengthens FCIS by preserving:
+
+evidence provenance
+canonical identity
+projection authority
+publication authority
+presentation source
+Directory discovery
+
+as related but distinct layers.
+
+
+====================================================================================================
+IMPLEMENTATION BOUNDARY
+====================================================================================================
+
+This design does NOT yet authorize:
+
+- public_api.py changes
+- Directory route changes
+- legacy feed retirement
+- canonical feed replacement
+- database schema changes
+- canonical entity changes
+- canonical publication changes
+- presentation migration
+- frontend changes
+- Partner feed implementation
+
+
+====================================================================================================
+SUCCESS CONDITIONS FOR FUTURE IMPLEMENTATION
+====================================================================================================
+
+A future Directory aggregation implementation must prove at minimum:
+
+1. organization:2 appears once, not twice;
+
+2. canonical Organization identity is retained;
+
+3. canonical publication authority is retained;
+
+4. organization:1 transitional legacy behavior is explicit;
+
+5. no name-based or website-based merge occurs;
+
+6. legacy presentation supplementation cannot overwrite canonical identity;
+
+7. separate projection types can coexist;
+
+8. existing Directory behavior is preserved until explicitly migrated.
+
+
+====================================================================================================
+NEXT
+====================================================================================================
+
+Verify this design against:
+
+- Canonical Organization Projection v1
+- Canonical Organization Projection Feed v1
+- Canonical ↔ Legacy Organization Parity v1
+- live Public Directory organization record shape
+
+Then lock the aggregation seam.
+
+Only after lock should a controlled Directory multi-feed implementation begin.
+
+
+====================================================================================================
+STATUS
+====================================================================================================
+
+Directory Multi-Feed Aggregation Seam v1 has been DEFINED.
+
+It has NOT yet been locked.
+
+Verify before implementation.

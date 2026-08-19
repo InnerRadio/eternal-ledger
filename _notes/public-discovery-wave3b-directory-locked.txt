@@ -1,0 +1,61 @@
+PUBLIC DISCOVERY WAVE 3B LOCKED
+
+Implemented:
+- GET /public/directory
+- Public Directory aggregation endpoint
+- Directory listings sourced from existing public-safe records
+
+Aggregated Sources:
+- FounderProfile
+- PublicProfile / User creator records
+- RescueProfile
+- PartnerOrganization
+
+Verified:
+- python3 -m py_compile backend/app/public_api.py backend/app/models.py
+- eternal-ledger-api.service active
+- /public/directory returns active public-safe directory records
+- /public/directory?listing_type=partner works
+- /public/directory?location=Toronto works
+
+Endpoint:
+- /public/directory
+
+Version:
+- public-discovery-directory-v1
+
+Design:
+- No new directory table
+- Directory is an aggregation layer
+- listing_type is used instead of role
+- A person or organization may appear under multiple listing types
+
+Supported Listing Types:
+- founder
+- creator
+- rescue
+- partner
+- organization
+
+Privacy:
+- Excludes email
+- Excludes referral_code
+- Excludes affiliate_id
+- Excludes contact_email
+- Excludes security data
+- Excludes private account details
+
+Purpose:
+- Foundation for PurPaws Directory
+- Founder Wall discovery
+- Creator Network discovery
+- Rescue Network discovery
+- Partner Network discovery
+- Future white-label community directories
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

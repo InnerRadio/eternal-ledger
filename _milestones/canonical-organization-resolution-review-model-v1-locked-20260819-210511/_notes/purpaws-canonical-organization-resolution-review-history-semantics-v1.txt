@@ -1,0 +1,580 @@
+PURPAWS CANONICAL ORGANIZATION RESOLUTION REVIEW HISTORY SEMANTICS v1
+
+STATUS
+
+LOCKED.
+
+
+================================================================================
+PURPOSE
+================================================================================
+
+This document defines the historical semantics of Organization Resolution
+Review.
+
+It governs how review judgments are preserved, how the current-effective
+review is determined, and where ordinary review authority ends and canonical
+reconciliation begins.
+
+
+================================================================================
+GOVERNING LOCKS
+================================================================================
+
+This architecture is governed by:
+
+purpaws-canonical-organization-resolution-invariants-v1.txt
+
+and:
+
+purpaws-canonical-organization-resolution-review-authority-v1.txt
+
+
+================================================================================
+CORE PRINCIPLE
+================================================================================
+
+Organization Resolution Review is historical evidence.
+
+A review judgment must not be destructively rewritten merely because a later
+judgment exists.
+
+Review history is append-only.
+
+
+================================================================================
+WHY HISTORY MUST SURVIVE
+================================================================================
+
+A review record answers historical questions including:
+
+- what source was considered?
+- what target was considered?
+- what decision was made?
+- who made the decision?
+- what evidence supported it?
+- when was the decision made?
+
+Replacing an earlier review with a later review destroys evidence.
+
+Therefore:
+
+HISTORICAL REVIEW != CURRENT-EFFECTIVE REVIEW
+
+
+================================================================================
+APPEND-ONLY REVIEW EVENTS
+================================================================================
+
+Each completed review judgment creates a new durable review event.
+
+Existing completed review events are not updated in place to represent a new
+judgment.
+
+Existing completed review events are not deleted merely because the effective
+judgment later changes.
+
+
+================================================================================
+REVIEW DECISIONS
+================================================================================
+
+The locked decision vocabulary remains:
+
+ESTABLISHED
+
+NOT_SAME
+
+DEFERRED
+
+
+================================================================================
+CURRENT-EFFECTIVE REVIEW
+================================================================================
+
+Current-effective review state is derived from review history.
+
+For a specific source and target, the minimum deterministic ordering is:
+
+ORDER BY reviewed_at DESC, id DESC
+LIMIT 1
+
+reviewed_at provides temporal ordering.
+
+id provides deterministic tie-breaking.
+
+
+================================================================================
+NO SECOND CURRENT-STATE TABLE IN v1
+================================================================================
+
+v1 does not require a second mutable table or pointer merely to store the
+current-effective review.
+
+Current-effective state is derived from append-only history.
+
+A future performance requirement may justify a projection/cache, but such a
+projection must remain derivable from authoritative review history.
+
+
+================================================================================
+NO DESTRUCTIVE ONE-ROW VERDICT
+================================================================================
+
+The following model is rejected:
+
+one source/target row
+    ->
+decision overwritten whenever judgment changes
+
+That destroys review history and weakens provenance.
+
+
+================================================================================
+NO SOURCE/TARGET UNIQUENESS CONSTRAINT
+================================================================================
+
+Because multiple historical review events may exist for the same source and
+target, the review table must not impose uniqueness across:
+
+source_type
+source_id
+target_type
+target_id
+
+Multiple historical rows for the same source/target pair are valid.
+
+
+================================================================================
+LOOKUP / INDEX SEMANTICS
+================================================================================
+
+The minimum useful lookup paths are:
+
+SOURCE HISTORY
+
+(source_type, source_id)
+
+
+SOURCE -> TARGET HISTORY
+
+(source_type, source_id, target_type, target_id)
+
+
+TARGET REVIEW HISTORY
+
+(target_type, target_id)
+
+
+REVIEWER HISTORY
+
+(reviewer_user_id)
+
+
+These are lookup/index concerns.
+
+They are not uniqueness constraints.
+
+
+================================================================================
+REVIEWER IDENTITY
+================================================================================
+
+For consistency with the current repository model convention:
+
+reviewer_user_id is represented as a plain integer identity reference in v1.
+
+This architecture does not introduce a new ORM ForeignKey convention merely
+for this review model.
+
+
+================================================================================
+REVIEW HISTORY != AUDIT LOG
+================================================================================
+
+Organization Resolution Review is a first-class domain record.
+
+AuditLog may additionally record actions involving review authority.
+
+AuditLog does not replace the durable review record.
+
+The review record preserves the identity judgment itself.
+
+
+================================================================================
+REVIEW HISTORY != CANONICALIZATION PROVENANCE
+================================================================================
+
+Review history records judgments.
+
+Canonicalization provenance records established source -> canonical target
+mapping.
+
+Example:
+
+Review:
+
+onboarding_record:15
+candidate organization:2
+decision ESTABLISHED
+
+may authorize:
+
+Canonicalization provenance:
+
+onboarding_record:15
+    ->
+organization:2
+
+These are separate durable facts.
+
+
+================================================================================
+ESTABLISHED HANDOFF
+================================================================================
+
+When the current-effective authorized review for a source/target pair is:
+
+ESTABLISHED
+
+and no conflicting protected canonical provenance exists,
+
+the trusted canonicalization flow may consume:
+
+established_target_id
+
+and the Organization Resolver may return:
+
+REUSE
+
+reason = explicitly_established_target
+
+
+================================================================================
+PROVENANCE PROTECTION
+================================================================================
+
+Once canonicalization provenance exists for a source:
+
+source -> canonical target
+
+ordinary later review must not silently redirect that source to another
+canonical target.
+
+
+================================================================================
+CONTRADICTORY LATER REVIEW
+================================================================================
+
+Suppose history contains:
+
+Review 1:
+source A
+target Organization 2
+ESTABLISHED
+
+and canonical provenance is created:
+
+source A -> Organization 2
+
+Later evidence suggests:
+
+source A
+target Organization 2
+NOT_SAME
+
+or:
+
+source A
+target Organization 7
+ESTABLISHED
+
+This is no longer ordinary identity review.
+
+It represents a contradiction with established canonical provenance.
+
+
+================================================================================
+RECONCILIATION BOUNDARY
+================================================================================
+
+Contradiction after canonical provenance exists requires:
+
+CANONICAL RECONCILIATION AUTHORITY
+
+Ordinary Organization Resolution Review must not:
+
+- delete existing provenance
+- redirect existing provenance
+- rewrite historical provenance
+- silently change canonical target identity
+
+
+================================================================================
+RECONCILIATION IS DEFERRED
+================================================================================
+
+Canonical Reconciliation Authority is not implemented by this v1 lock.
+
+Its future purpose will be to govern explicit correction of already-established
+canonical identity when sufficient later evidence requires it.
+
+Until then:
+
+DEFER RATHER THAN GUESS.
+
+
+================================================================================
+LATER OBSERVATIONS MAY STILL BE PRESERVED
+================================================================================
+
+The existence of protected canonical provenance does not require later
+conflicting observations to be discarded.
+
+Later evidence may still be preserved.
+
+Later review judgments may still be preserved.
+
+What is prohibited is silently mutating established canonical provenance
+without reconciliation authority.
+
+
+================================================================================
+MULTI-MEMBER HISTORY
+================================================================================
+
+Separate onboarding sources may each produce their own review history.
+
+Example:
+
+onboarding_record:15
+    reviews against organization:2
+
+onboarding_record:16
+    reviews against organization:2
+
+onboarding_record:17
+    reviews against organization:2
+
+These are independent historical evidence streams.
+
+They may all eventually establish the same canonical Organization.
+
+
+================================================================================
+MULTIPLE REVIEWS OF SAME SOURCE/TARGET
+================================================================================
+
+The same source/target pair may legitimately have:
+
+DEFERRED
+    ↓
+later evidence
+    ↓
+ESTABLISHED
+
+or:
+
+DEFERRED
+    ↓
+later evidence
+    ↓
+NOT_SAME
+
+Both judgments remain historical artifacts.
+
+The latest applicable review is current-effective unless protected canonical
+provenance moves the question into reconciliation territory.
+
+
+================================================================================
+NO LATEST-SUBMISSION-EQUALS-TRUTH RULE
+================================================================================
+
+Temporal recency alone does not make submitted facts canonical truth.
+
+Review ordering determines current-effective review judgment.
+
+Canonical authority remains separately governed.
+
+
+================================================================================
+NO REVIEW-IMPLIES-RELATIONSHIP
+================================================================================
+
+Review history does not establish:
+
+User -> Organization membership.
+
+
+================================================================================
+NO REVIEW-IMPLIES-PERMISSION
+================================================================================
+
+Review history does not grant edit, administration, stewardship, or invitation
+permission.
+
+
+================================================================================
+NO REVIEW-IMPLIES-ELIGIBILITY
+================================================================================
+
+Review history does not determine eligibility.
+
+
+================================================================================
+NO REVIEW-IMPLIES-COMMERCE
+================================================================================
+
+Review history does not determine commerce.
+
+
+================================================================================
+NO REVIEW-IMPLIES-PUBLICATION
+================================================================================
+
+Review history does not determine publication.
+
+
+================================================================================
+NO REVIEW-IMPLIES-DIRECTORY
+================================================================================
+
+Review history does not directly mutate Directory state.
+
+Directory remains aggregation / projection.
+
+
+================================================================================
+HISTORICAL ARTIFACT PRINCIPLE
+================================================================================
+
+Historical artifacts are not disposable implementation residue.
+
+They are evidence.
+
+Preserved review history allows the system to understand:
+
+- what was believed
+- when it was believed
+- why it was believed
+- who exercised authority
+- what later evidence appeared
+- how understanding evolved
+
+This historical evidence may support future intelligence and analysis.
+
+Observed Fact != Canonical Fact.
+
+Historical Judgment != Current Canonical State.
+
+
+================================================================================
+UNIVERSAL PROVENANCE PRINCIPLE
+================================================================================
+
+The domain vocabulary may change.
+
+The evidence/provenance requirement does not.
+
+A trustworthy intelligence system must preserve sufficient historical evidence
+to explain how canonical understanding was reached.
+
+
+================================================================================
+CONTROLLED #15 BOUNDARY
+================================================================================
+
+Current controlled case:
+
+onboarding_record:15
+
+resolver:
+REVIEW
+
+candidate:
+organization:2
+
+No review event is created by this architecture lock.
+
+No ESTABLISHED decision is made by this architecture lock.
+
+No provenance is created by this architecture lock.
+
+Organization #2 is not modified.
+
+OnboardingRecord #15 is not modified.
+
+
+================================================================================
+MINIMUM EXECUTABLE MODEL CONSEQUENCE
+================================================================================
+
+The future durable model should support append-only rows containing at minimum:
+
+id
+
+source_type
+source_id
+
+target_type
+target_id
+
+decision
+basis
+
+evidence_summary
+
+reviewer_user_id
+reviewed_at
+
+created_at
+updated_at
+
+
+================================================================================
+MODEL MUTATION RULE
+================================================================================
+
+Once a completed review event has been committed as historical judgment, a
+later judgment must be represented by another review event.
+
+updated_at may exist for repository consistency and controlled non-semantic
+maintenance, but must not be used to overwrite a completed historical verdict
+with a new verdict.
+
+
+================================================================================
+IMPLEMENTATION DISCIPLINE
+================================================================================
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+
+================================================================================
+LOCK
+================================================================================
+
+PURPAWS CANONICAL ORGANIZATION RESOLUTION REVIEW HISTORY SEMANTICS v1 — LOCKED.
+
+APPEND-ONLY REVIEW HISTORY — LOCKED.
+
+CURRENT-EFFECTIVE REVIEW = DERIVED — LOCKED.
+
+PROTECTED PROVENANCE CANNOT BE SILENTLY REDIRECTED — LOCKED.
+
+CONTRADICTION AFTER PROVENANCE = RECONCILIATION — LOCKED.
+
+DEFER RATHER THAN GUESS.

@@ -1,0 +1,368 @@
+PURPAWS CANONICAL ORGANIZATION PROJECTION v1
+
+STATUS
+
+Defined for verification.
+Not yet locked.
+
+
+====================================================================================================
+PURPOSE
+====================================================================================================
+
+This document defines the first public projection boundary for canonical
+PurPaws Organizations.
+
+It does not redefine canonical Organization identity.
+
+It defines how a canonical Organization may become eligible to appear in a
+public Organization projection feed.
+
+
+====================================================================================================
+GOVERNING PRINCIPLE
+====================================================================================================
+
+Canonicalization and publication are separate operations.
+
+The existence of:
+
+organization:X
+
+does not itself mean:
+
+organization:X is publicly published.
+
+
+====================================================================================================
+PROVENANCE IS NOT PUBLICATION
+====================================================================================================
+
+The existence of:
+
+onboarding_record:N
+    ->
+organization:X
+
+proves canonical source-to-target correspondence.
+
+It does not prove public publication entitlement.
+
+
+====================================================================================================
+ACTIVE STATUS IS NOT PUBLICATION AUTHORITY
+====================================================================================================
+
+The existing PartnerOrganization implementation uses:
+
+status = active
+
+for operational Organization state.
+
+This must not silently become canonical publication authority.
+
+Organization existence / operational status and public publication are
+different dimensions.
+
+
+====================================================================================================
+DIRECTORY AUTHORITY
+====================================================================================================
+
+The Directory remains downstream.
+
+The Directory consumes published projections.
+
+The Directory does not decide:
+
+- Organization identity
+- canonicalization
+- eligibility
+- commerce requirement
+- commerce fulfillment
+- publication authority
+
+
+====================================================================================================
+CANONICAL ORGANIZATION PROJECTION
+====================================================================================================
+
+A canonical Organization projection must obtain durable Organization facts from
+the canonical Organization target.
+
+For the current implementation seam:
+
+canonical target type:
+
+organization
+
+implementation model:
+
+PartnerOrganization
+
+
+====================================================================================================
+FIRST LIVE CANONICAL ORGANIZATION
+====================================================================================================
+
+source:
+
+onboarding_record:12
+
+canonical target:
+
+organization:2
+
+canonical provenance:
+
+canonicalization_provenance:1
+
+Observed durable Organization facts:
+
+organization_name = PurPaws Testing
+organization_type = Network
+project = PurPaws
+contact_email = info@purpaws.ca
+website_url = www.purpaws.ca
+location = Toronto, Ontario, Canada
+
+
+====================================================================================================
+PUBLIC-SAFE PROJECTION
+====================================================================================================
+
+A public Organization projection must not expose private or account-only data.
+
+Public projection candidates include:
+
+- canonical organization ID
+- organization name
+- organization type
+- project
+- website URL
+- location
+- public-safe description / presentation fields when separately attached
+- public-safe badges / relationships when separately authorized
+
+Private or operational fields must not be exposed merely because they exist.
+
+
+====================================================================================================
+CONTACT EMAIL
+====================================================================================================
+
+contact_email must not automatically be exposed publicly.
+
+Public communication should continue through the protected communication /
+contact-relay layer unless explicit public-contact semantics authorize direct
+exposure.
+
+
+====================================================================================================
+PRESENTATION CONTENT
+====================================================================================================
+
+The canonical Organization core intentionally does not contain all presentation
+content.
+
+Legacy onboarding fields such as:
+
+- headline
+- description
+- cover image
+- logo image
+- gallery
+
+are presentation concerns.
+
+They must not be copied blindly into canonical Organization identity merely to
+make a public card render.
+
+A projection / profile layer must own presentation semantics.
+
+
+====================================================================================================
+PUBLICATION AUTHORITY REQUIRED
+====================================================================================================
+
+Canonical Organization Projection v1 requires an explicit publication
+authority before a canonical Organization is included in the permanent
+canonical public feed.
+
+This authority must remain distinct from:
+
+- Organization existence
+- active status
+- provenance
+- eligibility
+- commerce status
+- Partner relationship
+
+
+====================================================================================================
+TRANSITIONAL PARITY MODE
+====================================================================================================
+
+During migration, the existing legacy Directory feed may continue to operate.
+
+A canonical Organization projection feed may be introduced beside it.
+
+The two feeds may be compared for:
+
+- identity
+- canonical organization ID
+- name
+- category / organization type
+- location
+- website
+- presentation completeness
+- publication state
+
+No legacy feed is retired merely because a canonical Organization exists.
+
+
+====================================================================================================
+FIRST PROJECTION TARGET
+====================================================================================================
+
+The first canonical projection target is:
+
+organization:2
+
+However:
+
+organization:2 must not be treated as canonically published solely because:
+
+- it exists
+- it is active
+- provenance exists
+
+The system must establish explicit projection publication semantics first.
+
+
+====================================================================================================
+PROJECTION FEED PRINCIPLE
+====================================================================================================
+
+The canonical Organization projection feed must be a separate feed during
+parity testing.
+
+It must not silently replace:
+
+/public/organizations
+
+or the legacy Directory aggregation.
+
+A new feed allows:
+
+legacy feed
+    ||
+canonical projection feed
+    ||
+parity verification
+    ||
+explicit retirement decision
+
+
+====================================================================================================
+PUBLICATION STATE DESIGN
+====================================================================================================
+
+The durable publication mechanism remains to be implemented.
+
+Possible implementation approaches must be inspected before mutation.
+
+The mechanism must support at minimum:
+
+target_type
+target_id
+publication_status
+created_at
+updated_at
+
+Potential publication states may include concepts such as:
+
+draft
+published
+unpublished
+
+Exact executable vocabulary requires verification before implementation.
+
+
+====================================================================================================
+NO ONBOARDING PAYLOAD AUTHORITY
+====================================================================================================
+
+The permanent canonical projection must not depend on OnboardingRecord.payload_json
+as its canonical data source.
+
+Onboarding remains transitional evidence.
+
+Canonical Organization facts must come from the canonical Organization.
+
+Presentation facts require their own durable projection/profile layer.
+
+
+====================================================================================================
+PARTNER FEED COEXISTENCE
+====================================================================================================
+
+An Organization may later also have a Partner relationship.
+
+That may permit:
+
+organization projection
++
+Partner projection
+
+to coexist.
+
+Separate feeds do not redefine Organization identity.
+
+
+====================================================================================================
+IMPLEMENTATION BOUNDARY
+====================================================================================================
+
+This design does NOT yet authorize:
+
+- database schema changes
+- publication table creation
+- PublicProfile repurposing
+- API replacement
+- /public/organizations replacement
+- Directory feed replacement
+- onboarding payload migration
+- presentation field migration
+- frontend changes
+- payment changes
+
+
+====================================================================================================
+NEXT
+====================================================================================================
+
+Verify this projection design against:
+
+- Canonicalization Seam v1
+- Canonicalization Execution Contract v1
+- live organization:2
+- current /public/organizations implementation
+- PublicProfile implementation
+- contact-relay privacy boundary
+
+Then define and implement explicit canonical publication state.
+
+Only after publication state exists should a permanent canonical Organization
+projection feed be activated.
+
+
+====================================================================================================
+STATUS
+====================================================================================================
+
+Canonical Organization Projection v1 has been DEFINED.
+
+It has NOT yet been locked.
+
+Verify before implementation.

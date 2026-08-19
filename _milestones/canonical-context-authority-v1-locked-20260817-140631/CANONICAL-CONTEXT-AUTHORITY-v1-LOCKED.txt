@@ -1,0 +1,96 @@
+FCIS — CANONICAL CONTEXT AUTHORITY v1
+LOCKED
+
+PURPOSE
+
+Provide a generalized durable contextual assertion authority
+for canonical FCIS nodes.
+
+TABLE
+
+canonical_contexts
+
+MODEL
+
+CanonicalContext
+
+V1 SEMANTIC CONTRACT
+
+CanonicalContext answers:
+
+"What durable contextual assertion is recognized about this node?"
+
+It does NOT represent:
+
+- canonical identity
+- canonicalization provenance
+- canonical publication
+- canonical relationship
+- opportunity hypothesis
+- follow-up workflow
+- public projection authority
+
+GENERALIZED FIELDS
+
+subject_type
+subject_id
+
+context_type
+context_key
+context_value
+
+context_status
+scope
+
+evidence_source_type
+evidence_source_id
+evidence_reference
+evidence_notes
+
+effective_at
+expires_at
+
+created_at
+updated_at
+
+UNIQUENESS CONTRACT
+
+subject_type
+subject_id
+context_type
+context_key
+evidence_source_type
+evidence_source_id
+
+The same contextual concept may be supported by multiple
+independent evidence sources.
+
+LOCKED STATE
+
+canonical_contexts: 0
+canonical_relationships: 3
+canonicalization_provenance: 4
+canonical_publications: 1
+partner_organizations: 5
+
+No synthetic context has yet been created.
+
+PUBLIC BOUNDARY
+
+No CanonicalContext import in public_api.py.
+No Canonical Context public endpoint.
+No public projection semantics were changed.
+
+PRIVATE INTELLIGENCE
+
+Unchanged.
+
+NEXT HILL
+
+Canonical Context Write Authority v1.
+
+The write gate must validate canonical subject standing,
+context semantics, evidence, status and temporal validity.
+
+Synthetic Needs / Offers must not be created until the
+write authority is verified and locked.

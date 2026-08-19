@@ -1,0 +1,754 @@
+PURPAWS CANONICALIZATION EXECUTION CONTRACT v1
+
+STATUS
+Defined for verification.
+Not yet locked.
+
+
+================================================================================
+PURPOSE
+================================================================================
+
+This document defines the minimum execution contract required to translate a
+transitional PurPaws OnboardingRecord into durable canonical network structure.
+
+It governs execution mechanics beneath the already locked canonical
+architecture.
+
+It does not redefine:
+
+- canonical ontology
+- onboarding meaning
+- intake vocabulary
+- participant / organization branching
+- canonicalization semantics
+- publication semantics
+- Directory semantics
+
+This contract exists so canonicalization can become executable without guessing.
+
+
+================================================================================
+GOVERNING ARCHITECTURE
+================================================================================
+
+This contract is governed by:
+
+1. PurPaws Canonical Network Ontology v1
+2. PurPaws Canonical Onboarding Mapping v1
+3. PurPaws Canonical Intake Contract v1
+4. PurPaws Canonical Intake Vocabulary v1
+5. PurPaws Participant / Organization Branching v1
+6. PurPaws Canonicalization Seam v1
+
+All six governing architecture layers are locked.
+
+
+================================================================================
+FIRST EXECUTABLE SLICE
+================================================================================
+
+The first executable canonicalization slice is intentionally narrow.
+
+SOURCE
+
+A qualifying Directory-path OnboardingRecord representing organization facts.
+
+FIRST TEST SOURCE
+
+OnboardingRecord #12
+
+Observed characteristics:
+
+- path = directory
+- user_id = 8
+- status = published
+- verification_status = verified
+- organization/listing facts are present in payload_json
+
+TARGET
+
+A durable canonical Organization representation using the existing
+PartnerOrganization implementation seam where appropriate.
+
+RELATIONSHIP
+
+The linked User and canonical Organization remain distinct.
+
+Any relationship created between them must be supported by intake evidence.
+
+The first slice must not invent:
+
+- ownership
+- employment
+- volunteering
+- administration
+- partnership
+- founder status
+- creator status
+- rescue status
+- any other unsupported semantic relationship
+
+
+================================================================================
+EXECUTION PRINCIPLE
+================================================================================
+
+Canonicalization is an explicit backend operation.
+
+The operation receives a transitional source record.
+
+It determines whether sufficient evidence exists to create or reuse durable
+canonical structure.
+
+It must either:
+
+1. return an already established canonical result,
+2. create a new canonical result supported by evidence,
+3. create supported relationships,
+4. defer an ambiguous decision,
+5. or stop safely.
+
+It must not guess.
+
+
+================================================================================
+SOURCE IDENTITY
+================================================================================
+
+For this first execution contract, the canonicalization source identity is:
+
+source_type = onboarding_record
+source_id   = OnboardingRecord.id
+
+The pair:
+
+(source_type, source_id)
+
+identifies the transitional source being canonicalized.
+
+This identity is not the identity of the resulting Organization.
+
+It identifies the source evidence from which canonicalization occurred.
+
+
+================================================================================
+CANONICALIZATION PROVENANCE
+================================================================================
+
+Canonicalization requires durable provenance.
+
+At minimum, provenance must be capable of expressing:
+
+source_type
+source_id
+target_type
+target_id
+
+For the first slice:
+
+source_type = onboarding_record
+source_id   = 12
+target_type = organization
+target_id   = <canonical organization id>
+
+The provenance relationship means:
+
+"This source record canonicalized to this durable target."
+
+It does NOT mean:
+
+- the source and target are ontologically identical
+- the User owns the Organization
+- the Organization is commercially eligible
+- commerce is complete
+- publication is approved
+- Partner status exists
+
+Provenance is correspondence and execution history.
+
+
+================================================================================
+PROVENANCE MUST NOT USE AUDIT_LOG AS IDENTITY
+================================================================================
+
+Existing audit logging records activity.
+
+Canonical provenance records durable source-to-target correspondence.
+
+These are different responsibilities.
+
+The existing audit_logs mechanism must not be treated as the authoritative
+canonicalization identity map.
+
+Canonicalization may later emit audit events in addition to provenance, but an
+audit event does not replace durable canonical provenance.
+
+
+================================================================================
+IDEMPOTENCY
+================================================================================
+
+Canonicalization must be idempotent for a given source.
+
+If:
+
+source_type = onboarding_record
+source_id   = 12
+
+has already established:
+
+target_type = organization
+target_id   = X
+
+then repeating canonicalization for the same source must resolve to X rather
+than blindly creating another Organization.
+
+Therefore the first idempotency anchor is source provenance.
+
+Organization name is not the idempotency key.
+
+Website URL is not the idempotency key.
+
+Location is not the idempotency key.
+
+Email address is not the idempotency key.
+
+Display text is not the idempotency key.
+
+
+================================================================================
+ENTITY RESOLUTION IS DISTINCT FROM IDEMPOTENCY
+================================================================================
+
+Two different onboarding sources may describe the same real-world Organization.
+
+That is an entity-resolution problem.
+
+It must not be confused with same-source idempotency.
+
+This contract does not authorize automatic organization merging based only on:
+
+- matching names
+- matching websites
+- matching locations
+- matching email addresses
+- fuzzy similarity
+- frontend labels
+
+Where a different source may correspond to an existing Organization and the
+evidence is not sufficient for deterministic reuse, canonicalization must defer
+rather than guess.
+
+
+================================================================================
+CREATE / REUSE RULE
+================================================================================
+
+For the first executable slice:
+
+1. Look for authoritative provenance for the source.
+
+2. If provenance already points to a valid canonical Organization:
+   reuse that Organization.
+
+3. If no provenance exists:
+   evaluate whether the execution context contains an explicitly established
+   canonical target.
+
+4. If an explicitly established target exists:
+   link provenance to that target.
+
+5. Otherwise:
+   create a new Organization only when the intake contains sufficient
+   organization evidence for creation.
+
+6. Record provenance immediately as part of the canonicalization operation.
+
+Blind name-based reuse is prohibited.
+
+
+================================================================================
+ORGANIZATION CREATION
+================================================================================
+
+Organization creation must preserve the distinction between:
+
+- facts supplied by the participant
+- PurPaws determinations
+- eligibility
+- commerce requirement
+- commerce fulfillment
+- public projection
+
+Creating the Organization does not itself mean:
+
+- verified community eligibility
+- verified commercial eligibility
+- commerce required
+- commerce complete
+- Partner status
+- public publication
+
+
+================================================================================
+USER / ORGANIZATION RELATIONSHIP
+================================================================================
+
+The existence of:
+
+OnboardingRecord.user_id = X
+
+does not by itself prove:
+
+User X owns the Organization.
+
+It also does not automatically prove:
+
+- employment
+- volunteering
+- administration
+- stewardship
+- partnership
+
+Therefore canonicalization must not manufacture one of those relationships
+merely because the User submitted the intake.
+
+If the current durable OrganizationMember implementation requires a semantic
+role that cannot be truthfully derived from evidence, creation of that
+membership must be deferred until the relationship representation is resolved.
+
+Canonical Organization creation and canonical provenance must not depend on
+inventing an OrganizationMember role.
+
+
+================================================================================
+ORGANIZATIONMEMBER DEFAULTS
+================================================================================
+
+An implementation default such as:
+
+role = viewer
+
+must not silently become a canonical statement about the real-world
+relationship between a Person and an Organization.
+
+Application permissions and semantic network relationships are distinct
+concerns.
+
+If OrganizationMember is later used by canonicalization, its role semantics
+must be explicitly understood before canonical execution depends upon them.
+
+
+================================================================================
+CANONICAL COMMERCE SEPARATION
+================================================================================
+
+The locked canonical vocabulary defines two separate dimensions:
+
+commerce_requirement
+commerce_status
+
+commerce_requirement answers:
+
+"Does this participation require commerce?"
+
+commerce_status answers:
+
+"If commerce is required, what is the fulfillment state?"
+
+These meanings must remain separate in executable canonicalization.
+
+
+================================================================================
+CURRENT SCHEMA GAP
+================================================================================
+
+Inspection of the current PartnerOrganization implementation established that:
+
+declared_activity_nature exists
+activity_nature exists
+eligibility_status exists
+commerce_status exists
+
+but:
+
+commerce_requirement does not currently exist.
+
+This is a concrete implementation gap between the locked canonical vocabulary
+and the existing durable Organization seam.
+
+
+================================================================================
+COMMERCE REQUIREMENT IMPLEMENTATION OBLIGATION
+================================================================================
+
+Before canonicalization depends on durable commerce semantics,
+PartnerOrganization must be capable of representing commerce_requirement
+separately from commerce_status.
+
+The field must not be simulated by overloading commerce_status.
+
+The field must not be hidden inside unrelated text or metadata merely to avoid
+a schema change.
+
+Its implementation requires its own:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+
+================================================================================
+DATABASE CHANGE PRINCIPLE
+================================================================================
+
+The repository currently does not provide a general migration framework for
+this schema evolution.
+
+Base.metadata.create_all() is not sufficient to add a missing column to an
+existing SQLite table.
+
+Therefore any required schema evolution must be deliberate, backed up,
+explicitly verified, and separately locked.
+
+This contract does not itself execute that schema change.
+
+
+================================================================================
+TRANSACTION BOUNDARY
+================================================================================
+
+Canonicalization must not leave a successful-looking half-result.
+
+Where implementation permits, creation of:
+
+- canonical target
+- required canonical provenance
+
+must behave as one logical operation.
+
+If target creation succeeds but required provenance cannot be established, the
+canonicalization operation must not report successful completion.
+
+The exact transaction implementation will be designed separately.
+
+
+================================================================================
+FAILURE PRINCIPLE
+================================================================================
+
+Canonicalization must fail safely.
+
+Examples include:
+
+- missing source record
+- malformed source payload
+- insufficient organization evidence
+- invalid existing provenance target
+- ambiguous entity resolution
+- unsupported relationship assertion
+- database failure
+- provenance failure
+
+Failure must not silently create duplicate or misleading canonical structure.
+
+
+================================================================================
+PUBLICATION REMAINS SEPARATE
+================================================================================
+
+This execution contract does not replace the existing Directory publication
+path.
+
+The first canonicalization slice may execute while the existing legacy
+Directory feed continues to operate.
+
+Canonicalization success does not automatically publish a canonical projection.
+
+Canonical projection feeds require their own implementation and parity
+verification before legacy publication is retired.
+
+
+================================================================================
+DIRECTORY REMAINS DOWNSTREAM
+================================================================================
+
+The Directory remains an aggregator of published projections.
+
+The Directory does not determine:
+
+- canonical identity
+- organization existence
+- relationships
+- roles
+- eligibility
+- commerce requirement
+- commerce fulfillment
+- Partner status
+
+The first canonicalization execution slice must not alter this authority
+boundary.
+
+
+================================================================================
+FIRST-SLICE SUCCESS TEST
+================================================================================
+
+The minimum success test is:
+
+OnboardingRecord #12
+        ↓
+canonicalize
+        ↓
+Organization X
+        ↓
+durable provenance:
+onboarding_record:12 -> organization:X
+
+Then:
+
+OnboardingRecord #12
+        ↓
+canonicalize again
+        ↓
+Organization X
+
+The second execution must not create Organization Y.
+
+PASS means:
+
+- one source
+- one established canonical target
+- durable provenance
+- repeated execution returns the same target
+- no invented relationship
+- no Directory behavior change
+
+
+================================================================================
+NOT YET PART OF FIRST-SLICE SUCCESS
+================================================================================
+
+The first success test does not require:
+
+- migration of every historical onboarding record
+- automatic organization deduplication
+- fuzzy entity resolution
+- Partner projection publication
+- Organization projection publication
+- Directory feed replacement
+- payment execution
+- commerce fulfillment
+- automatic OrganizationMember creation
+- frontend redesign
+- onboarding redesign
+
+
+================================================================================
+FCIS EVIDENCE PRINCIPLE
+================================================================================
+
+Canonicalization strengthens the Founding Community Intelligence System by
+preserving the path from evidence to durable network structure.
+
+The system must be able to distinguish:
+
+what was submitted
+        ↓
+what source contained it
+        ↓
+what PurPaws determined
+        ↓
+what canonical structure resulted
+        ↓
+what public projections were later published
+
+Canonicalization must not erase the evidence trail that produced the result.
+
+
+================================================================================
+WHITE-LABEL PRINCIPLE
+================================================================================
+
+This execution contract is independent of PurPaws-specific frontend branding.
+
+A future branded or white-label experience may use different:
+
+- labels
+- onboarding cards
+- copy
+- visual design
+- entry experiences
+
+while retaining the same canonicalization execution semantics beneath them.
+
+
+================================================================================
+IMPLEMENTATION BOUNDARY
+================================================================================
+
+This document does NOT itself authorize immediate changes to:
+
+- database schema
+- models
+- OnboardingRecord
+- PartnerOrganization
+- OrganizationMember
+- User
+- PublicProfile
+- FounderProfile
+- RescueProfile
+- onboarding APIs
+- publication APIs
+- Directory APIs
+- frontend modules
+- eligibility behavior
+- commerce behavior
+- payment behavior
+- migration execution
+
+Each implementation change requires its own verification cycle.
+
+
+================================================================================
+STATUS
+================================================================================
+
+PURPAWS CANONICALIZATION EXECUTION CONTRACT v1 — LOCKED
+
+Canonicalization Execution Contract v1 has been VERIFIED and LOCKED.
+
+This contract now governs executable canonicalization implementation.
+
+LOCKED EXECUTION PRINCIPLES
+
+1. Canonicalization source identity is based on durable source provenance.
+
+2. For the first slice:
+
+   source_type = onboarding_record
+   source_id   = OnboardingRecord.id
+
+3. Canonical provenance must preserve durable source-to-target correspondence.
+
+4. Same-source canonicalization must be idempotent.
+
+5. Organization name, website, location, email, and display text are not
+   canonical idempotency keys.
+
+6. Entity resolution between different sources is distinct from same-source
+   idempotency.
+
+7. Ambiguous entity resolution must defer rather than guess.
+
+8. Canonicalization must not invent Person / Organization relationship
+   semantics.
+
+9. OrganizationMember must not receive an unsupported semantic role merely
+   because a User submitted an intake.
+
+10. Canonical Organization creation and provenance may proceed independently
+    of deferred OrganizationMember relationship resolution.
+
+11. commerce_requirement and commerce_status are separate canonical
+    dimensions.
+
+12. commerce_requirement must receive an explicit durable representation
+    before executable canonicalization depends upon commerce semantics.
+
+13. Existing audit logging is not authoritative canonical provenance.
+
+14. Canonical target creation and required provenance form one logical
+    canonicalization operation.
+
+15. Canonicalization must fail safely and must not report successful
+    completion when required provenance cannot be established.
+
+16. Canonicalization does not itself mean:
+    - publication
+    - eligibility approval
+    - commerce completion
+    - Partner status
+
+17. The existing legacy Directory publication path remains operational during
+    the first canonicalization implementation slice.
+
+18. Canonical projection feeds require separate implementation and parity
+    verification before legacy publication may be retired.
+
+FIRST EXECUTABLE SUCCESS TARGET
+
+OnboardingRecord #12
+        ↓
+canonicalize
+        ↓
+Organization X
+        ↓
+durable provenance:
+onboarding_record:12 -> organization:X
+
+Repeated execution:
+
+OnboardingRecord #12
+        ↓
+canonicalize again
+        ↓
+Organization X
+
+The second execution must not create Organization Y.
+
+No invented relationship is required for this success test.
+
+No Directory behavior change is required for this success test.
+
+IMPLEMENTATION DISCIPLINE
+
+This lock authorizes subsequent implementation design under the governing
+architecture.
+
+It does not itself perform:
+
+- database schema changes
+- model changes
+- provenance table creation
+- commerce_requirement creation
+- canonicalizer implementation
+- API changes
+- frontend changes
+- Directory changes
+- payment changes
+- historical migration
+
+Each implementation step must continue to follow:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+FUTURE VERSION RULE
+
+Future changes to these governing execution principles require a new version
+rather than silent mutation of v1.
+
+PURPAWS CANONICALIZATION EXECUTION CONTRACT v1 — LOCKED.

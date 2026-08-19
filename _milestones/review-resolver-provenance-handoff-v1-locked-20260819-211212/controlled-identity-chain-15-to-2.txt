@@ -1,0 +1,35 @@
+PURPAWS CONTROLLED IDENTITY CHAIN
+
+SOURCE
+onboarding_record:15
+
+REVIEW
+id=1
+decision=ESTABLISHED
+target_type=partner_organization
+target_id=2
+reviewer_user_id=1
+reviewed_at=2026-08-19 21:09:23.004630
+
+CANONICALIZATION PROVENANCE
+id=5
+source_type=onboarding_record
+source_id=15
+target_type=organization
+target_id=2
+
+RESULT
+resolver=REUSE
+reason=existing_source_provenance
+canonical_target=organization:2
+
+NOT ESTABLISHED BY THIS CHAIN
+User↔Organization relationship
+membership
+stewardship
+permission
+eligibility
+commerce
+workspace entitlement
+publication
+Directory state

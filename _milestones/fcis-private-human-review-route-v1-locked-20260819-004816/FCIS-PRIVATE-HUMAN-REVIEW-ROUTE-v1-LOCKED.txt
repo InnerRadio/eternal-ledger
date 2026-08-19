@@ -1,0 +1,306 @@
+FCIS PRIVATE HUMAN REVIEW ROUTE v1 — LOCKED
+
+Locked at:
+20260819-004816 UTC
+
+
+PURPOSE
+=======
+
+Expose the already-established FCIS Human Review Write Authority
+through one authenticated, active-admin-only private route.
+
+
+PRIVATE ROUTE
+=============
+
+POST /fcis/review/{card_id}
+
+External Nginx path:
+
+POST /api/fcis/review/{card_id}
+
+
+AUTHENTICATION
+==============
+
+Existing bearer token.
+
+
+AUTHORIZATION
+=============
+
+FCIS Private Access Authority v1
+
+Allowed role:
+
+admin
+
+Live database role remains authoritative.
+
+
+REQUEST CONTRACT
+================
+
+Required:
+
+disposition
+
+Optional:
+
+reviewer_note
+
+
+SUPPORTED DISPOSITIONS
+======================
+
+new
+investigating
+held
+dismissed
+
+
+CURRENT CARD CONTRACT
+=====================
+
+The supplied card_id must resolve against the current
+Opportunity Card set.
+
+Unknown or stale Opportunity Card:
+
+404
+
+
+DURABLE WRITER
+==============
+
+backend/app/fcis/review_authority.py
+
+Authority:
+
+fcis_human_review_authority_v1
+
+Review schema:
+
+fcis_human_review_v1
+
+The route itself does not perform direct database mutation.
+
+Durable Human Review writes remain delegated exclusively to
+write_human_review().
+
+
+VERIFIED FAILURE BOUNDARIES
+===========================
+
+Anonymous:
+401
+
+Invalid bearer token:
+401
+
+Active non-admin:
+403
+
+Forged admin claim backed by live non-admin:
+403
+
+Malformed request body:
+422
+
+Invalid disposition:
+400
+
+Unknown / stale Opportunity Card:
+404
+
+All failure probes produced:
+
+Human Review writes:
+0
+
+AuditLog writes:
+0
+
+Database byte changes:
+0
+
+
+VERIFIED SUCCESSFUL ROUTE WRITE
+===============================
+
+Target:
+
+need-offer:3:4:1:3
+
+Review:
+
+need-offer-review:1:3
+
+Review ID:
+
+1
+
+Transition:
+
+held
+→
+investigating
+
+HTTP:
+
+200
+
+Private response headers:
+
+Cache-Control: no-store
+Pragma: no-cache
+X-FCIS-Private: true
+
+Human Review rows:
+
+1
+→
+1
+
+Audit Logs:
+
+12
+→
+13
+
+Current Review ID retained:
+
+YES
+
+Canonical contexts changed:
+
+NO
+
+Canonical relationships changed:
+
+NO
+
+Canonical facts created:
+
+NO
+
+Relationships created:
+
+NO
+
+Actions authorized:
+
+NO
+
+Public projection:
+
+NO
+
+
+CURRENT DURABLE BASELINE
+========================
+
+fcis_human_reviews:
+1
+
+audit_logs:
+13
+
+canonical_contexts:
+6
+
+canonical_relationships:
+3
+
+canonicalization_provenance:
+4
+
+canonical_publications:
+1
+
+partner_organizations:
+5
+
+users:
+8
+
+
+CURRENT REVIEW
+==============
+
+Review ID:
+1
+
+Review identity:
+need-offer-review:1:3
+
+Current disposition:
+investigating
+
+Need context:
+1
+
+Offer context:
+3
+
+Surfaced card:
+need-offer:3:4:1:3
+
+
+HUMAN / CANONICAL BOUNDARY
+==========================
+
+Human Review represents:
+HUMAN JUDGMENT
+
+Human Review is canonical truth:
+NO
+
+Route may create canonical context:
+NO
+
+Route may create canonical relationship:
+NO
+
+Route may authorize action:
+NO
+
+Route may authorize outreach:
+NO
+
+Route may authorize publication:
+NO
+
+Route may create public projection:
+NO
+
+
+PUBLIC BOUNDARY
+===============
+
+Public Human Review endpoint:
+NONE
+
+public_api.py Human Review exposure:
+NONE
+
+
+BROWSER BOUNDARY
+================
+
+Browser Human Review write control:
+NONE
+
+The Admin Browser Bridge is not yet authorized to invoke
+the Human Review route.
+
+
+NEXT HILL
+=========
+
+FCIS Admin Human Review Control v1
+
+The next hill may wire the already-proven private route into the
+private Admin Browser Bridge while preserving the existing bearer
+token boundary and human/canonical separation.

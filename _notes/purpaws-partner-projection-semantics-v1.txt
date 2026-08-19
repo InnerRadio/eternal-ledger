@@ -1,0 +1,692 @@
+PURPAWS PARTNER PROJECTION SEMANTICS v1
+
+STATUS
+
+Defined for verification.
+
+Not yet locked.
+
+
+====================================================================================================
+PURPOSE
+====================================================================================================
+
+Partner Projection Semantics v1 defines what "Partner" means inside the
+PurPaws canonical network.
+
+It separates:
+
+Organization identity
+
+from:
+
+Partner relationship
+
+from:
+
+relationship basis
+
+from:
+
+relationship status
+
+from:
+
+Partner publication
+
+from:
+
+commerce.
+
+
+====================================================================================================
+CORE LAW
+====================================================================================================
+
+PARTNER IS NOT IDENTITY.
+
+A Partner is not a distinct canonical entity type merely because an
+organization participates in a Partner relationship.
+
+The durable identity remains:
+
+    Organization
+
+
+Conceptually:
+
+    Organization
+        +
+    explicit Partner relationship
+        ->
+    Partner projection eligibility
+
+
+====================================================================================================
+PARTNER DEFINITION
+====================================================================================================
+
+A PurPaws Partner is an Organization that has an explicit, recognized
+relationship with the PurPaws network under a qualifying Partner basis.
+
+Partner status must be supported by durable evidence.
+
+Partner status must not be inferred from:
+
+- Directory presence
+- Organization existence
+- organization name
+- organization type
+- website
+- location
+- event attendance
+- FCIS research
+- booth photographs
+- contact history
+- affiliate participation alone
+- a purchase that does not establish a defined Partner relationship
+- historical placement in the partner_organizations table alone
+
+
+====================================================================================================
+FIRST QUALIFYING BASES
+====================================================================================================
+
+Partner relationships may arise through multiple explicit bases.
+
+v1 recognizes the semantic categories below.
+
+
+1. FOUNDER MEMBERSHIP
+
+An Organization holds a qualifying Founder membership that explicitly grants
+or establishes Partner relationship status.
+
+Conceptually:
+
+    Organization
+        ->
+    Founder Membership
+        ->
+    Partner Relationship
+
+
+Founder membership is one valid route to Partner status.
+
+It is not the definition of Organization identity.
+
+
+2. SPONSORSHIP
+
+An Organization enters an explicit sponsorship relationship with PurPaws.
+
+Examples may include:
+
+- bank sponsor
+- corporate sponsor
+- event sponsor
+- program sponsor
+- campaign sponsor
+
+Conceptually:
+
+    Organization
+        ->
+    Sponsorship Agreement
+        ->
+    Partner Relationship
+
+
+A bank sponsor therefore remains canonically:
+
+    Organization
+
+while its sponsorship establishes:
+
+    Partner Relationship
+
+
+3. COMMUNITY PARTNERSHIP
+
+An Organization enters an explicit community collaboration with PurPaws.
+
+Examples may include:
+
+- rescue
+- shelter
+- community organization
+- nonprofit
+- animal-welfare group
+- community venue
+
+A commercial purchase is not required if the relationship is explicitly
+recognized and authorized.
+
+
+4. STRATEGIC PARTNERSHIP
+
+An Organization enters a strategic relationship with PurPaws.
+
+Examples may include:
+
+- financial institution
+- technology provider
+- media organization
+- veterinary network
+- venue
+- institutional collaborator
+
+
+5. CAMPAIGN PARTNERSHIP
+
+An Organization participates as a Partner within a defined campaign.
+
+Campaign partnership may be scoped.
+
+It does not necessarily create permanent network-wide Partner status.
+
+Conceptually:
+
+    Organization
+        ->
+    Partner Relationship
+        basis = campaign
+        scope = campaign
+        ->
+    Partner Projection within that scope
+
+
+6. NETWORK PARTNERSHIP
+
+An Organization enters an explicit broader PurPaws network relationship under
+an agreement or recognized network-participation basis.
+
+
+====================================================================================================
+RELATIONSHIP BASIS
+====================================================================================================
+
+The relationship basis answers:
+
+    WHY is this Organization a Partner?
+
+
+Example canonical vocabulary may include:
+
+    founder_membership
+    sponsorship
+    community_partnership
+    strategic_partnership
+    campaign_partnership
+    network_partnership
+
+
+This vocabulary describes the basis of a relationship.
+
+It does not redefine Organization identity.
+
+
+====================================================================================================
+RELATIONSHIP STATUS
+====================================================================================================
+
+Partner relationship status answers:
+
+    IS the Partner relationship currently in force?
+
+
+Conceptual states may include:
+
+    pending
+    active
+    inactive
+    expired
+    suspended
+    ended
+
+
+Exact executable vocabulary requires a separate implementation contract.
+
+Relationship status must remain separate from:
+
+- Organization operational status
+- canonical publication status
+- eligibility status
+- commerce status
+
+
+====================================================================================================
+RELATIONSHIP SCOPE
+====================================================================================================
+
+A Partner relationship may have scope.
+
+Examples:
+
+    network
+    campaign
+    event
+    program
+    project
+
+
+Scope matters.
+
+A campaign-scoped Partner relationship must not silently become a permanent
+network-wide Partner relationship.
+
+
+====================================================================================================
+FOUNDER MEMBERSHIP
+====================================================================================================
+
+Founder membership may establish Partner status when the Founder membership
+definition explicitly grants a Partner relationship.
+
+The correct semantic chain is:
+
+    Organization
+        ->
+    Founder Membership
+        ->
+    Partner Relationship
+
+
+Not:
+
+    payment
+        ->
+    Partner identity
+
+
+====================================================================================================
+SPONSORSHIP
+====================================================================================================
+
+Sponsorship is a first-class qualifying basis for Partner relationship.
+
+Example:
+
+    Bank
+        ->
+    canonical Organization
+        ->
+    explicit sponsorship agreement
+        ->
+    Partner relationship
+        ->
+    Partner projection
+
+
+The bank remains an Organization.
+
+"Partner" describes how the bank is connected to PurPaws.
+
+
+====================================================================================================
+COMMERCE SEPARATION
+====================================================================================================
+
+COMMERCE != PARTNER RELATIONSHIP.
+
+A payment may provide evidence that a qualifying membership, sponsorship, or
+agreement was purchased.
+
+The transaction itself does not become the semantic relationship.
+
+
+Conceptually:
+
+    Payment / Commerce Event
+        ->
+    satisfies or activates
+        ->
+    qualifying relationship basis
+        ->
+    Partner Relationship
+
+
+Therefore:
+
+payment status
+
+and:
+
+Partner relationship status
+
+must remain separate durable questions.
+
+
+====================================================================================================
+PUBLICATION SEPARATION
+====================================================================================================
+
+PARTNER RELATIONSHIP != PARTNER PUBLICATION.
+
+An Organization may hold an active Partner relationship without necessarily
+having a published Partner projection.
+
+Partner publication requires explicit publication authority.
+
+Therefore:
+
+    Organization existence
+        !=
+    Partner relationship
+
+    Partner relationship
+        !=
+    Partner projection publication
+
+
+====================================================================================================
+ORGANIZATION PUBLICATION INDEPENDENCE
+====================================================================================================
+
+Organization publication and Partner publication answer different questions.
+
+An Organization may be:
+
+    canonically published as an Organization
+
+without:
+
+    being a Partner.
+
+
+An Organization may hold:
+
+    an active Partner relationship
+
+while Partner projection publication remains separately controlled.
+
+
+====================================================================================================
+MULTI-PROJECTION COEXISTENCE
+====================================================================================================
+
+One canonical Organization may legitimately support multiple public
+projections.
+
+Example:
+
+    organization:2
+        ->
+    Organization projection
+
+and:
+
+    organization:2
+        ->
+    Partner relationship
+        ->
+    Partner projection
+
+
+These projections may coexist when their public semantics are intentionally
+different.
+
+They must not be collapsed merely because they share one canonical
+Organization identity.
+
+
+====================================================================================================
+CURRENT LEGACY PartnerOrganization BOUNDARY
+====================================================================================================
+
+The existing PartnerOrganization / partner_organizations structure is a legacy
+application structure.
+
+Its existence does not by itself establish canonical Partner relationship
+authority.
+
+A row in:
+
+    partner_organizations
+
+does NOT automatically prove:
+
+    founder membership
+    sponsorship
+    community partnership
+    strategic partnership
+    campaign partnership
+    network partnership
+
+
+The historical table may continue to support transitional application
+behavior while canonical Partner relationship semantics are implemented
+separately.
+
+
+====================================================================================================
+CURRENT partner-2 RULE
+====================================================================================================
+
+partner-2 currently exists as a legacy public Partner projection.
+
+Partner Projection Semantics v1 does NOT retroactively invent a relationship
+basis for partner-2.
+
+Until explicit evidence or a future migration establishes a qualifying Partner
+relationship:
+
+    partner-2 relationship basis = unresolved / legacy
+
+This design does not remove partner-2.
+
+This design does not declare partner-2 canonically qualified.
+
+This design preserves the current projection while relationship authority is
+designed.
+
+
+====================================================================================================
+CURRENT partner-1 RULE
+====================================================================================================
+
+partner-1 is subject to the same principle.
+
+Historical presence in partner_organizations does not itself establish a
+canonical Partner relationship basis.
+
+No Founder, sponsor, strategic, campaign, or other Partner basis may be
+invented without evidence.
+
+
+====================================================================================================
+PARTNER PROJECTION ELIGIBILITY
+====================================================================================================
+
+Conceptually, future Partner projection eligibility requires:
+
+1. canonical Organization identity;
+
+2. explicit Partner relationship;
+
+3. qualifying relationship basis;
+
+4. relationship status that permits projection;
+
+5. explicit Partner publication authority.
+
+
+Conceptually:
+
+    Organization
+        +
+    Partner Relationship
+        +
+    Qualifying Basis
+        +
+    Eligible Relationship Status
+        +
+    Partner Publication
+        ->
+    Public Partner Projection
+
+
+====================================================================================================
+NO INFERENCE
+====================================================================================================
+
+Partner status must never be inferred from:
+
+- category
+- organization_type
+- organization name
+- domain
+- website
+- matching email
+- payment amount alone
+- historical table placement
+- campaign existence alone
+- Directory publication
+- canonical Organization publication
+- affiliate enrollment
+- FCIS observation alone
+
+
+====================================================================================================
+FCIS
+====================================================================================================
+
+FCIS may collect evidence suggesting a potential Partner relationship.
+
+Examples:
+
+- sponsorship conversation
+- Founder membership purchase
+- signed agreement
+- campaign agreement
+- collaboration commitment
+- explicit community partnership
+
+FCIS evidence may support relationship determination.
+
+FCIS observation itself does not automatically create the relationship.
+
+
+====================================================================================================
+WHITE-LABEL PRINCIPLE
+====================================================================================================
+
+This architecture is not PurPaws-specific at the identity layer.
+
+A white-label deployment may use other relationship labels while preserving
+the same pattern:
+
+    canonical entity
+        +
+    explicit relationship
+        +
+    relationship basis
+        +
+    relationship status
+        +
+    publication authority
+        ->
+    relationship projection
+
+
+====================================================================================================
+IMPLEMENTATION BOUNDARY
+====================================================================================================
+
+Partner Projection Semantics v1 does NOT yet authorize:
+
+- database schema changes
+- Partner relationship table creation
+- PartnerOrganization migration
+- partner-1 relationship classification
+- partner-2 relationship classification
+- Founder membership migration
+- sponsorship migration
+- campaign migration
+- API changes
+- Directory changes
+- Partner projection removal
+- Partner publication changes
+- commerce changes
+- payment changes
+- frontend changes
+
+
+====================================================================================================
+FIRST FUTURE IMPLEMENTATION REQUIREMENT
+====================================================================================================
+
+Before canonical Partner projection execution begins, a separate implementation
+contract must define durable Partner relationship authority.
+
+That future contract must determine at minimum:
+
+- relationship target Organization
+- relationship type
+- relationship basis
+- relationship status
+- relationship scope
+- evidence / provenance
+- effective dates where required
+- publication separation
+- idempotency
+- correction semantics
+
+
+====================================================================================================
+SUCCESS CONDITIONS
+====================================================================================================
+
+Partner Projection Semantics v1 succeeds if it preserves all of the following:
+
+1. Partner is not identity.
+
+2. Canonical Organization remains identity authority.
+
+3. Founder membership may establish Partner relationship.
+
+4. Sponsorship may establish Partner relationship.
+
+5. Community partnership may establish Partner relationship.
+
+6. Strategic partnership may establish Partner relationship.
+
+7. Campaign partnership may be scoped.
+
+8. Network partnership may be explicit.
+
+9. Commerce remains separate from relationship semantics.
+
+10. Publication remains separate from relationship semantics.
+
+11. Historical PartnerOrganization rows do not automatically become canonical
+    Partner relationships.
+
+12. partner-1 and partner-2 receive no invented relationship basis.
+
+13. Different legitimate projections may coexist.
+
+14. FCIS evidence may support but does not silently create relationship truth.
+
+
+====================================================================================================
+NEXT
+====================================================================================================
+
+Verify Partner Projection Semantics v1 against the locked canonical architecture
+and observed database reality.
+
+Then lock Partner Projection Semantics v1.
+
+Only after lock should Partner Relationship Authority v1 be designed.
+
+
+====================================================================================================
+STATUS
+====================================================================================================
+
+Partner Projection Semantics v1 has been DEFINED.
+
+It has NOT yet been locked.
+
+Verify before implementation.

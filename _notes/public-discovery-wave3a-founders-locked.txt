@@ -1,0 +1,36 @@
+PUBLIC DISCOVERY WAVE 3A LOCKED
+
+Implemented:
+- FounderProfile model
+- founder_profiles database table
+- GET /public/founders
+
+Verified:
+- Service restarts successfully
+- /public/founders returns active public-safe founder records
+- First Founder record seeded
+
+Endpoint:
+- /public/founders
+
+Version:
+- public-discovery-founders-v1
+
+Privacy:
+- Excludes email
+- Excludes referral_code
+- Excludes affiliate_id
+- Excludes account security data
+- Excludes private account details
+
+Purpose:
+- Foundation for PurPaws Founder Wall
+- Founder recognition layer
+- Future Founding Member / Creator / Rescue / Partner / Organization records
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

@@ -1,0 +1,135 @@
+FCIS — CANONICAL RELATIONSHIP WRITE AUTHORITY v1
+LOCKED
+
+PURPOSE
+
+Provides the controlled write gate for recognized
+CanonicalRelationship records.
+
+IMPLEMENTATION
+
+backend/app/relationship_authority.py
+
+PRIMARY WRITE FUNCTION
+
+create_canonical_relationship(...)
+
+V1 ENDPOINT CONTRACT
+
+organization -> organization only
+
+Both endpoints must:
+
+- exist as PartnerOrganization rows
+- have established CanonicalizationProvenance
+  with target_type = organization
+
+V1 VALIDATIONS
+
+- unsupported endpoint types rejected
+- missing organizations rejected
+- organizations without canonical provenance rejected
+- self-edges rejected
+- relationship_type required
+- relationship_basis required
+- relationship_status controlled
+- evidence_source_type required
+- evidence_source_id positive when supplied
+- expires_at cannot precede effective_at
+
+SUPPORTED RELATIONSHIP STATUSES
+
+pending
+active
+inactive
+expired
+revoked
+
+DUPLICATE SEMANTICS
+
+Equivalent relationship authority edges are reused
+deterministically using:
+
+source_type
+source_id
+target_type
+target_id
+relationship_type
+relationship_basis
+
+TRANSACTION CONTRACT
+
+The authority performs db.flush().
+
+Caller owns:
+
+commit
+rollback
+
+This follows the existing canonicalizer transaction pattern.
+
+PUBLIC API
+
+No relationship write API has been exposed.
+
+PARTNER PROJECTION
+
+Unchanged.
+
+DIRECTORY PROJECTION
+
+Unchanged.
+
+INTEGRATION VERIFICATION
+
+A temporary canonical Organization and provenance record were
+created inside one transaction.
+
+A valid organization -> organization CanonicalRelationship was
+created successfully.
+
+The identical edge was reused deterministically.
+
+Independent validation branches passed.
+
+The entire transaction was rolled back.
+
+DURABLE POST-TEST STATE
+
+canonical_relationships rows: 0
+partner_organizations rows: 2
+canonicalization_provenance rows: 1
+test fixture organizations: 0
+
+No synthetic relationship, Organization, or provenance record
+was persisted.
+
+IMPORTANT SEMANTIC BOUNDARY
+
+CanonicalRelationship represents recognized, evidence-backed
+relationship authority.
+
+Opportunity intelligence remains prospective and must never
+silently create CanonicalRelationship records.
+
+NEXT HILL
+
+FIRST DURABLE CANONICAL RELATIONSHIP
+
+Before creating the first real relationship edge, explicitly
+establish:
+
+- canonical source
+- canonical target
+- relationship_type
+- relationship_basis
+- relationship_status
+- scope
+- evidence_source_type
+- evidence_source_id if applicable
+- evidence_reference / evidence_notes
+- effective / expiry dates if applicable
+
+No real relationship should be created from assumption,
+legacy table membership, Partner naming, commerce, publication,
+or inference alone.

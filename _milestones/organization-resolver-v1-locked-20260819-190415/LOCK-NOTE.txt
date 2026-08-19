@@ -1,0 +1,44 @@
+PURPAWS ORGANIZATION RESOLVER v1
+STATUS: LOCKED
+
+Resolver: /var/www/eternal-ledger-github/backend/app/organization_resolver.py
+Resolver SHA256: 918d8e0f8f947a12cc16237331efd3fe3f32de767f38b496247349787808ea02
+
+Governing architecture: /var/www/eternal-ledger-github/_notes/purpaws-canonical-organization-resolution-invariants-v1.txt
+Architecture SHA256: 672fd1ad305a675275f1e7a66ab72337231a05070fba2bef88bb8bdbfef58917
+
+LOCKED BEHAVIOR:
+- REUSE
+- CREATE
+- REVIEW
+- REJECT
+- provenance-first same-source idempotency
+- canonical intake starter facts
+- normalized comparison signals
+- domain match is strong evidence
+- ambiguous candidate collision returns REVIEW
+- no automatic merge
+- no blind duplicate creation
+
+NOT INCLUDED:
+- Organization creation
+- provenance mutation
+- User/Organization relationship creation
+- permission assignment
+- teammate invitation
+- Location schema
+- eligibility
+- commerce
+- workspace entitlement
+- publication
+- Directory mutation
+
+CONTROLLED PROOF:
+- Onboarding #15 => REVIEW
+- Candidate Organization #2 detected
+- exact normalized purpaws.ca domain detected as strong evidence
+- automatic merge = NO
+- duplicate creation = NO
+
+NEXT:
+Define REVIEW -> explicitly-established-target handoff.

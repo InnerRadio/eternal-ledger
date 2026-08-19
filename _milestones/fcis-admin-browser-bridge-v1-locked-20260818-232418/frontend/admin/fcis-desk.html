@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>FCIS Private Intelligence</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    background: #060606;
+    color: #f3efe4;
+    font-family: Inter, Arial, sans-serif;
+}
+
+.shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr;
+}
+
+.topbar {
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+
+    padding: 0 28px;
+
+    background: #090909;
+    border-bottom: 1px solid rgba(212,175,55,.28);
+}
+
+.brand-kicker {
+    color: #d4af37;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .18em;
+}
+
+.brand-title {
+    margin-top: 4px;
+
+    font-family: Georgia, serif;
+    font-size: 20px;
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.operator {
+    color: #888;
+    font-size: 12px;
+}
+
+button {
+    appearance: none;
+
+    border: 1px solid #d4af37;
+    border-radius: 6px;
+
+    background: transparent;
+    color: #d4af37;
+
+    padding: 9px 14px;
+
+    cursor: pointer;
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+}
+
+button:hover {
+    background: #d4af37;
+    color: #060606;
+}
+
+button:disabled {
+    opacity: .45;
+    cursor: default;
+}
+
+.login-shell {
+    width: min(520px, calc(100% - 40px));
+    margin: 80px auto;
+}
+
+.login-card {
+    padding: 34px;
+
+    background: #101010;
+    border: 1px solid #292929;
+    border-radius: 12px;
+}
+
+.eyebrow {
+    color: #d4af37;
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .16em;
+}
+
+h1 {
+    margin: 10px 0 12px;
+
+    font-family: Georgia, serif;
+    font-size: 36px;
+    font-weight: 400;
+}
+
+.intro {
+    margin: 0 0 28px;
+
+    color: #999;
+    line-height: 1.65;
+}
+
+.field {
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+
+    color: #aaa;
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+}
+
+input {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border: 1px solid #333;
+    border-radius: 6px;
+
+    background: #080808;
+    color: #eee;
+
+    font: inherit;
+}
+
+input:focus {
+    outline: none;
+    border-color: #d4af37;
+}
+
+.login-button {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.message {
+    min-height: 24px;
+    margin-top: 16px;
+
+    color: #aaa;
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.message.error {
+    color: #d4af37;
+}
+
+.security-note {
+    margin-top: 26px;
+    padding-top: 18px;
+
+    border-top: 1px solid #242424;
+
+    color: #666;
+
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.desk-shell {
+    display: none;
+    min-height: calc(100vh - 72px);
+}
+
+.desk-shell.active {
+    display: block;
+}
+
+.desk-frame {
+    display: block;
+
+    width: 100%;
+    height: calc(100vh - 72px);
+
+    border: 0;
+
+    background: #060606;
+}
+
+.loading {
+    width: min(720px, calc(100% - 40px));
+    margin: 80px auto;
+
+    color: #888;
+
+    text-align: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="shell">
+
+    <header class="topbar">
+
+        <div>
+            <div class="brand-kicker">
+                FCIS · PRIVATE
+            </div>
+
+            <div class="brand-title">
+                Intelligence Desk
+            </div>
+        </div>
+
+        <div class="top-actions">
+
+            <div
+                id="operator"
+                class="operator"
+            ></div>
+
+            <button
+                id="refreshButton"
+                type="button"
+                class="hidden"
+            >
+                REFRESH
+            </button>
+
+            <button
+                id="logoutButton"
+                type="button"
+                class="hidden"
+            >
+                LOG OUT
+            </button>
+
+        </div>
+
+    </header>
+
+    <main>
+
+        <div
+            id="loginShell"
+            class="login-shell"
+        >
+
+            <section class="login-card">
+
+                <div class="eyebrow">
+                    AUTHORIZED ACCESS ONLY
+                </div>
+
+                <h1>
+                    Open the Desk
+                </h1>
+
+                <p class="intro">
+                    Sign in with an authorized Eternal Ledger
+                    administrator account to retrieve the private
+                    FCIS Intelligence Desk.
+                </p>
+
+                <form id="loginForm">
+
+                    <div class="field">
+
+                        <label for="email">
+                            EMAIL
+                        </label>
+
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="field">
+
+                        <label for="password">
+                            PASSWORD
+                        </label>
+
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                    </div>
+
+                    <button
+                        id="loginButton"
+                        class="login-button"
+                        type="submit"
+                    >
+                        ENTER PRIVATE DESK
+                    </button>
+
+                </form>
+
+                <div
+                    id="message"
+                    class="message"
+                    aria-live="polite"
+                ></div>
+
+                <div class="security-note">
+                    The FCIS bearer token is held in sessionStorage
+                    for this browser session only. Private intelligence
+                    is retrieved from the protected /fcis/desk route
+                    and is not embedded in this page.
+                </div>
+
+            </section>
+
+        </div>
+
+        <div
+            id="loading"
+            class="loading hidden"
+        >
+            Loading private intelligence…
+        </div>
+
+        <section
+            id="deskShell"
+            class="desk-shell"
+        >
+
+            <iframe
+                id="deskFrame"
+                class="desk-frame"
+                title="FCIS Private Intelligence Desk"
+                sandbox="allow-same-origin"
+            ></iframe>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script>
+
+const TOKEN_KEY = "fcis_admin_bearer_v1";
+const USER_KEY = "fcis_admin_user_v1";
+
+const loginShell = document.getElementById("loginShell");
+const loginForm = document.getElementById("loginForm");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginButton = document.getElementById("loginButton");
+
+const message = document.getElementById("message");
+
+const loading = document.getElementById("loading");
+
+const deskShell = document.getElementById("deskShell");
+const deskFrame = document.getElementById("deskFrame");
+
+const operator = document.getElementById("operator");
+const logoutButton = document.getElementById("logoutButton");
+const refreshButton = document.getElementById("refreshButton");
+
+
+function setMessage(text, isError = false) {
+    message.textContent = text || "";
+
+    message.classList.toggle(
+        "error",
+        Boolean(isError)
+    );
+}
+
+
+function readToken() {
+    return sessionStorage.getItem(
+        TOKEN_KEY
+    );
+}
+
+
+function readUser() {
+    const raw = sessionStorage.getItem(
+        USER_KEY
+    );
+
+    if (!raw) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(raw);
+    } catch (error) {
+        return null;
+    }
+}
+
+
+function saveSession(token, user) {
+    sessionStorage.setItem(
+        TOKEN_KEY,
+        token
+    );
+
+    sessionStorage.setItem(
+        USER_KEY,
+        JSON.stringify(user || {})
+    );
+}
+
+
+function clearSession() {
+    sessionStorage.removeItem(
+        TOKEN_KEY
+    );
+
+    sessionStorage.removeItem(
+        USER_KEY
+    );
+}
+
+
+function showLogin() {
+    loginShell.classList.remove(
+        "hidden"
+    );
+
+    loading.classList.add(
+        "hidden"
+    );
+
+    deskShell.classList.remove(
+        "active"
+    );
+
+    logoutButton.classList.add(
+        "hidden"
+    );
+
+    refreshButton.classList.add(
+        "hidden"
+    );
+
+    operator.textContent = "";
+
+    deskFrame.removeAttribute(
+        "srcdoc"
+    );
+}
+
+
+function showDesk(user) {
+    loginShell.classList.add(
+        "hidden"
+    );
+
+    loading.classList.add(
+        "hidden"
+    );
+
+    deskShell.classList.add(
+        "active"
+    );
+
+    logoutButton.classList.remove(
+        "hidden"
+    );
+
+    refreshButton.classList.remove(
+        "hidden"
+    );
+
+    if (user && user.email) {
+        operator.textContent =
+            user.email;
+    } else {
+        operator.textContent =
+            "Authorized administrator";
+    }
+}
+
+
+async function fetchDesk(token) {
+
+    loading.classList.remove(
+        "hidden"
+    );
+
+    loginShell.classList.add(
+        "hidden"
+    );
+
+    deskShell.classList.remove(
+        "active"
+    );
+
+    try {
+
+        const response = await fetch(
+            "/api/fcis/desk",
+            {
+                method: "GET",
+
+                headers: {
+                    "Authorization":
+                        "Bearer " + token
+                },
+
+                cache: "no-store"
+            }
+        );
+
+        if (!response.ok) {
+
+            if (
+                response.status === 401
+                || response.status === 403
+            ) {
+                clearSession();
+                showLogin();
+
+                setMessage(
+                    response.status === 403
+                        ? "This account is not authorized for FCIS."
+                        : "Your private session is no longer valid.",
+                    true
+                );
+
+                return false;
+            }
+
+            throw new Error(
+                "Desk request failed with status "
+                + response.status
+            );
+        }
+
+        const html = await response.text();
+
+        if (
+            !html.includes(
+                "FCIS · PRIVATE"
+            )
+            ||
+            !html.includes(
+                "Intelligence Desk"
+            )
+        ) {
+            throw new Error(
+                "Unexpected FCIS Desk response."
+            );
+        }
+
+        deskFrame.srcdoc = html;
+
+        const user = readUser();
+
+        showDesk(
+            user
+        );
+
+        return true;
+
+    } catch (error) {
+
+        clearSession();
+
+        showLogin();
+
+        setMessage(
+            "Unable to open the private Desk. "
+            + error.message,
+            true
+        );
+
+        return false;
+    }
+}
+
+
+loginForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        setMessage("");
+
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!email || !password) {
+            setMessage(
+                "Email and password are required.",
+                true
+            );
+
+            return;
+        }
+
+        loginButton.disabled = true;
+        loginButton.textContent =
+            "AUTHENTICATING…";
+
+        try {
+
+            const response = await fetch(
+                "/api/cms/login",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    }),
+
+                    cache: "no-store"
+                }
+            );
+
+            const data = await response.json();
+
+            if (
+                !response.ok
+                ||
+                data.status !== "authenticated"
+                ||
+                !data.access_token
+            ) {
+                clearSession();
+
+                setMessage(
+                    data.message
+                        || "Invalid credentials.",
+                    true
+                );
+
+                return;
+            }
+
+            /*
+            This check is for user feedback only.
+
+            FCIS authorization itself is enforced by
+            the protected backend route against the
+            live User database.
+            */
+            if (
+                !data.user
+                ||
+                data.user.role !== "admin"
+            ) {
+                clearSession();
+
+                setMessage(
+                    "This account is not authorized for FCIS.",
+                    true
+                );
+
+                return;
+            }
+
+            saveSession(
+                data.access_token,
+                data.user
+            );
+
+            passwordInput.value = "";
+
+            await fetchDesk(
+                data.access_token
+            );
+
+        } catch (error) {
+
+            clearSession();
+
+            setMessage(
+                "Login failed. "
+                + error.message,
+                true
+            );
+
+        } finally {
+
+            loginButton.disabled = false;
+            loginButton.textContent =
+                "ENTER PRIVATE DESK";
+        }
+    }
+);
+
+
+logoutButton.addEventListener(
+    "click",
+    function() {
+
+        clearSession();
+
+        showLogin();
+
+        emailInput.value = "";
+        passwordInput.value = "";
+
+        setMessage(
+            "Private session closed."
+        );
+
+        emailInput.focus();
+    }
+);
+
+
+refreshButton.addEventListener(
+    "click",
+    async function() {
+
+        const token = readToken();
+
+        if (!token) {
+            showLogin();
+
+            setMessage(
+                "Please sign in again.",
+                true
+            );
+
+            return;
+        }
+
+        await fetchDesk(
+            token
+        );
+    }
+);
+
+
+async function bootstrap() {
+
+    const token = readToken();
+
+    if (!token) {
+        showLogin();
+        return;
+    }
+
+    await fetchDesk(
+        token
+    );
+}
+
+
+bootstrap();
+
+</script>
+
+</body>
+</html>

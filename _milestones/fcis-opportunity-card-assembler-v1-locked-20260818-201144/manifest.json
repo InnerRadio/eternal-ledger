@@ -1,0 +1,20 @@
+{
+  "milestone": "fcis-opportunity-card-assembler-v1-locked-20260818-201144",
+  "locked_at": "20260818-201144",
+  "authority": "FCIS Opportunity Card Assembler v1",
+  "module": "backend/app/fcis/opportunity_cards.py",
+  "schema_version": "fcis_opportunity_card_v1",
+  "structured_private_cards": 2,
+  "event_photography_card": "need-offer:3:4:1:3",
+  "promotional_support_card": "need-offer:4:5:4:5",
+  "relationship_context_verified": true,
+  "pending_relationship_caution_verified": true,
+  "human_review_required": true,
+  "workflow_persisted": false,
+  "canonical_facts_created": 0,
+  "relationships_created": 0,
+  "actions_authorized": 0,
+  "database_changed": false,
+  "public_exposure": false,
+  "next_hill": "FCIS Private Intelligence Desk v1"
+}

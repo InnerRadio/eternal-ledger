@@ -1,0 +1,14 @@
+{
+  "milestone": "canonical-relationship-write-authority-v1-locked-20260817-091804",
+  "locked_at": "20260817-091804",
+  "authority_module": "backend/app/relationship_authority.py",
+  "durable_relationship_rows": 0,
+  "organization_rows": 2,
+  "canonical_provenance_rows": 1,
+  "endpoint_contract_v1": "organization -> organization",
+  "transaction_contract": "authority flushes; caller commits or rolls back",
+  "duplicate_semantics": "deterministic reuse",
+  "public_api_changed": false,
+  "partner_projection_changed": false,
+  "synthetic_test_data_persisted": false
+}

@@ -1,0 +1,202 @@
+PURPAWS PARTNER RELATIONSHIP AUTHORITY v1
+
+Created:
+2026-08-16T20:42:35.953866+00:00
+
+STATUS:
+DESIGN ONLY
+NOT LOCKED
+NOT IMPLEMENTED
+
+
+1. CORE AUTHORITY
+
+Partner is not identity.
+
+Canonical Organization remains identity authority.
+
+Partner Relationship Authority records an explicit qualifying
+relationship between a canonical Organization and PurPaws or an
+applicable network/project context.
+
+Legacy PartnerOrganization existence is not canonical relationship
+authority.
+
+
+2. QUALIFYING RELATIONSHIP TYPES
+
+- founder_partner
+- sponsor_partner
+- community_partner
+- strategic_partner
+- campaign_partner
+- network_partner
+
+
+3. RELATIONSHIP BASIS
+
+relationship_type answers what kind of Partner relationship exists.
+
+relationship_basis answers why PurPaws has authority to assert that
+relationship.
+
+Relationship basis must be explicit and evidence-backed.
+
+No relationship basis may be inferred from:
+
+- organization name
+- website
+- location
+- legacy PartnerOrganization existence
+
+
+4. EVIDENCE
+
+Canonical Partner relationship authority must be traceable to
+evidence or an explicitly authoritative originating system event.
+
+Potential evidence sources include:
+
+- Founder membership record
+- sponsorship agreement
+- partnership agreement
+- campaign participation record
+- administrator-approved relationship record
+- another explicit canonical relationship source
+
+Legacy PartnerOrganization existence alone is insufficient.
+
+
+5. RELATIONSHIP STATUS
+
+Allowed conceptual lifecycle:
+
+- pending
+- active
+- inactive
+- ended
+
+Historical relationship records should be preserved.
+
+
+6. TIME
+
+Relationship authority should support:
+
+- relationship start
+- relationship end
+- created timestamp
+- updated timestamp
+
+Relationships may be open-ended or time-bounded.
+
+
+7. SCOPE
+
+Relationship scope may include:
+
+- project
+- network
+- campaign
+- program
+- event
+
+The same Organization may hold multiple distinct Partner
+relationships when relationship type or scope differs.
+
+
+8. IDEMPOTENCY
+
+Organization alone must not be the uniqueness key.
+
+Conceptual relationship identity must distinguish at least:
+
+- canonical Organization
+- relationship type
+- relationship scope
+
+Repeated execution from the same authoritative source must not
+create duplicate relationships.
+
+Exact database uniqueness is deferred until live implementation
+inspection.
+
+
+9. AUTHORITY SEPARATION
+
+IDENTITY
+    !=
+RELATIONSHIP
+    !=
+PUBLICATION
+    !=
+COMMERCE
+
+An active Partner relationship does not automatically authorize
+public Partner projection.
+
+
+10. LEGACY
+
+partner-1:
+unresolved / legacy
+
+partner-2:
+unresolved / legacy
+
+Neither record is classified by this design.
+
+Future migration requires independent evidence review.
+
+
+11. FCIS
+
+Partner Relationship Authority becomes a first-class relationship
+edge suitable for:
+
+- Opportunity Graph reasoning
+- sponsorship discovery
+- Founder recognition
+- campaign eligibility
+- network discovery
+- relationship history
+- Partner projection
+
+Downstream uses do not redefine relationship authority.
+
+
+12. IMPLEMENTATION BOUNDARY
+
+NOT AUTHORIZED BY THIS DESIGN:
+
+- database schema changes
+- model changes
+- partner_relationships table creation
+- provenance changes
+- legacy Partner migration
+- Founder migration
+- sponsorship migration
+- campaign migration
+- API changes
+- Directory changes
+- frontend changes
+- publication changes
+- commerce changes
+
+
+NEXT:
+
+LIVE RELATIONSHIP AUTHORITY FORENSIC INSPECTION
+
+Inspect:
+
+- models.py
+- SQLite tables
+- OrganizationMember
+- FounderProfile
+- PartnerOrganization
+- AffiliateCampaign
+- existing agreement / relationship structures
+- canonical provenance structures
+
+Then define the exact durable implementation contract.

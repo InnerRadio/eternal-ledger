@@ -1,0 +1,67 @@
+PUBLIC DIRECTORY WAVE 5G-D PARTNER CAMPAIGNS LOCKED
+
+Implemented:
+- PartnerCampaign model
+- partner_campaigns database table
+- Partner campaign serializer
+- GET /account/partner-campaigns
+- GET /account/partner-campaigns/{campaign_id}
+- POST /account/partner-campaigns
+- Campaign-level taxonomy serialization
+- Partner organization to campaign architecture
+
+Verified:
+- python3 -m py_compile backend/app/account.py backend/app/models.py
+- eternal-ledger-api.service restarts successfully
+- OpenAPI exposes /account/partner-campaigns GET and POST
+- OpenAPI exposes /account/partner-campaigns/{campaign_id} GET
+- Senior Companion Formula Launch campaign created
+- Campaign list returns active campaign board
+- Campaign detail returns campaign record
+- Campaign taxonomy assignment works through PartnerTaxonomyAssignment
+- Campaign detail returns Food & Nutrition, Pet Food, and Senior Nutrition taxonomy records
+
+Model:
+- PartnerCampaign
+
+Table:
+- partner_campaigns
+
+Admin / Account Endpoints:
+- GET /account/partner-campaigns
+- GET /account/partner-campaigns/{campaign_id}
+- POST /account/partner-campaigns
+
+Initial Campaign:
+- Senior Companion Foods
+  - Senior Companion Formula Launch
+  - campaign_type: affiliate_promotion
+  - status: active
+  - budget_cents: 250000
+  - currency: CAD
+
+Campaign Taxonomy:
+- Food & Nutrition
+- Pet Food
+- Senior Nutrition
+
+Purpose:
+- Enables partner organizations to run multiple promotional campaign boards
+- Enables per-campaign budgets, assets, landing URLs, taxonomy, and dashboard reporting
+- Supports partner membership upsells by campaign count
+- Supports future campaign boards, campaign stats, campaign decks, and campaign-specific discovery
+- Connects partner organizations, taxonomy, affiliates, conversions, and future dashboards
+
+Future Support:
+- Campaign taxonomy uses PartnerTaxonomyAssignment.assignment_context = campaign
+- Campaign taxonomy uses PartnerTaxonomyAssignment.campaign_id
+- Supports multiple campaigns per partner organization
+- Supports campaign-specific affiliate promotions
+- Supports campaign-specific decks and reporting boards
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

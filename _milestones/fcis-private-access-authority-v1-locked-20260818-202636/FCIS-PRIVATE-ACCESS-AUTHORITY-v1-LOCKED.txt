@@ -1,0 +1,77 @@
+FCIS — PRIVATE ACCESS AUTHORITY v1
+LOCKED
+
+PURPOSE
+
+Protect private FCIS intelligence behind existing authenticated
+identity plus live database authorization.
+
+MODULE
+
+backend/app/fcis/access.py
+
+AUTHENTICATION
+
+Existing bearer-token authority:
+
+backend/app/cms/security.py
+get_current_user()
+
+AUTHORIZATION
+
+FCIS v1 requires:
+
+- valid authenticated identity
+- live User record exists
+- live User status == active
+- live User role == admin
+
+ALLOWED ROLES
+
+admin
+
+CURRENT VERIFIED AUTHORIZED USERS
+
+2 active administrators.
+
+NON-ADMIN ACCESS
+
+DENIED.
+
+LIVE DATABASE AUTHORITY
+
+The live User record overrides token role claims.
+
+A bearer token claiming admin cannot authorize FCIS if the
+live database role is not admin.
+
+BOUNDARY
+
+This authority creates:
+
+- no users
+- no role changes
+- no status changes
+- no routes
+- no public exposure
+- no intelligence writes
+- no workflow writes
+
+NEXT HILL
+
+FCIS Private Route v1.
+
+Expected route:
+
+GET /fcis/desk
+
+The route must:
+
+- depend on require_fcis_access
+- render the Desk dynamically
+- return HTMLResponse
+- remain read-only
+- never use public_api.py
+- never expose the filesystem preview directly
+
+FCIS intelligence remains internal.

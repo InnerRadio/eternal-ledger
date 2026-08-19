@@ -1,0 +1,148 @@
+PURPAWS FIRST CANONICALIZATION v1 — LOCKED
+
+LOCKED AT
+2026-08-15 02:18:32
+
+
+================================================================================
+SOURCE
+================================================================================
+
+source_type = onboarding_record
+source_id   = 12
+
+Observed source:
+
+user_id             = 8
+path                = directory
+status              = published
+verification_status = verified
+
+
+================================================================================
+CANONICAL TARGET
+================================================================================
+
+target_type = organization
+target_id   = 2
+
+Implementation model:
+
+PartnerOrganization
+
+
+================================================================================
+CANONICAL ORGANIZATION FACTS
+================================================================================
+
+organization_name  = PurPaws Testing
+organization_type  = Network
+project            = PurPaws
+contact_email      = info@purpaws.ca
+website_url        = www.purpaws.ca
+location           = Toronto, Ontario, Canada
+
+
+================================================================================
+SEMANTIC NON-INFERENCE
+================================================================================
+
+declared_activity_nature = None
+activity_nature          = None
+eligibility_status       = unclassified
+commerce_requirement     = unclassified
+commerce_status          = unclassified
+
+No unsupported semantic determination was invented.
+
+
+================================================================================
+PROVENANCE
+================================================================================
+
+canonicalization_provenance.id = 1
+
+onboarding_record:12
+    ->
+organization:2
+
+
+================================================================================
+IDEMPOTENCY TEST
+================================================================================
+
+First execution:
+
+onboarding_record:12
+    ->
+organization:2
+    ->
+action = created
+
+Second execution:
+
+onboarding_record:12
+    ->
+organization:2
+    ->
+action = reused
+
+PASS:
+
+- same source
+- same target type
+- same canonical target
+- no Organization Y
+- no duplicate provenance
+
+
+================================================================================
+RELATIONSHIP SAFETY
+================================================================================
+
+No OrganizationMember row was created for organization:2.
+
+The source User was not automatically classified as:
+
+- owner
+- employee
+- volunteer
+- administrator
+- representative
+- steward
+- Partner
+
+
+================================================================================
+PUBLICATION SAFETY
+================================================================================
+
+No API changed.
+
+No frontend changed.
+
+No Directory behavior changed.
+
+The legacy Directory publication path remains operational.
+
+Canonicalization remains separate from public projection.
+
+
+================================================================================
+MILESTONE
+================================================================================
+
+This is the first verified live transition from transitional PurPaws onboarding
+evidence into durable canonical network structure.
+
+OnboardingRecord
+    ↓
+Canonicalization
+    ↓
+Organization
+    ↓
+Durable Provenance
+    ↓
+Repeatable Same-Source Identity
+
+LOCKED.

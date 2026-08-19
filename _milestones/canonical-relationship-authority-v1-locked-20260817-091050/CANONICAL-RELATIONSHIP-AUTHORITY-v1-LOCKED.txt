@@ -1,0 +1,184 @@
+FCIS — CANONICAL RELATIONSHIP AUTHORITY v1
+LOCKED
+
+ARCHITECTURAL DECISION
+
+Partner is a relationship/status, not an identity type.
+
+The durable first-class relationship authority is:
+
+    canonical_relationships
+
+NOT:
+
+    partner_relationships
+
+
+GENERALIZATION TEST
+
+PASS.
+
+The authority is generalized in structure but v1 canonical
+relationship semantics are limited to:
+
+    organization -> organization
+
+No other canonical node types are presently proven by the live
+canonicalization/publication authorities.
+
+
+AUTHORITY SEPARATION
+
+CanonicalizationProvenance
+    Answers:
+    Where did this canonical identity come from?
+
+CanonicalRelationship
+    Answers:
+    What recognized evidence-backed relationship exists?
+
+CanonicalPublication
+    Answers:
+    May this canonical entity be publicly projected?
+
+These authorities remain separate.
+
+
+CANONICAL RELATIONSHIP v1 FIELDS
+
+id
+
+source_type
+source_id
+
+target_type
+target_id
+
+relationship_type
+relationship_basis
+relationship_status
+
+scope
+
+evidence_source_type
+evidence_source_id
+evidence_reference
+evidence_notes
+
+effective_at
+expires_at
+
+created_at
+updated_at
+
+
+CURRENT DATA STATE
+
+canonical_relationships rows:
+    0
+
+No relationship was invented or backfilled.
+
+Existing PartnerOrganization records do NOT automatically establish
+Partner relationships.
+
+
+OPPORTUNITY GRAPH SEPARATION
+
+CanonicalRelationship:
+    recognized
+    evidence-backed
+    durable
+    authoritative
+
+Opportunity edge:
+    inferred
+    prospective
+    analytical
+    non-authoritative
+
+Opportunity intelligence must never silently create a recognized
+CanonicalRelationship.
+
+
+PUBLIC DIRECTORY PARITY VERIFIED
+
+Current live Directory result remains:
+
+    founder-1
+    partner-1
+    partner-2
+    organization-2
+
+directory-12 remains superseded.
+
+partner-2 remains a distinct legacy Partner projection.
+
+organization-2 remains the canonical Organization projection.
+
+No Partner relationship basis was invented.
+
+
+VERIFICATION
+
+CanonicalRelationship model:
+    PASS
+
+canonical_relationships physical table:
+    PASS
+
+Model / database column parity:
+    PASS
+
+canonical_relationships row count:
+    0
+
+canonicalization_provenance preserved:
+    PASS
+
+canonical_publications preserved:
+    PASS
+
+partner_organizations preserved:
+    PASS
+
+FastAPI service:
+    ACTIVE
+
+Local FastAPI OpenAPI:
+    HTTP 200
+
+Public HTTPS through:
+    https://purpaws.ca/api/openapi.json
+    HTTP 200
+
+/public/directory:
+    HTTP 200
+
+Directory count:
+    4
+
+
+LOCKED PRINCIPLES
+
+- Python-only
+- No guessing
+- No blind patching
+- No invented relationships
+- Identity and relationship remain separate
+- Commerce and relationship remain separate
+- Publication and relationship remain separate
+- Provenance and relationship remain separate
+- Opportunity inference and recognized relationship remain separate
+
+
+NEXT HILL
+
+Canonical Relationship Write Authority v1
+
+Define and implement the controlled path by which evidence may create
+the first recognized CanonicalRelationship.
+
+No relationship row should be created until its source, target,
+relationship type, basis, status, scope, and evidence are explicitly
+established and validated.

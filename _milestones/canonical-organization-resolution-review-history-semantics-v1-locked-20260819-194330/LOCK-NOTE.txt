@@ -1,0 +1,29 @@
+PURPAWS CANONICAL ORGANIZATION RESOLUTION REVIEW HISTORY SEMANTICS v1
+STATUS: LOCKED
+
+History semantics SHA256: 9cc2a3d33c7cccf9e40bc9b61380b5b5a5ed12504c610d45441a499fadac2a3e
+
+LOCKED:
+- review history is append-only
+- current-effective review is derived
+- reviewed_at DESC, id DESC provides deterministic current ordering
+- no destructive one-row verdict model
+- no source/target uniqueness constraint
+- reviewer_user_id follows plain integer repository convention
+- review history is not AuditLog
+- review history is not canonicalization provenance
+- established provenance is protected
+- contradiction after provenance requires reconciliation
+- reconciliation authority is deferred
+- historical artifacts remain evidence
+- provenance is universal architecture
+
+CONTROLLED CASE:
+- onboarding_record:15 unchanged
+- organization:2 unchanged
+- review created: NO
+- provenance created: NO
+
+NEXT:
+Add CanonicalOrganizationResolutionReview model + database migration.
+Verify schema/indexes with zero review decisions.

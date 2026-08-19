@@ -1,0 +1,94 @@
+FCIS — PRIVATE BRIEFING v2
+LOCKED
+
+PURPOSE
+
+Render verified private FCIS correlation intelligence
+for human review.
+
+MODULE
+
+backend/app/fcis/briefing.py
+
+V2 CAPABILITY
+
+render_correlation_briefing(db)
+
+INPUT
+
+Verified FCIS Correlation Engine v1 output.
+
+CURRENT VERIFIED SIGNALS
+
+1.
+
+Alpha ↔ Beta
+Signal:
+event photography
+
+Reason:
+Alpha has active need.
+Beta has active offer.
+
+Existing relationship:
+ACTIVE partner via community_partnership.
+
+2.
+
+Beta ↔ Gamma
+Signal:
+promotional support
+
+Reason:
+Beta has active need.
+Gamma has active offer.
+
+Existing relationship:
+PENDING partner via strategic_partnership.
+
+Caution:
+Relationship is not active.
+
+BOUNDARY
+
+Private Briefing v2 creates:
+
+- no canonical facts
+- no canonical context
+- no canonical relationships
+- no external action
+- no public projection
+
+Human review is required.
+
+PUBLIC EXPOSURE
+
+NONE.
+
+ARCHITECTURAL PRINCIPLE
+
+Identity provides subject truth.
+Context provides contextual truth.
+Relationships provide connection truth.
+Correlation proposes hypotheses.
+Private Briefing surfaces those hypotheses.
+Humans authorize action.
+
+NEXT HILL
+
+FCIS Private Intelligence Desk v1.
+
+First goal:
+
+Render the verified private intelligence signals as
+structured internal Opportunity Cards.
+
+Initial card actions may be visually represented as:
+
+INSPECT
+WATCH
+DEVELOP
+DISMISS
+
+These controls must not mutate canonical truth.
+Workflow persistence is a later authority.

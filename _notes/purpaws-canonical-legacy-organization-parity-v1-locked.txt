@@ -1,0 +1,222 @@
+PURPAWS CANONICAL ↔ LEGACY ORGANIZATION PARITY v1 — LOCKED
+
+LOCKED AT
+
+2026-08-16 19:16:42
+
+
+================================================================================
+STATUS
+================================================================================
+
+VERIFIED AND LOCKED.
+
+Canonical ↔ Legacy Organization Projection Parity v1 now governs the next
+Directory aggregation design step.
+
+
+================================================================================
+VISIBILITY SET
+================================================================================
+
+Legacy public Organization IDs:
+
+[2, 1]
+
+
+Canonical public Organization IDs:
+
+[2]
+
+
+Shared:
+
+[2]
+
+
+Legacy only:
+
+[1]
+
+
+Canonical only:
+
+[]
+
+
+================================================================================
+INTERPRETATION
+================================================================================
+
+organization:2 is shared by both feeds.
+
+organization:1 is legacy-only because it is operationally active but does not
+have explicit canonical publication authority.
+
+This is an intentional publication-authority difference.
+
+It is NOT an identity parity failure.
+
+
+================================================================================
+CORE FACT PARITY — organization:2
+================================================================================
+
+id: PASS
+
+organization_name: PASS
+
+organization_type: PASS
+
+project: PASS
+
+website_url: PASS
+
+location: PASS
+
+created_at: PASS
+
+
+================================================================================
+METRICS PARITY
+================================================================================
+
+active_member_count:
+
+PASS
+
+
+================================================================================
+STATUS SEMANTICS
+================================================================================
+
+Legacy:
+
+status = active
+
+
+Canonical:
+
+status = published
+
+
+These values answer different questions.
+
+Legacy status represents operational Organization state.
+
+Canonical status represents explicit publication state.
+
+They must not be conflated.
+
+
+================================================================================
+CANONICAL-ONLY METADATA
+================================================================================
+
+canonical_publication
+
+is intentionally canonical-only.
+
+For organization:2:
+
+canonical_publication.id = 1
+
+canonical_publication.status = published
+
+
+================================================================================
+RECORD SHAPE
+================================================================================
+
+Shared record keys:
+
+id
+identity
+metrics
+organization
+profile
+status
+type
+
+
+Legacy-only record keys:
+
+none
+
+
+Canonical-only record keys:
+
+canonical_publication
+
+
+================================================================================
+LEGACY REPAIR PREREQUISITE
+================================================================================
+
+The legacy active-member query defect was repaired and independently locked
+before parity comparison.
+
+Repair lock:
+
+purpaws-public-organizations-active-member-query-v1-locked.txt
+
+
+================================================================================
+CANONICAL FEED PREREQUISITE
+================================================================================
+
+Canonical Organization Projection Feed v1 remains locked.
+
+Canonical publication authority remains:
+
+canonical_publications.publication_status = published
+
+
+================================================================================
+DIRECTORY AGGREGATION BOUNDARY
+================================================================================
+
+The next implementation must define a Directory multi-feed aggregation seam.
+
+The seam must NOT:
+
+- silently retire the legacy feed
+- duplicate the same Organization in Directory results
+- copy presentation fields into canonical Organization core
+- redefine canonical identity
+- treat operational active status as canonical publication authority
+- treat canonical publication as Partner identity
+
+
+================================================================================
+AGGREGATION INVARIANT
+================================================================================
+
+If the same Organization is visible through both legacy and canonical sources,
+the Directory must emit one logical Organization result.
+
+Canonical identity must remain authoritative.
+
+Legacy presentation data may remain transitional until presentation semantics
+are migrated explicitly.
+
+
+================================================================================
+SOURCE PARITY NOTE
+================================================================================
+
+SHA256:
+
+8349f4459701ac72a1eab58caca14b39d91a5298e018fc0da7dcd41a7bfce039
+
+
+================================================================================
+FUTURE VERSION RULE
+================================================================================
+
+Changes to these locked parity conclusions require an explicit future version.
+
+No silent mutation.
+
+
+LOCKED.

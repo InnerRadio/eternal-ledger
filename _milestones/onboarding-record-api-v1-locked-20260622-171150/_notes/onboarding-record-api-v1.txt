@@ -1,0 +1,36 @@
+ONBOARDING RECORD API v1 LOCKED
+
+Implemented:
+- OnboardingRecord SQLAlchemy model
+- onboarding_records database table
+- POST /public/onboarding
+
+Architecture:
+- Onboarding creates draft records.
+- Publishing remains separate.
+- Draft onboarding records store:
+  - user_id
+  - path
+  - display_name
+  - email
+  - payload_json
+  - status
+  - created_at
+  - updated_at
+
+Status values planned:
+- started
+- dashboard_issued
+- completed
+- archived
+
+Verified:
+- models.py compiles
+- public_api.py compiles
+- Base.metadata.create_all creates onboarding_records
+- TestClient POST /public/onboarding inserts directory record
+- Latest DB record verified with id/path/display_name/email/payload_json/status
+
+Next:
+- Implement Directory onboarding wizard → POST /public/onboarding
+- Then dashboard handoff / affiliate issuance flow

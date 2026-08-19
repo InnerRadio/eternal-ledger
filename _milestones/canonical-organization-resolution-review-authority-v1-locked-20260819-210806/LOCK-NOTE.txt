@@ -1,0 +1,56 @@
+PURPAWS — CANONICAL ORGANIZATION RESOLUTION REVIEW AUTHORITY v1
+
+STATUS
+LOCKED
+
+AUTHORITY
+backend/app/organization_resolution_review_authority.py
+
+AUTHORITY SHA256
+ca71b636aba6a1df72becde053e3e9f09180ae5ff7652aa84c46526a2bef1fc7
+
+LOCKED DECISIONS
+ESTABLISHED
+NOT_SAME
+DEFERRED
+
+LOCKED EXECUTABLE BEHAVIOR
+- validate source existence
+- validate target existence
+- validate decision vocabulary
+- validate reviewer_user_id
+- append historical review row
+- append-only semantics
+- commit=False by default
+- current-effective review derived by reviewed_at DESC, id DESC
+
+LOCKED BOUNDARIES
+- no canonicalization provenance mutation
+- no relationship mutation
+- no permission mutation
+- no publication mutation
+- no reconciliation
+- no destructive update
+- no destructive delete
+
+CONTROLLED PROOF
+- onboarding_record:15 validates
+- partner_organization:2 validates
+- dry-run ESTABLISHED request validates
+- current-effective review = None
+- review rows remain 0
+
+NEXT
+Create the first controlled historical review judgment:
+onboarding_record:15
+    ->
+partner_organization:2
+decision = ESTABLISHED
+
+Then verify:
+- exactly one review row
+- #15 unchanged
+- Organization #2 unchanged
+- provenance still unchanged
+- relationship still unchanged
+- current-effective review resolves to the new row

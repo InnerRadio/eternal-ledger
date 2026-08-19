@@ -1,0 +1,23 @@
+{
+  "milestone": "canonical-context-authority-v1-locked-20260817-140631",
+  "locked_at": "20260817-140631",
+  "authority": "Canonical Context Authority v1",
+  "model": "CanonicalContext",
+  "table": "canonical_contexts",
+  "canonical_context_rows": 0,
+  "canonical_relationship_rows": 3,
+  "canonical_provenance_rows": 4,
+  "canonical_publication_rows": 1,
+  "partner_organization_rows": 5,
+  "synthetic_context_created": false,
+  "public_api_changed": false,
+  "private_intelligence_changed": false,
+  "uniqueness_contract": [
+    "subject_type",
+    "subject_id",
+    "context_type",
+    "context_key",
+    "evidence_source_type",
+    "evidence_source_id"
+  ]
+}

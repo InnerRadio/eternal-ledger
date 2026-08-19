@@ -1,0 +1,28 @@
+{
+  "milestone": "fcis-private-route-v1-locked-20260818-203200",
+  "locked_at": "20260818-203200",
+  "authority": "FCIS Private Route v1",
+  "route": "GET /fcis/desk",
+  "router": "backend/app/fcis/routes.py",
+  "registered_in": "backend/app/main.py",
+  "rendering": "dynamic HTML",
+  "authentication": "existing bearer token",
+  "authorization": "FCIS Private Access Authority v1",
+  "allowed_roles": [
+    "admin"
+  ],
+  "active_admins": 2,
+  "active_admin_status": 200,
+  "active_member_status": 403,
+  "forged_admin_claim_status": 403,
+  "invalid_token_status": 401,
+  "anonymous_access": "rejected",
+  "live_database_role_authoritative": true,
+  "desk_read_only": true,
+  "workflow_writes": false,
+  "database_changed": false,
+  "public_api_changed": false,
+  "public_fcis_endpoints": 0,
+  "cache_control": "no-store",
+  "next_hill": "FCIS Admin Browser Bridge v1"
+}

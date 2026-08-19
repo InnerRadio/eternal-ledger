@@ -1,0 +1,1129 @@
+PURPAWS CANONICAL INTAKE CONTRACT v1
+
+STATUS
+Defined for verification.
+Not yet locked.
+
+
+================================================================================
+PURPOSE
+================================================================================
+
+This document defines the canonical facts PurPaws onboarding is allowed and
+expected to collect before those facts are translated into canonical entities,
+records, roles, relationships, classifications, workspaces, and public
+projections.
+
+This document is governed by:
+
+- PurPaws Canonical Network Ontology v1
+- PurPaws Canonical Onboarding Mapping v1
+
+Both governing documents are locked.
+
+This contract does not redesign the user interface.
+
+It defines the semantic contract beneath the interface.
+
+
+================================================================================
+GOVERNING PRINCIPLE
+================================================================================
+
+Onboarding collects facts and intent.
+
+Onboarding does not directly define final ontology.
+
+The participant tells PurPaws:
+
+- who they are
+- what they are doing
+- what they are connected to
+- what they are trying to create
+- what they declare about their activity
+
+PurPaws then determines:
+
+- canonical entities
+- canonical records
+- relationships
+- roles
+- classifications
+- eligibility
+- commerce conditions
+- public projection eligibility
+
+A user declaration is not automatically a final PurPaws determination.
+
+
+================================================================================
+CANONICAL INTAKE LAYERS
+================================================================================
+
+The intake contract is organized into distinct semantic layers:
+
+1. Identity
+
+2. Acting Capacity
+
+3. Intent
+
+4. Entity / Record Facts
+
+5. Relationship Facts
+
+6. Activity Declaration
+
+7. Evidence
+
+8. Email Verification
+
+9. Canonicalization
+
+10. Eligibility Verification
+
+11. Commerce Determination
+
+12. Workspace Entitlement
+
+13. Publication Entitlement
+
+14. Directory Projection
+
+
+================================================================================
+1. IDENTITY
+================================================================================
+
+Identity answers:
+
+Who is the human participant completing this onboarding?
+
+Canonical starter facts include:
+
+- display_name
+- email
+
+Later implementation may include additional identity-safe fields where
+required, but the canonical starter identity must remain minimal.
+
+Identity should not unnecessarily ask for organization details before it is
+known that an organization is involved.
+
+Identity should not infer commercial status.
+
+Identity should not infer role.
+
+Identity should not infer Directory type.
+
+
+================================================================================
+2. ACTING CAPACITY
+================================================================================
+
+Acting Capacity answers:
+
+In what capacity is this person completing this onboarding?
+
+Possible conceptual answers may include:
+
+- acting for myself
+- acting for an organization
+- acting for an informal group
+- acting for a household
+- acting for a companion
+- acting as an organizer / steward
+- other future supported capacity
+
+This is not itself a permanent identity type.
+
+Its purpose is to determine what additional canonical facts are needed.
+
+
+================================================================================
+PERSON VS ORGANIZATION BRANCHING
+================================================================================
+
+The intake contract must explicitly separate:
+
+PERSON
+        ↓
+human participant
+
+from:
+
+ORGANIZATION
+        ↓
+organization / group / institution / business / community entity
+
+A person may represent one or more organizations.
+
+An organization may have one or more people connected to it.
+
+The person must not become commercially classified merely because one
+organization they represent is commercial.
+
+The organization must not become a person role merely because one person
+created it.
+
+
+================================================================================
+3. INTENT
+================================================================================
+
+Intent answers:
+
+What is the participant trying to do right now?
+
+Intent may originate from a friendly frontend entry experience such as:
+
+- Add a Companion
+- Create a Memorial
+- Creator Profile
+- Event
+- Partner Application
+- Founder
+- future Organization / Business intake
+- future Rescue / Foster intake
+- future Trails contribution
+
+Intent is a routing fact.
+
+Intent is not automatically:
+
+- an entity type
+- a role
+- a classification
+- a commerce state
+- a Directory listing type
+
+
+================================================================================
+4. ENTITY / RECORD FACTS
+================================================================================
+
+Entity / Record Facts describe the thing the participant is creating,
+representing, or connecting to.
+
+Examples may include:
+
+For a Companion:
+
+- companion_name
+- species
+- relevant profile starter facts
+
+For an Organization:
+
+- organization_name
+- organization_type
+- location
+- website_url
+
+For an Event:
+
+- event_name
+- event_type
+- location
+- date / schedule information
+
+For a Memorial:
+
+- companion identity reference where applicable
+- memorial-specific starter facts
+
+For a Creator:
+
+- person identity
+- creator profile starter facts
+
+These facts belong to the future canonical entity or record.
+
+They should not become permanent merely because they were first collected in
+OnboardingRecord.payload_json.
+
+
+================================================================================
+5. RELATIONSHIP FACTS
+================================================================================
+
+Relationship Facts answer:
+
+How is the participant related to the entity, record, or activity?
+
+Examples may include:
+
+- caregiver
+- steward
+- owner
+- family member
+- foster
+- rescue participant
+- organization member
+- organization administrator
+- organizer
+- creator
+- founder
+- partner
+- sponsor
+- collaborator
+- author
+
+Relationship facts must remain distinct from canonical entity identity.
+
+Partner is a relationship / collaboration status.
+
+Founder is primarily a role / recognition status.
+
+Creator is primarily a participation role / status.
+
+Foster may be a person relationship rather than an organization identity.
+
+
+================================================================================
+6. ACTIVITY DECLARATION
+================================================================================
+
+Activity Declaration answers:
+
+How does the participant describe the nature of the activity they or their
+organization are performing?
+
+The canonical intake field is:
+
+declared_activity_nature
+
+This is a participant declaration.
+
+It is not automatically the final PurPaws classification.
+
+Potential declared values may include conceptual categories such as:
+
+- community_serving
+- commercial
+- mixed
+- uncertain
+
+Exact implementation vocabulary must be verified before coding.
+
+The participant should not be forced to understand legal or accounting
+terminology that is unnecessary to PurPaws classification.
+
+
+================================================================================
+FORMAL NOT-FOR-PROFIT STATUS
+================================================================================
+
+Formal not-for-profit registration may be useful evidence.
+
+It must not be treated as the only way to qualify as community-serving.
+
+PurPaws may encounter:
+
+- registered charities
+- registered not-for-profits
+- informal rescues
+- foster networks
+- volunteer animal-welfare groups
+- community initiatives
+- individuals performing community-serving activity
+
+The intake contract must preserve enough information to review these cases
+without forcing them into false legal categories.
+
+
+================================================================================
+COMMERCIAL ACTIVITY
+================================================================================
+
+Commercial activity is not participant identity.
+
+Examples may include:
+
+- groomers
+- veterinarians
+- pet stores
+- pet food manufacturers
+- commercial service businesses
+- commercial product businesses
+
+A commercial participant may still be a valid PurPaws participant.
+
+Commercial classification may determine that a package or payment condition
+must be completed before the applicable publication or participation
+entitlement is enabled.
+
+Commercial does not automatically mean Partner.
+
+Partner does not automatically mean commercial.
+
+
+================================================================================
+7. EVIDENCE
+================================================================================
+
+Evidence supports later PurPaws review.
+
+The simplest evidence may be:
+
+- website_url
+
+Additional evidence may later include:
+
+- public social profile
+- public organization page
+- registration reference
+- public event page
+- other appropriate public reference
+
+Evidence is not necessarily proof by itself.
+
+It is material PurPaws may use when reviewing classification and eligibility.
+
+
+================================================================================
+WEBSITE REVIEW PRINCIPLE
+================================================================================
+
+Where appropriate, PurPaws may review a participant or organization's public
+website instead of requiring manual telephone follow-up.
+
+A website review may help establish:
+
+- what the organization actually does
+- whether activity appears community-serving
+- whether activity appears commercial
+- whether stated rescue / foster activity is credible
+- whether additional review is required
+
+The review result must be recorded separately from the participant's original
+declaration.
+
+
+================================================================================
+8. EMAIL VERIFICATION
+================================================================================
+
+Email Verification answers:
+
+Does the participant control the submitted email address?
+
+Existing onboarding verification_status currently serves this purpose.
+
+Conceptual states include:
+
+- pending
+- verified
+
+Email verification may enable:
+
+- account completion
+- password setup
+- account access
+- dashboard / workspace access
+
+Email verification does NOT determine:
+
+- community eligibility
+- commercial classification
+- package requirement
+- organization legitimacy
+- final publication entitlement
+
+
+================================================================================
+EMAIL VERIFICATION IS NOT ELIGIBILITY VERIFICATION
+================================================================================
+
+This distinction is mandatory.
+
+verification_status
+        =
+email / account verification
+
+eligibility_status
+        =
+PurPaws participation review
+
+commerce_status
+        =
+commercial condition / completion state
+
+These fields must not be collapsed into one status.
+
+
+================================================================================
+9. CANONICALIZATION
+================================================================================
+
+Canonicalization occurs after sufficient facts are available.
+
+Canonicalization answers:
+
+What actual PurPaws entities, records, roles, and relationships do these facts
+represent?
+
+Examples:
+
+Companion intent
+        ↓
+Companion entity
+        +
+caregiver / steward relationship
+
+Creator intent
+        ↓
+Person participant
+        +
+Creator participation / role
+        +
+public profile projection
+
+Organization intake
+        ↓
+Organization entity
+        +
+OrganizationMember relationship
+
+Partner intent
+        ↓
+participant / organization
+        +
+Partner relationship where applicable
+
+Memorial intent
+        ↓
+Memorial record
+        +
+steward / author relationship
+
+Canonicalization must not be inferred solely from the frontend path name.
+
+
+================================================================================
+10. ELIGIBILITY VERIFICATION
+================================================================================
+
+Eligibility Verification answers:
+
+Under what participation conditions may this participant, organization, or
+activity proceed?
+
+Eligibility is not identity.
+
+Eligibility is not email verification.
+
+Eligibility is not payment completion.
+
+Canonical eligibility states should support at least these conceptual
+conditions:
+
+- unclassified
+- review_pending
+- verified_community
+- verified_commercial
+- review_required
+
+Exact implementation vocabulary must be independently verified before coding.
+
+
+================================================================================
+ELIGIBILITY REVIEW PRINCIPLE
+================================================================================
+
+The participant may declare their activity nature.
+
+PurPaws makes the final eligibility determination.
+
+Canonical sequence:
+
+Declared Activity Nature
+        ↓
+Evidence
+        ↓
+PurPaws Review
+        ↓
+Activity Nature
+        ↓
+Eligibility Status
+        ↓
+Commerce Status
+
+
+================================================================================
+REVIEW PENDING
+================================================================================
+
+review_pending means:
+
+PurPaws has not yet finalized the participation conditions that depend upon
+eligibility.
+
+review_pending is not rejection.
+
+review_pending is not commercial.
+
+review_pending is not community approval.
+
+review_pending is not email verification failure.
+
+
+================================================================================
+ELIGIBILITY SCOPE PRINCIPLE
+================================================================================
+
+Eligibility must apply to the specific participant, entity, relationship, or
+activity whose participation terms are being reviewed.
+
+Eligibility review must not unnecessarily freeze the person's entire PurPaws
+account.
+
+For example:
+
+A person may have:
+
+- an active User account
+- a Companion
+- Trails participation
+- other ordinary community activity
+
+while an Organization they represent remains:
+
+- eligibility_status = review_pending
+
+The Organization's publication or commercial entitlement may remain pending
+without disabling unrelated participant activity.
+
+
+================================================================================
+11. COMMERCE DETERMINATION
+================================================================================
+
+Commerce Determination answers:
+
+What commercial condition, if any, applies after eligibility has been
+determined?
+
+Commerce status is not identity.
+
+Commerce status is not Partner status.
+
+Commerce status is not email verification.
+
+Conceptual commerce states should support conditions such as:
+
+- unclassified
+- not_required
+- required
+- pending
+- complete
+
+Exact implementation vocabulary must be independently verified before coding.
+
+
+================================================================================
+COMMERCIAL ROUTING PRINCIPLE
+================================================================================
+
+A participant should not first be admitted under an apparent free entitlement
+and then later be unexpectedly asked to pay.
+
+Where participation terms depend upon eligibility, those terms should remain
+pending until eligibility has been resolved.
+
+Canonical sequence:
+
+Account Created
+        ↓
+Workspace Available
+        ↓
+Eligibility Review
+        ↓
+
+COMMUNITY-SERVING
+        ↓
+commerce_status = not_required
+        ↓
+applicable entitlement enabled
+
+COMMERCIAL
+        ↓
+commerce_status = required / pending
+        ↓
+package / commerce experience
+        ↓
+commerce_status = complete
+        ↓
+applicable entitlement enabled
+
+
+================================================================================
+NO RETROACTIVE PAYMENT SURPRISE PRINCIPLE
+================================================================================
+
+PurPaws should avoid the sequence:
+
+participant appears fully approved
+        ↓
+participant publishes / receives applicable entitlement
+        ↓
+PurPaws later decides activity is commercial
+        ↓
+PurPaws asks participant to pay retroactively
+
+Instead:
+
+eligibility unresolved
+        ↓
+applicable entitlement remains pending
+        ↓
+classification completed
+        ↓
+correct participation terms are presented before entitlement is granted
+
+
+================================================================================
+12. WORKSPACE ENTITLEMENT
+================================================================================
+
+Account creation and workspace access may occur before eligibility review is
+complete.
+
+This allows participants to:
+
+- complete their profile
+- prepare content
+- upload permitted draft materials
+- continue onboarding
+- save work
+- review their information
+
+Workspace access does not automatically equal publication entitlement.
+
+Workspace access does not automatically equal commercial approval.
+
+Workspace access does not automatically equal community eligibility.
+
+
+================================================================================
+13. PUBLICATION ENTITLEMENT
+================================================================================
+
+Publication is a separate entitlement.
+
+Publication should eventually require the relevant conditions for the
+specific canonical record being published.
+
+Depending on record type, conditions may include:
+
+- email verified
+- canonical record exists
+- required profile facts complete
+- applicable eligibility resolved
+- applicable commerce condition satisfied
+- publication status approved / enabled
+
+Not every PurPaws record must necessarily require organization eligibility.
+
+For example, personal Companion or Trails activity may follow different
+publication rules from a commercial Organization profile.
+
+Publication rules must therefore be scoped to the applicable canonical record.
+
+
+================================================================================
+14. DIRECTORY PROJECTION
+================================================================================
+
+Directory is downstream from canonical publication.
+
+Target sequence:
+
+Participant / Entity / Record
+        ↓
+Relationships
+        ↓
+Classification
+        ↓
+Eligibility where applicable
+        ↓
+Commerce where applicable
+        ↓
+Publication
+        ↓
+Public Projection
+        ↓
+Directory Aggregation
+
+Directory must not become the authority for deciding what the participant is.
+
+
+================================================================================
+CURRENT IMPLEMENTATION FACTS
+================================================================================
+
+The current onboarding implementation already provides:
+
+- display_name
+- email
+- path / entry experience
+- payload_json transitional storage
+- email verification
+- account creation
+- Affiliate ID / referral information
+- workspace draft state
+
+The current implemented Directory intake provides:
+
+- listing_name
+- category
+- location
+
+The current frontend path payload architecture can collect additional
+path-specific facts.
+
+The existing organization model already contains:
+
+- organization_name
+- organization_type
+- contact_name
+- contact_email
+- website_url
+- location
+
+and classification fields:
+
+- declared_activity_nature
+- activity_nature
+- eligibility_status
+- eligibility_basis
+- eligibility_review_source
+- eligibility_review_reference
+- eligibility_review_notes
+- eligibility_reviewed_at
+- commerce_status
+
+Those classification fields are presently structural and are not yet wired
+into onboarding behavior.
+
+
+================================================================================
+CURRENT IMPLEMENTATION GAP
+================================================================================
+
+The current onboarding flow does not yet explicitly collect:
+
+- acting capacity
+- canonical participant nature
+- organization branching
+- declared_activity_nature
+- eligibility evidence
+- organization eligibility state
+- commerce state
+
+The current publish behavior also predates the canonical distinction between:
+
+- email verification
+- eligibility verification
+- commerce completion
+
+These gaps are implementation targets, not reasons to change the locked
+ontology.
+
+
+================================================================================
+CANONICAL INTAKE FACT GROUPS
+================================================================================
+
+The first implementation of the canonical intake contract should therefore
+work toward reusable fact groups rather than path-specific duplication.
+
+Potential reusable fact groups include:
+
+IDENTITY
+- display_name
+- email
+
+CAPACITY
+- acting_capacity
+
+ORGANIZATION
+- organization_name
+- organization_type
+- website_url
+- location
+
+ACTIVITY DECLARATION
+- declared_activity_nature
+
+EVIDENCE
+- website_url
+- future evidence references
+
+INTENT
+- onboarding path / requested experience
+
+RELATIONSHIP
+- relationship intent where applicable
+
+These are semantic groups.
+
+This document does not authorize exact frontend field names beyond those
+already established in the existing model.
+
+
+================================================================================
+SHARED INTAKE VS PATH-SPECIFIC INTAKE
+================================================================================
+
+The future onboarding system should distinguish:
+
+SHARED INTAKE
+
+Facts useful across many paths.
+
+Examples:
+
+- identity
+- acting capacity
+- organization involvement
+- declared activity nature where relevant
+- website / evidence where relevant
+
+
+PATH-SPECIFIC INTAKE
+
+Facts needed only for the selected experience.
+
+Examples:
+
+Companion
+- companion-specific facts
+
+Memorial
+- memorial-specific facts
+
+Creator
+- creator profile facts
+
+Event
+- event facts
+
+Founder
+- founder-specific facts
+
+Partner
+- collaboration intent / relationship facts
+
+
+================================================================================
+MODULARITY PRINCIPLE
+================================================================================
+
+Canonical intake must remain modular.
+
+Shared intake concepts should not be hard-coded independently into every path.
+
+Where practical, reusable modules should handle:
+
+- identity
+- organization
+- classification declaration
+- evidence
+- eligibility status display
+- commerce status display
+
+Path-specific modules should handle only their own unique facts.
+
+This supports:
+
+- white-label architecture
+- consistent validation
+- consistent classification
+- reduced duplication
+- easier future path creation
+
+
+================================================================================
+WHITE-LABEL PRINCIPLE
+================================================================================
+
+The intake contract must not depend conceptually on PurPaws-specific frontend
+page names.
+
+The canonical layers should remain reusable for future branded deployments:
+
+Identity
+Capacity
+Intent
+Entity Facts
+Relationships
+Activity Declaration
+Evidence
+Verification
+Canonicalization
+Eligibility
+Commerce
+Workspace
+Publication
+Projection
+
+Brand-specific copy and path labels may sit above this canonical contract.
+
+
+================================================================================
+IMPLEMENTATION ORDER — PROPOSED
+================================================================================
+
+This document does not authorize implementation yet.
+
+After verification and lock, the recommended implementation sequence is:
+
+1. Define exact canonical intake vocabulary.
+
+2. Define acting_capacity values.
+
+3. Define participant / organization branching.
+
+4. Define declared_activity_nature values.
+
+5. Define eligibility_status vocabulary.
+
+6. Define commerce_status vocabulary.
+
+7. Decide where transitional intake facts live before canonicalization.
+
+8. Define eligibility review workflow.
+
+9. Define entitlement gates.
+
+10. Define shared reusable onboarding modules.
+
+11. Introduce the contract into onboarding one controlled step at a time.
+
+12. Verify legacy Directory flow remains operational during migration.
+
+13. Canonicalize publication sources only after replacement flows exist.
+
+14. Retire legacy Directory-as-identity behavior after verification.
+
+
+================================================================================
+IMPLEMENTATION BOUNDARIES
+================================================================================
+
+This contract does NOT authorize immediate changes to:
+
+- backend models
+- database schema
+- OnboardingRecord
+- PartnerOrganization
+- User
+- OrganizationMember
+- PublicProfile
+- RescueProfile
+- FounderProfile
+- onboarding API contracts
+- verification endpoints
+- publication endpoints
+- onboarding cards
+- onboarding modules
+- dashboards
+- workspaces
+- Directory response shape
+- package definitions
+- payment logic
+
+Each implementation change requires its own:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+
+================================================================================
+STATUS
+================================================================================
+
+PURPAWS CANONICAL INTAKE CONTRACT v1 — LOCKED
+
+This contract has been:
+
+- defined
+- inspected against the existing onboarding implementation
+- verified against the locked Canonical Network Ontology v1
+- verified against the locked Canonical Onboarding Mapping v1
+- verified against the existing organization classification fields
+- reviewed for person / organization separation
+- reviewed for activity declaration
+- reviewed for community-serving and commercial participation
+- reviewed for Rescue / Foster flexibility
+- reviewed for evidence and website-based verification
+- reviewed for email / eligibility / commerce separation
+- reviewed for entitlement scoping
+- reviewed for modularity and white-label use
+- independently verified
+
+No remaining intake-contract blockers were identified.
+
+This document now governs subsequent canonical intake implementation.
+
+Locked principles include:
+
+- Onboarding collects facts and intent.
+- A participant declaration is not automatically a final PurPaws determination.
+- Person and Organization are distinct canonical concepts.
+- A person may represent one or more Organizations.
+- Commercial classification of an Organization does not automatically classify
+  the Person as commercial.
+- Acting capacity is an intake fact, not a permanent identity type.
+- Intent is a routing fact.
+- Path names do not automatically define canonical entities, roles, or
+  classifications.
+- declared_activity_nature preserves the participant declaration.
+- activity_nature represents the reviewed PurPaws classification.
+- Formal not-for-profit status is not the only basis for community-serving
+  eligibility.
+- Commercial activity is not participant identity.
+- Commercial does not automatically mean Partner.
+- Partner does not automatically mean commercial.
+- Public evidence such as a website may support eligibility review.
+- Email verification, eligibility verification, and commerce status are
+  distinct state systems.
+- verification_status remains conceptually associated with email / account
+  verification.
+- eligibility_status represents PurPaws participation review.
+- commerce_status represents commercial conditions / completion.
+- review_pending is not rejection.
+- Eligibility applies to the relevant participant, entity, relationship, or
+  activity and must not unnecessarily freeze the entire User account.
+- Account creation and workspace access may occur before eligibility review is
+  complete.
+- Workspace entitlement does not equal publication entitlement.
+- Publication entitlement must be scoped to the canonical record being
+  published.
+- Participation terms that depend upon eligibility remain pending until
+  eligibility is resolved.
+- PurPaws should not create retroactive payment surprises.
+- Directory remains downstream from canonical publication.
+- Shared intake concepts must remain modular.
+- Path-specific intake modules should contain only path-specific facts.
+- Canonical intake must remain white-label capable.
+
+The eligibility and commerce state labels documented in this contract remain
+conceptual vocabulary until independently verified for implementation.
+
+Future changes to these governing intake principles require a new version of
+the Canonical Intake Contract rather than silent mutation of v1.
+
+LOCKED.

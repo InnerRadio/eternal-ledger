@@ -1,0 +1,192 @@
+CANONICALIZATION PROVENANCE SCHEMA v1 — LOCKED
+
+STATUS
+
+VERIFIED IMPLEMENTATION.
+
+The canonicalization_provenance schema is now locked for v1.
+
+
+================================================================================
+IMPLEMENTED TABLE
+================================================================================
+
+canonicalization_provenance
+
+
+================================================================================
+FIELDS
+================================================================================
+
+id
+source_type
+source_id
+target_type
+target_id
+created_at
+updated_at
+
+
+================================================================================
+IDEMPOTENCY INVARIANT
+================================================================================
+
+The database enforces uniqueness on:
+
+(source_type, source_id, target_type)
+
+target_id is deliberately excluded from the uniqueness key.
+
+This preserves:
+
+one source
++
+one target type
+=
+at most one canonical target
+
+
+================================================================================
+POLYMORPHIC BOUNDARY
+================================================================================
+
+No fixed database foreign keys are defined for:
+
+source_id
+
+or:
+
+target_id
+
+because:
+
+source_type
+
+and:
+
+target_type
+
+are generic polymorphic domains.
+
+The canonicalizer must verify source and target existence according to type.
+
+
+================================================================================
+MODEL / DATABASE PARITY
+================================================================================
+
+backend/app/models.py contains:
+
+CanonicalizationProvenance
+
+with:
+
+source_type
+source_id
+target_type
+target_id
+created_at
+updated_at
+
+The live SQLite database contains the corresponding table and columns.
+
+
+================================================================================
+PRE-CHANGE SAFETY
+================================================================================
+
+Backups created before implementation confirm:
+
+- the model did not previously contain CanonicalizationProvenance
+- the database did not previously contain canonicalization_provenance
+
+The provenance schema was introduced deliberately in this implementation cycle.
+
+
+================================================================================
+LEGACY SAFETY
+================================================================================
+
+Existing application tables remain present.
+
+Existing onboarding data remains unchanged.
+
+Existing PartnerOrganization data remains unchanged.
+
+Existing OrganizationMember data remains unchanged.
+
+No provenance rows were created during schema implementation.
+
+No canonicalization was executed during schema implementation.
+
+No Directory behavior changed.
+
+
+================================================================================
+FIRST EXECUTABLE TARGET
+================================================================================
+
+The locked next canonicalization target remains:
+
+source_type = onboarding_record
+source_id   = 12
+target_type = organization
+target_id   = X
+
+Expected idempotency:
+
+first execution
+    ->
+Organization X
++
+provenance row
+
+second execution
+    ->
+same Organization X
+
+The second execution must not create:
+
+Organization Y
+
+and must not create:
+
+a duplicate provenance row.
+
+
+================================================================================
+IMPLEMENTATION BOUNDARY
+================================================================================
+
+This schema lock does NOT itself authorize:
+
+- arbitrary historical migration
+- fuzzy entity resolution
+- organization merging
+- OrganizationMember inference
+- publication changes
+- Directory feed replacement
+- frontend changes
+- payment behavior changes
+
+Canonicalization execution must continue under the locked:
+
+- Canonicalization Seam v1
+- Canonicalization Execution Contract v1
+- Canonicalization Provenance Implementation v1
+
+
+================================================================================
+NEXT
+================================================================================
+
+Implement the first controlled canonicalizer for:
+
+onboarding_record:12
+    ->
+organization:X
+
+Then execute it twice and verify same-target idempotency.
+
+
+LOCKED.

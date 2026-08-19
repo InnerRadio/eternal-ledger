@@ -1,0 +1,106 @@
+commerce_requirement IMPLEMENTATION v1 — LOCKED
+
+LOCKED AT
+2026-08-15 01:50:22
+
+STATUS
+
+VERIFIED EXISTING IMPLEMENTATION.
+
+No schema mutation was required during this lock cycle.
+
+No model mutation was required during this lock cycle.
+
+
+IMPLEMENTATION VERIFIED
+
+PartnerOrganization model contains:
+
+commerce_requirement = Column(String, default="unclassified")
+
+commerce_status = Column(String, default="unclassified")
+
+
+Live SQLite table:
+
+partner_organizations
+
+contains:
+
+commerce_requirement VARCHAR DEFAULT 'unclassified'
+
+and:
+
+commerce_status
+
+
+CANONICAL PARITY
+
+The implementation preserves the locked distinction:
+
+commerce_requirement
+    =
+whether a commercial condition applies
+
+commerce_status
+    =
+the fulfillment state of that condition
+
+
+FORENSIC FINDING
+
+The backup created before the attempted commerce_requirement implementation
+already contained commerce_requirement in both:
+
+- backend/app/models.py
+- eternal_ledger.db
+
+Therefore commerce_requirement existed before that attempted implementation
+cycle began.
+
+The attempted implementation halted before performing any model or database
+mutation because its expected pre-change model block was not present.
+
+No duplicate field was added.
+
+
+EXISTING DATA
+
+Existing PartnerOrganization rows can read commerce_requirement.
+
+Current existing values remain preserved.
+
+No historical classification or commerce determination was inferred or
+rewritten.
+
+
+IMPLEMENTATION BOUNDARY
+
+This lock covers only durable representation of:
+
+commerce_requirement
+
+alongside:
+
+commerce_status
+
+It does not implement:
+
+- canonical provenance
+- canonicalization execution
+- entity resolution
+- OrganizationMember relationship inference
+- publication projection
+- Directory feed changes
+- eligibility review
+- commerce determination
+- commerce fulfillment
+- payment behavior
+
+
+NEXT
+
+Implement canonicalization provenance under the locked
+Canonicalization Execution Contract v1.
+
+LOCKED.

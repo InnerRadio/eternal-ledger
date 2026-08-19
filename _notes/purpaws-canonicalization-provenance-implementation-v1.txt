@@ -1,0 +1,747 @@
+PURPAWS CANONICALIZATION PROVENANCE IMPLEMENTATION v1
+
+STATUS
+
+Defined for verification.
+Not yet locked.
+
+
+====================================================================================================
+PURPOSE
+====================================================================================================
+
+This document defines the first durable canonicalization provenance mechanism.
+
+It is governed by:
+
+- PurPaws Canonicalization Seam v1
+- PurPaws Canonicalization Execution Contract v1
+
+Both are locked.
+
+This document designs implementation.
+
+It does not yet authorize schema mutation.
+
+
+====================================================================================================
+CORE PURPOSE
+====================================================================================================
+
+Canonicalization provenance answers:
+
+Which canonical target was produced or resolved from this source?
+
+Example:
+
+source_type = onboarding_record
+source_id   = 12
+target_type = organization
+target_id   = X
+
+This correspondence must survive:
+
+- process restart
+- application restart
+- repeated canonicalization
+- frontend changes
+- Directory changes
+- future migration work
+
+
+====================================================================================================
+PROVENANCE IS NOT AUDIT
+====================================================================================================
+
+Audit records describe events.
+
+Canonicalization provenance describes durable correspondence.
+
+Therefore:
+
+audit_logs
+
+must not be used as the authoritative canonicalization identity map.
+
+Audit logging may later record that provenance was created or reused.
+
+The provenance record itself remains authoritative.
+
+
+====================================================================================================
+GENERIC PROVENANCE
+====================================================================================================
+
+The provenance mechanism must be generic.
+
+It must not be organization-specific.
+
+A source may eventually canonicalize into different canonical target types.
+
+Conceptually:
+
+onboarding_record:N
+    |
+    +-- organization:X
+    +-- companion:Y
+    +-- memorial:Z
+    +-- event:Q
+
+Not every source produces every target type.
+
+The structure must nevertheless permit multiple target types without schema redesign.
+
+
+====================================================================================================
+CARDINALITY
+====================================================================================================
+
+One source may correspond to multiple target types.
+
+Therefore this is NOT globally unique:
+
+(source_type, source_id)
+
+For Canonicalization Provenance v1:
+
+one source + one target type
+must resolve to at most one canonical target.
+
+Therefore the v1 idempotency key is:
+
+(source_type, source_id, target_type)
+
+The target_id is the resolved value.
+
+It is deliberately NOT part of the uniqueness key.
+
+
+====================================================================================================
+WHY target_id IS NOT IN THE UNIQUE KEY
+====================================================================================================
+
+The following must not be simultaneously valid:
+
+onboarding_record:12
+    -> organization:5
+
+onboarding_record:12
+    -> organization:9
+
+If target_id were included in the unique key, both rows could coexist.
+
+That would defeat same-source same-target-type idempotency.
+
+Therefore:
+
+UNIQUE(
+    source_type,
+    source_id,
+    target_type
+)
+
+is the required v1 invariant.
+
+
+====================================================================================================
+TABLE
+====================================================================================================
+
+Canonical table name:
+
+canonicalization_provenance
+
+
+====================================================================================================
+FIELDS
+====================================================================================================
+
+The v1 table requires:
+
+id
+source_type
+source_id
+target_type
+target_id
+created_at
+updated_at
+
+
+====================================================================================================
+FIELD SEMANTICS
+====================================================================================================
+
+id
+
+Internal provenance record identifier.
+
+
+source_type
+
+Names the source domain.
+
+First executable value:
+
+onboarding_record
+
+
+source_id
+
+Identifies the durable source record.
+
+For source_type = onboarding_record:
+
+source_id = OnboardingRecord.id
+
+
+target_type
+
+Names the canonical target domain.
+
+First executable value:
+
+organization
+
+
+target_id
+
+Identifies the resolved canonical target.
+
+For target_type = organization:
+
+target_id = PartnerOrganization.id
+
+
+created_at
+
+Records creation of the durable correspondence.
+
+
+updated_at
+
+Allows future deliberate correction or resolution workflows without requiring
+the v1 schema to invent those workflows now.
+
+
+====================================================================================================
+V1 UNIQUENESS INVARIANT
+====================================================================================================
+
+The database must enforce:
+
+UNIQUE(
+    source_type,
+    source_id,
+    target_type
+)
+
+Application logic alone is insufficient.
+
+The invariant must exist durably in the database.
+
+
+====================================================================================================
+TARGET EXISTENCE
+====================================================================================================
+
+Canonicalization must never report success when the provenance target does not
+exist.
+
+For the first executable slice:
+
+target_type = organization
+
+requires:
+
+PartnerOrganization.id = target_id
+
+to exist.
+
+
+====================================================================================================
+GENERIC FOREIGN KEY LIMITATION
+====================================================================================================
+
+Because target_type may refer to multiple canonical tables, target_id cannot be
+represented as one ordinary relational foreign key to a single target table.
+
+Therefore v1 does not define a database foreign key from:
+
+target_id
+
+to:
+
+partner_organizations.id
+
+The canonicalizer must verify target existence according to target_type before
+committing provenance.
+
+This is deliberate generic polymorphic provenance.
+
+
+====================================================================================================
+SOURCE FOREIGN KEY LIMITATION
+====================================================================================================
+
+For the same reason, source_type is generic.
+
+Although the first source type is:
+
+onboarding_record
+
+the provenance table is not permanently restricted to onboarding_records.
+
+Therefore v1 does not define source_id as a database foreign key solely to:
+
+onboarding_records.id
+
+The canonicalizer must verify source existence according to source_type.
+
+
+====================================================================================================
+TRANSACTION PRINCIPLE
+====================================================================================================
+
+For newly created canonical targets:
+
+target creation
++
+provenance creation
+
+must form one logical successful operation.
+
+Canonicalization must not report success if provenance creation fails.
+
+If the target is newly created and provenance cannot be durably recorded, the
+operation must fail safely rather than leave misleading canonical structure.
+
+
+====================================================================================================
+LOOKUP ORDER
+====================================================================================================
+
+Canonicalization must first query provenance using:
+
+source_type
+source_id
+target_type
+
+If a provenance row exists:
+
+1. verify its target still exists
+2. reuse that target
+3. do not create another target
+
+If no provenance row exists:
+
+1. evaluate source evidence
+2. resolve or create the target according to the execution contract
+3. record provenance
+4. commit the logical operation
+
+
+====================================================================================================
+ENTITY RESOLUTION REMAINS DISTINCT
+====================================================================================================
+
+Provenance lookup answers:
+
+Has THIS SOURCE already been canonicalized to this target type?
+
+Entity resolution answers:
+
+Does ANOTHER SOURCE refer to an already-existing real-world entity?
+
+Those are different problems.
+
+Canonicalization Provenance v1 does not authorize:
+
+- name matching
+- fuzzy matching
+- website matching
+- email matching
+- automatic organization merging
+
+Those require separate entity-resolution design.
+
+
+====================================================================================================
+NO INVENTED RELATIONSHIP
+====================================================================================================
+
+Creating or resolving:
+
+onboarding_record:12
+    -> organization:X
+
+does not imply:
+
+- owner
+- employee
+- volunteer
+- administrator
+- partner
+- steward
+- representative
+
+No OrganizationMember row may be invented merely because the onboarding record
+contains a user_id.
+
+Relationship canonicalization remains separate.
+
+
+====================================================================================================
+NO STATUS FIELD IN v1
+====================================================================================================
+
+Canonicalization Provenance v1 does not introduce:
+
+status
+active
+superseded
+conflict
+rejected
+
+Those concepts may become useful later.
+
+They are intentionally excluded from the first executable provenance slice.
+
+The v1 invariant is simpler:
+
+one source + one target type
+=
+one durable canonical target.
+
+
+====================================================================================================
+CORRECTION / CONFLICT BOUNDARY
+====================================================================================================
+
+The presence of updated_at does not authorize silent target reassignment.
+
+Changing target_id for an existing provenance key is a semantic correction.
+
+A future correction / conflict contract must define when such reassignment is
+allowed and what evidence must be preserved.
+
+Until then:
+
+existing provenance is reused,
+not silently redirected.
+
+
+====================================================================================================
+FIRST EXECUTABLE SLICE
+====================================================================================================
+
+Source:
+
+source_type = onboarding_record
+source_id   = 12
+
+Target:
+
+target_type = organization
+target_id   = X
+
+
+Expected first execution:
+
+1. lookup provenance for:
+   onboarding_record / 12 / organization
+
+2. if absent:
+   canonicalize Organization X from supported evidence
+
+3. create provenance:
+   onboarding_record / 12 / organization / X
+
+4. commit successfully
+
+
+Expected second execution:
+
+1. lookup provenance for:
+   onboarding_record / 12 / organization
+
+2. find X
+
+3. verify X exists
+
+4. reuse X
+
+5. create no Organization Y
+
+6. create no duplicate provenance row
+
+
+====================================================================================================
+FIRST IMPLEMENTATION SUCCESS TEST
+====================================================================================================
+
+After implementation:
+
+- canonicalization_provenance table exists
+- required fields exist
+- database uniqueness exists on:
+  source_type + source_id + target_type
+- source #12 can produce Organization X
+- provenance row points to X
+- second execution returns X
+- no Organization Y is created
+- no duplicate provenance row is created
+- no OrganizationMember relationship is invented
+- legacy Directory behavior remains unchanged
+
+
+====================================================================================================
+SCHEMA IMPLEMENTATION DISCIPLINE
+====================================================================================================
+
+The repository currently has no migration framework sufficient to add this
+table through ordinary create_all behavior alone as a controlled historical
+migration mechanism.
+
+Implementation therefore requires its own explicit:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+Before schema mutation:
+
+- models.py must be backed up
+- eternal_ledger.db must be backed up
+- existing absence of canonicalization_provenance must be verified
+- model insertion location must be observed exactly
+- required SQLAlchemy imports must be observed exactly
+
+After schema mutation:
+
+- model definition must be verified
+- SQLite table must be verified
+- uniqueness must be verified
+- existing application tables must remain intact
+- no canonicalization execution should occur until schema verification passes
+
+
+====================================================================================================
+IMPLEMENTATION BOUNDARY
+====================================================================================================
+
+This design does NOT yet authorize:
+
+- models.py changes
+- database schema changes
+- table creation
+- canonicalizer implementation
+- API changes
+- onboarding changes
+- frontend changes
+- Directory changes
+- publication changes
+- eligibility changes
+- commerce determination
+- commerce fulfillment
+- payment changes
+- historical migration
+- OrganizationMember creation
+
+
+====================================================================================================
+WHITE-LABEL PRINCIPLE
+====================================================================================================
+
+Canonical provenance is backend domain infrastructure.
+
+It must remain independent of PurPaws-specific frontend wording, navigation,
+branding, visual design, and entry-card labels.
+
+A future white-label frontend may use the same canonical provenance mechanism.
+
+
+====================================================================================================
+STATUS
+====================================================================================================
+
+PURPAWS CANONICALIZATION PROVENANCE IMPLEMENTATION v1 — LOCKED
+
+Canonicalization Provenance Implementation v1 has been VERIFIED and LOCKED.
+
+This design now governs provenance schema implementation.
+
+
+LOCKED PROVENANCE PRINCIPLES
+
+1. Provenance is generic backend infrastructure.
+
+2. Provenance is not organization-specific.
+
+3. One source may produce multiple canonical target types.
+
+4. One source + one target type may resolve to at most one canonical target.
+
+5. The v1 idempotency key is:
+
+   (source_type, source_id, target_type)
+
+6. target_id is deliberately excluded from the uniqueness key.
+
+7. The canonical table name is:
+
+   canonicalization_provenance
+
+8. Required fields are:
+
+   id
+   source_type
+   source_id
+   target_type
+   target_id
+   created_at
+   updated_at
+
+9. The database must enforce uniqueness for:
+
+   source_type
+   source_id
+   target_type
+
+10. Application logic alone is not sufficient for the idempotency invariant.
+
+11. source_type and target_type are generic polymorphic domains.
+
+12. v1 does not use a single relational foreign key for source_id or target_id.
+
+13. The canonicalizer must verify source and target existence according to type.
+
+14. Canonical target creation and provenance creation form one logical operation.
+
+15. Canonicalization must first query provenance before creating a target.
+
+16. Existing valid provenance must cause reuse of the existing target.
+
+17. Provenance lookup is distinct from cross-source entity resolution.
+
+18. Provenance v1 does not authorize:
+    - name matching
+    - fuzzy matching
+    - website matching
+    - automatic organization merging
+
+19. Provenance does not imply:
+    - owner
+    - employee
+    - volunteer
+    - administrator
+    - partner
+    - steward
+    - representative
+
+20. No OrganizationMember row may be invented merely because provenance exists.
+
+21. v1 introduces no provenance status field.
+
+22. Existing provenance must not be silently redirected to another target.
+
+23. Changing target_id is a semantic correction and requires future governing
+    rules.
+
+24. Audit logging is distinct from authoritative provenance.
+
+
+FIRST EXECUTABLE PROVENANCE TARGET
+
+source_type = onboarding_record
+source_id   = 12
+target_type = organization
+target_id   = X
+
+Expected behavior:
+
+First execution:
+
+onboarding_record:12
+    ↓
+Organization X
+    ↓
+canonicalization provenance established
+
+Second execution:
+
+onboarding_record:12
+    ↓
+existing provenance found
+    ↓
+Organization X reused
+
+The second execution must not create Organization Y.
+
+The second execution must not create duplicate provenance.
+
+
+SCHEMA IMPLEMENTATION SUCCESS CONDITIONS
+
+Before Canonicalization Provenance schema implementation is locked:
+
+- canonicalization_provenance table must exist
+- all required fields must exist
+- database uniqueness must exist on:
+  source_type + source_id + target_type
+- model and SQLite schema must agree
+- existing application tables must remain intact
+- no canonicalizer execution may be treated as successful until provenance
+  schema verification passes
+
+
+IMPLEMENTATION BOUNDARY
+
+This lock governs provenance schema implementation.
+
+It does not itself perform:
+
+- models.py changes
+- database schema changes
+- table creation
+- canonicalizer execution
+- API changes
+- onboarding changes
+- frontend changes
+- Directory changes
+- publication changes
+- OrganizationMember creation
+- historical migration
+
+Each implementation step continues to require:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+
+FUTURE VERSION RULE
+
+Future changes to these governing provenance principles require a new version
+rather than silent mutation of v1.
+
+PURPAWS CANONICALIZATION PROVENANCE IMPLEMENTATION v1 — LOCKED.

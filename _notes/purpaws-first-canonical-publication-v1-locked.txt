@@ -1,0 +1,56 @@
+PURPAWS FIRST CANONICAL PUBLICATION v1 — LOCKED
+
+CANONICAL TARGET
+
+organization:2
+
+
+PUBLICATION AUTHORITY
+
+canonical_publication:1
+
+
+PUBLICATION STATUS
+
+published
+
+
+IDEMPOTENCY
+
+First execution:
+canonical_publication:1
+
+Second execution:
+canonical_publication:1
+
+Same publication authority:
+PASS
+
+
+CANONICAL CHAIN
+
+onboarding_record:12
+        ↓
+organization:2
+        ↓
+canonicalization_provenance:1
+        ↓
+canonical_publication:1
+        ↓
+published
+
+
+SAFETY
+
+NO NEW ORGANIZATION
+NO NEW PROVENANCE
+NO NEW ORGANIZATIONMEMBER
+NO ELIGIBILITY CHANGE
+NO COMMERCE CHANGE
+NO API CHANGE
+NO FRONTEND CHANGE
+NO DIRECTORY CHANGE
+NO LEGACY RETIREMENT
+
+
+LOCKED.

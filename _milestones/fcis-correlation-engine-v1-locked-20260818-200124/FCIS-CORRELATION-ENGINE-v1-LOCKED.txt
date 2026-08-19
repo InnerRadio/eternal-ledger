@@ -1,0 +1,86 @@
+FCIS — CORRELATION ENGINE v1
+LOCKED
+
+PURPOSE
+
+Generate private FCIS hypotheses from established canonical context.
+
+MODULE
+
+backend/app/fcis/correlation.py
+
+V1 RULE
+
+active NEED.context_key
+==
+active OFFER.context_key
+
+GUARDRAILS
+
+- same-subject matches rejected
+- canonical context not modified
+- canonical relationships not created
+- no match score
+- no recommendation
+- no external action authorization
+- human review required
+
+VERIFIED CORRELATIONS
+
+1.
+
+Alpha
+NEED: event_photography
+
+Beta
+OFFER: event_photography
+
+Existing canonical relationship:
+active partner / community_partnership
+
+2.
+
+Beta
+NEED: promotional_support
+
+Gamma
+OFFER: promotional_support
+
+Existing canonical relationship:
+pending partner / strategic_partnership
+
+RESULT
+
+Private correlations generated: 2
+
+Canonical facts created: 0
+Relationships created: 0
+Actions authorized: 0
+
+DATABASE
+
+Unchanged.
+
+PUBLIC EXPOSURE
+
+NONE.
+
+ARCHITECTURAL PRINCIPLE
+
+Context Reader reports truth.
+
+Correlation Engine proposes hypotheses.
+
+Private Briefing decides what deserves attention.
+
+Humans authorize action.
+
+NEXT HILL
+
+FCIS Private Briefing v2.
+
+Connect verified correlation output to the private briefing.
+
+Expected first user-facing internal intelligence:
+
+"FCIS found 2 things worth looking at."

@@ -1,0 +1,56 @@
+PUBLIC DIRECTORY WAVE 5B ACTIONS LOCKED
+
+Implemented:
+- Public directory actions helper
+- Directory records now expose actions metadata
+- Founder listings expose frontend action flags
+- Creator listings expose frontend action flags
+- Rescue listings expose frontend action flags
+- Partner / Organization listings expose frontend action flags
+
+Verified:
+- eternal-ledger-api.service restarts successfully
+- /public/directory returns actions metadata
+- /public/directory?listing_type=founder returns founder actions
+- /public/directory?listing_type=partner returns partner actions
+
+Endpoint:
+- /public/directory
+
+Actions:
+- view_profile
+- contact
+- follow
+- support
+- affiliate
+- apply
+- donate
+- volunteer
+
+Purpose:
+- Public directory cards can render buttons directly from API metadata
+- Frontend does not need role-specific hardcoded button logic
+- Supports Founder Wall, Creator Directory, Rescue Directory, Partner Directory, Organization Directory, and future white-label communities
+
+Founder Actions:
+- view_profile
+- contact
+- follow
+- support
+
+Partner Actions:
+- view_profile
+- contact
+- support
+- affiliate
+
+Privacy:
+- Public actions do not expose private contact details
+- Contact action routes through relay metadata
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

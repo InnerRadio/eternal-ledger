@@ -1,0 +1,64 @@
+FCIS PRIVATE INTELLIGENCE v1 — LOCKED
+
+Locked at:
+20260817-124137
+
+PURPOSE
+
+Provide the first internal FCIS graph-reading and private briefing
+capability without modifying canonical truth or exposing intelligence
+through the public API.
+
+LOCKED INTERNAL MODULES
+
+backend/app/fcis/__init__.py
+backend/app/fcis/relationship_reader.py
+backend/app/fcis/briefing.py
+
+VERIFIED GRAPH
+
+Canonical relationships: 3
+Active relationships: 2
+Pending relationships: 1
+
+Alpha neighborhood:
+- 2 relationships
+- 2 neighbors
+
+Opportunity candidates surfaced: 1
+
+PRIVATE INTELLIGENCE PRINCIPLE
+
+FCIS discovers opportunity.
+Humans authorize action.
+
+BOUNDARY
+
+Relationship Reader:
+- reads established canonical relationship truth
+- resolves canonical organization endpoints
+- constructs node neighborhoods
+- does not create canonical relationships
+
+Private Briefing:
+- summarizes established graph truth
+- identifies patterns for human review
+- does not assert opportunity as canonical fact
+- does not authorize action
+
+PUBLIC EXPOSURE
+
+No FCIS briefing endpoint.
+No FCIS opportunity endpoint.
+No Relationship Reader import in public_api.py.
+
+DATABASE
+
+No schema modification was required for Private Intelligence v1.
+No data modification was required for Private Intelligence v1.
+
+NEXT HILL
+
+FCIS Private Intelligence v2:
+inspect existing durable context authorities for Needs, Offers,
+Campaigns, Notes and Follow-ups before adding contextual intelligence.

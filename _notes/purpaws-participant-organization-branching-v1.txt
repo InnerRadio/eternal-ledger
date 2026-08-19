@@ -1,0 +1,818 @@
+PURPAWS PARTICIPANT / ORGANIZATION BRANCHING v1
+
+STATUS
+Defined for verification.
+Not yet locked.
+
+
+================================================================================
+PURPOSE
+================================================================================
+
+This document defines how canonical PurPaws intake branches between:
+
+- the human participant
+- an organization the participant represents
+- an informal group the participant represents
+- a household context
+- a companion context
+- an organizer / steward context
+- other declared acting contexts
+
+This document does not implement the branch.
+
+It defines the semantic branching design that implementation must later follow.
+
+
+================================================================================
+GOVERNING ARCHITECTURE
+================================================================================
+
+This design is governed by the locked:
+
+1. PurPaws Canonical Network Ontology v1
+2. PurPaws Canonical Onboarding Mapping v1
+3. PurPaws Canonical Intake Contract v1
+4. PurPaws Canonical Intake Vocabulary v1
+
+This branching design may not redefine those layers.
+
+
+================================================================================
+CORE PRINCIPLE
+================================================================================
+
+A human account and an organization are not the same thing.
+
+A participant may act:
+
+- for themselves
+- for an organization
+- for an informal group
+- for a household
+- in relation to a companion
+- as an organizer or steward
+- in another declared capacity
+
+The intake experience must determine the context in which the participant is
+acting without turning that context into the participant's permanent identity.
+
+
+================================================================================
+THE HUMAN PARTICIPANT
+================================================================================
+
+The authenticated User represents the account holder.
+
+The User is not automatically:
+
+- a business
+- a rescue
+- a creator
+- a Founder
+- a Partner
+- an organization
+- a commercial participant
+- a community-serving participant
+
+Those meanings belong to other canonical dimensions, roles, entities,
+relationships, or classifications.
+
+A person may participate in multiple contexts over time.
+
+
+================================================================================
+THE ORGANIZATION
+================================================================================
+
+An organization is a canonical entity distinct from the User.
+
+An organization may have:
+
+- a name
+- organization facts
+- contact facts
+- location facts
+- website evidence
+- activity declarations
+- reviewed activity classification
+- eligibility state
+- commerce requirement
+- commerce fulfillment state
+- public projections
+- relationships
+- people connected to it
+
+An organization's classification does not automatically classify the person
+representing it.
+
+
+================================================================================
+THE RELATIONSHIP BETWEEN PERSON AND ORGANIZATION
+================================================================================
+
+When a participant acts for an organization, PurPaws must preserve both:
+
+1. the person
+2. the organization
+
+and establish a relationship between them.
+
+Conceptually:
+
+User
+    ↓
+Organization Relationship
+    ↓
+Organization
+
+The relationship answers questions such as:
+
+- who represents this organization?
+- what is this person's relationship to it?
+- is that relationship active?
+- what permissions may eventually follow from that relationship?
+
+The organization must not be collapsed into the User record.
+
+The User must not be collapsed into the organization record.
+
+
+================================================================================
+ACTING CAPACITY BRANCH
+================================================================================
+
+The locked acting_capacity vocabulary determines the intake context.
+
+Conceptual branch:
+
+acting_capacity
+    |
+    +-- self
+    |
+    +-- organization
+    |
+    +-- informal_group
+    |
+    +-- household
+    |
+    +-- companion
+    |
+    +-- organizer_steward
+    |
+    +-- other
+
+The branch controls which additional facts intake needs.
+
+It does not itself create a canonical role.
+
+
+================================================================================
+SELF BRANCH
+================================================================================
+
+When:
+
+acting_capacity = self
+
+PurPaws may collect person-oriented facts relevant to the chosen entry
+experience.
+
+No organization is implied.
+
+No organization membership is implied.
+
+No commercial classification is implied.
+
+No Partner relationship is implied.
+
+
+================================================================================
+ORGANIZATION BRANCH
+================================================================================
+
+When:
+
+acting_capacity = organization
+
+PurPaws must be able to collect organization facts separately from the
+participant's account facts.
+
+Typical facts may include:
+
+- organization name
+- organization type or descriptive category
+- website
+- location
+- contact information
+- participant's relationship to the organization
+- declared activity nature
+- supporting evidence
+
+The organization branch does not determine:
+
+- final activity classification
+- eligibility
+- commerce requirement
+- commerce fulfillment
+- Partner status
+- Founder status
+
+
+================================================================================
+INFORMAL GROUP BRANCH
+================================================================================
+
+An informal group must not be forced to falsely declare itself as a legally
+incorporated organization.
+
+PurPaws may preserve:
+
+- group name
+- people involved
+- purpose
+- location
+- website or social evidence
+- declared activity
+- relationship to the participant
+
+Examples may include:
+
+- informal rescue groups
+- foster networks
+- volunteer groups
+- neighbourhood initiatives
+- community projects
+
+Legal structure and community function remain separate facts.
+
+
+================================================================================
+HOUSEHOLD BRANCH
+================================================================================
+
+A household context may represent participation involving more than one person
+without requiring creation of an organization.
+
+A household is not automatically:
+
+- an organization
+- a commercial entity
+- a role
+- a public profile
+
+Implementation details remain deferred.
+
+
+================================================================================
+COMPANION BRANCH
+================================================================================
+
+When intake concerns a companion, the human account remains the participant
+account while the companion may become a distinct canonical entity.
+
+Conceptually:
+
+User
+    ↓
+relationship / stewardship
+    ↓
+Companion
+
+The companion must not be represented as the User.
+
+The User must not be represented as the companion.
+
+
+================================================================================
+ORGANIZER / STEWARD BRANCH
+================================================================================
+
+An organizer or steward capacity describes why the participant is entering
+facts for something else.
+
+Examples may include stewardship of:
+
+- an event
+- a memorial
+- a community initiative
+- another network record
+
+Organizer / steward is an intake context.
+
+It does not automatically become a permanent global User role.
+
+
+================================================================================
+ENTRY EXPERIENCE IS INDEPENDENT
+================================================================================
+
+The onboarding entry experience and acting capacity are separate dimensions.
+
+For example:
+
+Directory entry experience
+    +
+acting_capacity = organization
+
+is possible.
+
+But so is:
+
+Directory entry experience
+    +
+acting_capacity = self
+
+Likewise:
+
+Partner entry experience
+
+does not mean:
+
+acting_capacity = commercial
+
+and does not mean:
+
+participant identity = Partner.
+
+Partner remains a relationship / collaboration status.
+
+
+================================================================================
+CLASSIFICATION REMAINS SEPARATE
+================================================================================
+
+After the acting context is understood, activity classification remains a
+separate process.
+
+The following must remain distinct:
+
+acting_capacity
+
+declared_activity_nature
+
+activity_nature
+
+eligibility_status
+
+commerce_requirement
+
+commerce_status
+
+Email verification remains separate from all six.
+
+
+================================================================================
+COMMERCIAL ORGANIZATIONS
+================================================================================
+
+A commercial organization is still an organization.
+
+Commercial is not an entity type.
+
+Commercial classification may influence:
+
+- eligibility
+- commerce requirement
+- publication conditions
+- package applicability
+
+It does not change the canonical nature of the organization.
+
+
+================================================================================
+COMMUNITY-SERVING ORGANIZATIONS
+================================================================================
+
+A community-serving organization is still an organization.
+
+Community-serving classification may apply to:
+
+- registered charities
+- nonprofit organizations
+- informal rescues
+- foster networks
+- volunteer groups
+- other qualifying community-serving activity
+
+Formal nonprofit status is evidence.
+
+It is not the only possible basis for community eligibility.
+
+
+================================================================================
+REVIEW-PENDING ORGANIZATIONS
+================================================================================
+
+An organization may exist canonically while its participation classification or
+eligibility remains under review.
+
+Therefore:
+
+organization existence
+    !=
+eligibility approval
+
+and:
+
+organization existence
+    !=
+commerce determination
+
+and:
+
+organization existence
+    !=
+publication entitlement
+
+A pending organization must not freeze unrelated participation by the person.
+
+
+================================================================================
+EXISTING IMPLEMENTATION SEAM
+================================================================================
+
+The current implementation already contains useful pieces of this future
+canonical branch.
+
+Observed existing structures include:
+
+- User
+- OnboardingRecord
+- OrganizationMember
+- PartnerOrganization
+- PublicProfile
+- RescueProfile
+- FounderProfile
+
+OnboardingRecord currently provides transitional intake storage.
+
+OrganizationMember already demonstrates that a User-to-organization
+relationship is an existing architectural concept.
+
+PartnerOrganization currently contains organization-oriented facts and some
+classification / eligibility fields.
+
+These existing structures are implementation evidence.
+
+They do not independently define the canonical ontology.
+
+
+================================================================================
+DIRECTORY MIGRATION PRINCIPLE
+================================================================================
+
+The current implementation may publish some Directory records directly from
+OnboardingRecord.
+
+That is recognized as transitional behavior.
+
+The canonical target is:
+
+Onboarding
+    ↓
+Facts + Intent
+    ↓
+Canonicalization
+    ↓
+Person / Organization / Other Canonical Records
+    ↓
+Relationships
+    ↓
+Classification
+    ↓
+Eligibility
+    ↓
+Commerce Determination
+    ↓
+Publication Entitlement
+    ↓
+Canonical Public Projection
+    ↓
+Directory Aggregation
+
+Directory therefore remains downstream.
+
+OnboardingRecord must not become the permanent identity store merely because
+the current Directory can read from it.
+
+
+================================================================================
+ORGANIZATION RELATIONSHIP PRINCIPLE
+================================================================================
+
+OrganizationMember is evidence of an existing relationship seam.
+
+However, this design does not yet declare that the existing
+OrganizationMember schema is sufficient for every future relationship.
+
+Before implementation, PurPaws must determine whether the existing relationship
+model can faithfully represent:
+
+- ownership
+- employment
+- volunteering
+- authorized representation
+- stewardship
+- administration
+- other organization relationships
+
+No schema change is authorized by this document.
+
+
+================================================================================
+MULTIPLE ORGANIZATIONS
+================================================================================
+
+One User may eventually relate to multiple organizations.
+
+One organization may eventually relate to multiple Users.
+
+Therefore the architecture must not assume:
+
+User == Organization
+
+or:
+
+one User == exactly one Organization
+
+or:
+
+one Organization == exactly one User
+
+
+================================================================================
+MULTIPLE PARTICIPATION CONTEXTS
+================================================================================
+
+A participant may simultaneously or over time be:
+
+- an individual community member
+- steward of companions
+- connected to a rescue
+- creator of content
+- representative of an organization
+- Founder
+- affiliate
+- event organizer
+- Partner through a specific relationship
+
+These contexts must coexist without forcing the User into one permanent
+identity bucket.
+
+
+================================================================================
+CANONICALIZATION RESPONSIBILITY
+================================================================================
+
+Onboarding collects facts.
+
+Canonicalization determines what durable network records should result.
+
+Canonicalization may determine that intake describes:
+
+- only the participant
+- a participant plus organization
+- a participant plus informal group
+- a participant plus companion
+- a participant plus event
+- a participant plus memorial record
+- multiple related canonical records
+
+This determination occurs after intake facts are available.
+
+The onboarding path alone does not make that decision.
+
+
+================================================================================
+EVIDENCE PRESERVATION
+================================================================================
+
+PurPaws / FCIS should preserve provenance where meaningful.
+
+The system should be able to distinguish:
+
+- what the participant declared
+- what evidence was supplied
+- what PurPaws determined
+- what was later verified
+- what relationship was established
+- what public projection resulted
+
+Canonicalization should strengthen evidence rather than erase it.
+
+
+================================================================================
+WHITE-LABEL PRINCIPLE
+================================================================================
+
+This branching architecture is independent of PurPaws-specific frontend
+branding.
+
+A future implementation may present human-friendly questions such as:
+
+- Are you creating this for yourself?
+- Are you representing an organization?
+- Are you helping a rescue or community group?
+- Are you creating this for your companion?
+- Are you organizing or stewarding this record?
+
+The frontend wording may change.
+
+The canonical branching meanings beneath it must remain stable.
+
+
+================================================================================
+IMPLEMENTATION BOUNDARY
+================================================================================
+
+This document does NOT authorize immediate changes to:
+
+- backend models
+- database schema
+- User
+- OnboardingRecord
+- OrganizationMember
+- PartnerOrganization
+- PublicProfile
+- RescueProfile
+- FounderProfile
+- API contracts
+- onboarding endpoints
+- verification endpoints
+- publication endpoints
+- onboarding frontend
+- onboarding cards
+- workspaces
+- Directory response shape
+- eligibility logic
+- commerce logic
+- payment logic
+
+Each implementation change requires:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+
+================================================================================
+VERSION INDEPENDENCE
+================================================================================
+
+This architecture is not defined by:
+
+/21/
+/22/
+/23/
+
+Those are implementation versions.
+
+The canonical branching model exists above them.
+
+
+================================================================================
+STATUS
+================================================================================
+
+PURPAWS PARTICIPANT / ORGANIZATION BRANCHING v1 — LOCKED
+
+This branching design has been:
+
+- defined
+- inspected against the existing User model
+- inspected against the existing OnboardingRecord model
+- inspected against the existing OrganizationMember model
+- inspected against the existing PartnerOrganization model
+- inspected against the existing onboarding implementation
+- inspected against existing Directory projection behavior
+- verified against the locked Canonical Network Ontology v1
+- verified against the locked Canonical Onboarding Mapping v1
+- verified against the locked Canonical Intake Contract v1
+- verified against the locked Canonical Intake Vocabulary v1
+- reviewed for person / organization separation
+- reviewed for acting-capacity branching
+- reviewed for informal-group flexibility
+- reviewed for household context
+- reviewed for Companion separation
+- reviewed for organizer / steward context
+- reviewed for path / role / classification separation
+- reviewed for eligibility and commerce separation
+- reviewed for many-to-many person / organization relationships
+- reviewed for transitional OnboardingRecord behavior
+- reviewed for Directory migration
+- reviewed for FCIS evidence preservation
+- reviewed for white-label compatibility
+- independently verified
+
+No remaining participant / organization branching blockers were identified.
+
+This document now governs subsequent participant / organization branching
+implementation.
+
+LOCKED PRINCIPLES
+
+- A human account and an Organization are distinct canonical concepts.
+
+- The authenticated User represents the account holder.
+
+- acting_capacity describes the immediate intake context.
+
+- acting_capacity does not itself define permanent identity, role,
+  classification, eligibility, or commerce state.
+
+- A person acting for an Organization does not become the Organization.
+
+- An Organization does not become the User.
+
+- Person and Organization must be preserved as distinct records connected by
+  an explicit relationship.
+
+- One User may relate to multiple Organizations.
+
+- One Organization may relate to multiple Users.
+
+- Organization classification does not automatically classify the Person.
+
+- Organization existence is distinct from eligibility approval.
+
+- Organization existence is distinct from commerce determination.
+
+- Organization existence is distinct from publication entitlement.
+
+- Informal groups must not be forced into false legal-organization claims.
+
+- Household participation does not automatically imply Organization identity.
+
+- Companion records remain distinct from the User account.
+
+- Organizer / steward context does not automatically become a global User role.
+
+- Entry experience and acting capacity remain separate dimensions.
+
+- Partner remains a relationship / collaboration status and is not equivalent
+  to commercial identity or acting capacity.
+
+- Commercial remains an activity classification, not an entity type.
+
+- OnboardingRecord remains transitional intake storage.
+
+- Canonicalization determines what durable records and relationships result
+  from intake facts.
+
+- OrganizationMember is an existing relationship seam but is not automatically
+  declared sufficient for all future canonical relationship meanings.
+
+- Current direct Directory publication from OnboardingRecord is transitional.
+
+- Directory remains downstream from canonical publication.
+
+- Canonicalization must preserve meaningful evidence and provenance for FCIS.
+
+IMPLEMENTATION BOUNDARY
+
+This lock governs architecture.
+
+It does not itself authorize:
+
+- database schema changes
+- model changes
+- API changes
+- onboarding behavior changes
+- frontend changes
+- publication changes
+- Directory response changes
+- eligibility behavior
+- commerce behavior
+- payment behavior
+
+Each implementation change requires its own:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+Future changes to these governing branching principles require a new version
+rather than silent mutation of v1.
+
+LOCKED.

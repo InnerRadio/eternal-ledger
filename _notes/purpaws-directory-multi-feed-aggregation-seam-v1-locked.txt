@@ -1,0 +1,215 @@
+PURPAWS DIRECTORY MULTI-FEED AGGREGATION SEAM v1 — LOCKED
+
+LOCKED AT
+
+2026-08-16 19:45:29
+
+
+================================================================================
+STATUS
+================================================================================
+
+VERIFIED AND LOCKED.
+
+
+================================================================================
+CORE PRINCIPLE
+================================================================================
+
+FEED != IDENTITY
+
+PROJECTION != IDENTITY
+
+DIRECTORY != IDENTITY AUTHORITY
+
+
+================================================================================
+CANONICAL DEDUPLICATION KEY
+================================================================================
+
+For canonical Organizations:
+
+("organization", canonical_organization_id)
+
+
+No name matching.
+
+No website matching.
+
+No location matching.
+
+No fuzzy matching.
+
+
+================================================================================
+SOURCE SUPERSESSION
+================================================================================
+
+Source supersession is provenance-driven.
+
+First verified case:
+
+onboarding_record:12
+        |
+        v
+organization:2
+
+
+Canonical publication:
+
+organization:2
+        |
+        v
+canonical_publication:1
+        |
+        v
+published
+
+
+Legacy source projection:
+
+directory-12
+
+
+Therefore directory-12 may be superseded as an independent identity in
+aggregated Directory output when canonical organization:2 is emitted.
+
+Approved legacy presentation data may supplement the canonical result.
+
+The source provenance itself remains preserved.
+
+
+================================================================================
+PROJECTION COEXISTENCE
+================================================================================
+
+Projection coexistence is semantics-driven.
+
+The existence of:
+
+partner-2
+
+and:
+
+organization:2
+
+does not itself authorize collapsing the two public experiences.
+
+Partner is not Organization identity.
+
+A Partner projection may coexist with an Organization projection when their
+public listing semantics are intentionally distinct.
+
+
+================================================================================
+FIRST CONTROLLED AGGREGATION CASE
+================================================================================
+
+directory-12
+        +
+canonical organization:2
+        |
+        v
+ONE canonical Organization aggregation bucket
+
+
+No name inference is required.
+
+Canonical provenance proves source-to-target correspondence.
+
+
+================================================================================
+PARTNER BOUNDARY
+================================================================================
+
+partner-2
+
+must not automatically be removed merely because organization:2 exists.
+
+Partner / Organization projection handling requires an explicit semantic
+decision.
+
+
+================================================================================
+PRESENTATION BOUNDARY
+================================================================================
+
+Legacy/intake presentation may supplement canonical Directory presentation.
+
+It must not mutate canonical Organization core.
+
+
+================================================================================
+TRANSITIONAL LEGACY CASE
+================================================================================
+
+organization:1
+
+remains legacy-visible while canonical publication authority is absent.
+
+This does not make organization:1 canonically published.
+
+
+================================================================================
+NO SILENT CUTOVER
+================================================================================
+
+This lock does not retire:
+
+- legacy /public/organizations
+- legacy Directory contribution
+- Partner projection
+- onboarding presentation sources
+
+Retirement requires explicit future migration approval.
+
+
+================================================================================
+IMPLEMENTATION SAFETY
+================================================================================
+
+A controlled implementation must prove:
+
+1. directory-12 does not remain a duplicate identity beside canonical
+   organization:2;
+
+2. organization:2 canonical identity remains authoritative;
+
+3. canonical publication authority remains authoritative;
+
+4. approved onboarding presentation can supplement without mutating canonical
+   core;
+
+5. partner-2 is not silently collapsed;
+
+6. organization:1 legacy behavior remains explicit;
+
+7. no name / website / fuzzy merge occurs;
+
+8. existing unrelated Directory listing types remain unchanged.
+
+
+================================================================================
+SOURCE DESIGN HASH
+================================================================================
+
+SHA256:
+
+0f872e445e176153529db89df7e02b6e9a072e991907321955a134e883d63c26
+
+
+================================================================================
+NEXT
+================================================================================
+
+Implement controlled Directory multi-feed aggregation for the first verified
+source-supersession case:
+
+directory-12
+        ->
+organization:2
+
+while preserving Partner projection semantics for separate review.
+
+
+LOCKED.

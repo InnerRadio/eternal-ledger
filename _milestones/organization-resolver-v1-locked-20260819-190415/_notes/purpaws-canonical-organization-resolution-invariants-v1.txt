@@ -1,0 +1,873 @@
+PURPAWS CANONICAL ORGANIZATION RESOLUTION INVARIANTS v1
+
+STATUS
+
+LOCKED.
+
+
+================================================================================
+PURPOSE
+================================================================================
+
+This document defines the architectural invariants governing canonical
+Organization resolution in PurPaws.
+
+It exists to prevent implementation shortcuts in onboarding, canonicalization,
+workspace access, publication, Directory aggregation, and FCIS from collapsing
+distinct real-world concepts into one record or one form submission.
+
+This document governs subsequent Organization Resolver implementation.
+
+It does not itself implement the resolver.
+
+
+================================================================================
+GOVERNING PRINCIPLE
+================================================================================
+
+PurPaws must model the real world rather than the accidental shape of an
+onboarding form.
+
+A Person, Organization, Location, Brand, relationship, permission,
+publication, and Directory projection are distinct concepts.
+
+They may be connected.
+
+They must not be silently collapsed.
+
+
+================================================================================
+CORE IDENTITY INVARIANTS
+================================================================================
+
+Person != Organization
+
+Organization != Location
+
+Organization != Brand
+
+Organization != Directory Listing
+
+Organization != Partner status
+
+Organization != commercial classification
+
+Organization != publication
+
+Organization != one submitted spelling of its name
+
+Organization != one submitted website value
+
+Organization != one submitted address
+
+
+================================================================================
+PERSON / ORGANIZATION CARDINALITY
+================================================================================
+
+One User may relate to many Organizations.
+
+One Organization may relate to many Users.
+
+Therefore:
+
+User -> Organization
+
+is many-to-many.
+
+A verified human account remains a Person / User identity.
+
+A canonical Organization remains a separate durable entity.
+
+
+================================================================================
+MULTIPLE REPRESENTATIVES
+================================================================================
+
+Multiple verified members may represent, work for, volunteer with, administer,
+or otherwise relate to the same canonical Organization.
+
+Example:
+
+Member A ----\
+              >---- Canonical Organization X
+Member B ----/
+
+Separate onboarding sources may resolve to one canonical Organization.
+
+The existence of separate onboarding records must not force creation of
+separate Organizations.
+
+
+================================================================================
+FIRST PARTICIPANT DOES NOT OWN THE ORGANIZATION BY CHRONOLOGY
+================================================================================
+
+The first participant to submit an Organization does not automatically own,
+control, administer, or permanently steward that Organization merely because
+they arrived first.
+
+Chronology is not organizational authority.
+
+Any stewardship, administration, edit permission, ownership, employment,
+volunteering, or similar relationship must arise from an explicit supported
+relationship or a separately locked launch-governance rule.
+
+
+================================================================================
+INITIAL STEWARDSHIP / TEAM INVITATION PRINCIPLE
+================================================================================
+
+PurPaws may support an initial Organization steward or administrator once an
+appropriate authority rule is established.
+
+Once a legitimate steward/admin relationship exists, that authorized person
+may invite additional teammates.
+
+Each teammate:
+
+- receives or uses their own User account
+- verifies their own identity/account
+- connects to the same canonical Organization
+- receives their own relationship
+- receives separately determined permissions
+
+Inviting another teammate must not create another Organization.
+
+
+================================================================================
+ORGANIZATION IDENTITY RESOLUTION
+================================================================================
+
+Canonical Organization resolution must support at least these outcomes:
+
+REUSE
+
+An authoritative canonical target has already been established.
+
+CREATE
+
+No authoritative target exists, sufficient evidence supports creation, and no
+unresolved candidate collision exists.
+
+REVIEW
+
+Evidence suggests one or more possible existing Organizations, but target
+identity is not sufficiently authoritative.
+
+REJECT
+
+The intake does not contain sufficient valid Organization evidence for safe
+canonicalization.
+
+The resolver must not guess.
+
+
+================================================================================
+SOURCE PROVENANCE
+================================================================================
+
+Same-source idempotency is anchored by canonical provenance.
+
+For onboarding:
+
+source_type = onboarding_record
+source_id   = OnboardingRecord.id
+
+If authoritative provenance already identifies a valid canonical Organization,
+repeated canonicalization of that same source must reuse the same target.
+
+A second onboarding record is a different source.
+
+Therefore:
+
+onboarding_record:15
+
+and:
+
+onboarding_record:16
+
+are not the same source even if both describe the same real-world
+Organization.
+
+Cross-source Organization identity requires entity resolution.
+
+
+================================================================================
+ENTITY RESOLUTION IS DISTINCT FROM IDEMPOTENCY
+================================================================================
+
+Two or more different sources may describe the same real-world Organization.
+
+That is an entity-resolution problem.
+
+It must not be confused with same-source idempotency.
+
+
+================================================================================
+OBSERVED VALUES ARE EVIDENCE
+================================================================================
+
+Examples of participant-supplied observations include:
+
+PurPaws
+Purpaws
+PURPAWS
+purpaws.ca
+www.purpaws.ca
+Pur Paws Canada
+
+These strings may refer to the same Organization.
+
+They may also reflect:
+
+- capitalization variation
+- punctuation variation
+- domain usage as a name
+- branding
+- legal naming
+- operating naming
+- historical naming
+- local naming
+- participant error
+
+Observed text must therefore remain evidence rather than becoming an
+unconditional canonical identity key.
+
+
+================================================================================
+NORMALIZATION PRINCIPLE
+================================================================================
+
+PurPaws may derive normalized comparison values from raw evidence.
+
+Examples:
+
+raw_name:
+PurPaws
+
+normalized_name:
+purpaws
+
+
+raw_website:
+https://www.purpaws.ca/
+
+normalized_domain:
+purpaws.ca
+
+
+Normalization assists comparison.
+
+Normalization does not itself authorize canonical merging.
+
+Where practicable, raw observed evidence should remain preservable alongside
+derived normalized comparison signals.
+
+
+================================================================================
+WEBSITE / DOMAIN EVIDENCE
+================================================================================
+
+An exact normalized website/domain match is strong Organization-resolution
+evidence.
+
+It is materially stronger than superficial name similarity alone.
+
+However:
+
+website/domain match != universal canonical identity authority
+
+because real-world exceptions include:
+
+- franchises
+- parent organizations
+- subsidiaries
+- chapters
+- programs hosted on parent domains
+- multiple brands sharing a corporate domain
+- redirected or historical domains
+- shared institutional domains
+
+Therefore an exact domain match may substantially increase resolution
+confidence without universally forcing automatic reuse.
+
+
+================================================================================
+NAME EVIDENCE
+================================================================================
+
+Exact or normalized name similarity is useful evidence.
+
+Name similarity alone must not silently merge canonical Organizations.
+
+Examples such as:
+
+PurPaws
+Purpaws
+purpaws.ca
+
+must be compared intelligently without treating presentation text as a
+canonical primary key.
+
+
+================================================================================
+LOCATION IS NOT ORGANIZATION IDENTITY
+================================================================================
+
+An Organization may have zero, one, or many Locations.
+
+Therefore:
+
+Organization.location
+
+where currently present may serve as a launch/starter fact or primary
+presentation value, but the architecture must not assume permanently that one
+Organization equals one Location.
+
+
+================================================================================
+MULTIPLE LOCATION PRINCIPLE
+================================================================================
+
+Example:
+
+Happy Paws Veterinary Group
+
+    Queen Street Clinic
+    Danforth Clinic
+    Oakville Clinic
+
+These may represent:
+
+one canonical Organization
++
+multiple related Locations
+
+rather than three Organizations.
+
+A Location may have its own:
+
+- address
+- city
+- province/state
+- country
+- phone
+- hours
+- services
+- contacts
+- evidence
+- publication state
+- public projection
+
+The v1 Organization Resolver does not need to implement the full Location
+system.
+
+It must simply avoid encoding the false invariant:
+
+Organization = one location
+
+
+================================================================================
+HEAD OFFICE AND OPERATING LOCATIONS
+================================================================================
+
+An Organization may have:
+
+- corporate headquarters
+- mailing address
+- operating site
+- retail site
+- clinic
+- rescue facility
+- event site
+- branch
+- chapter office
+
+These location meanings must not be flattened into one permanent canonical
+identity field.
+
+
+================================================================================
+LOCATION AS FUTURE FIRST-CLASS STRUCTURE
+================================================================================
+
+PurPaws should preserve architectural room for Location to become a
+first-class durable entity or first-class Organization sub-record.
+
+This document does not authorize that schema or implementation yet.
+
+It only prohibits Organization resolution from depending on a one-location
+assumption.
+
+
+================================================================================
+BRAND IS NOT NECESSARILY ORGANIZATION
+================================================================================
+
+One Organization may operate multiple Brands.
+
+One Brand may have multiple Locations.
+
+A franchise brand may represent multiple independently owned Organizations.
+
+Therefore:
+
+shared brand != automatic same Organization
+
+and:
+
+shared domain != automatic same Organization
+
+
+================================================================================
+PARENT / CHILD / CHAPTER ORGANIZATIONS
+================================================================================
+
+Parent companies, subsidiaries, chapters, affiliates, local branches, and
+programs may be distinct Organizations connected by relationships.
+
+They must not automatically collapse merely because they share:
+
+- a name root
+- a brand
+- a website
+- a domain
+- a mailing address
+- leadership
+- visual identity
+
+
+================================================================================
+MULTIPLE WEBSITES / IDENTIFIERS
+================================================================================
+
+An Organization may have multiple valid digital identifiers, including:
+
+- primary website
+- alternate domain
+- historic domain
+- campaign site
+- regional site
+- social account
+- platform page
+
+The current website_url field may remain a useful launch/starter field.
+
+The architecture must not assume one Organization has exactly one permanent
+website identifier.
+
+
+================================================================================
+NO-WEBSITE ORGANIZATIONS
+================================================================================
+
+A legitimate Organization may have no website.
+
+Possible evidence may instead include:
+
+- email
+- phone
+- social account
+- physical location
+- documents
+- participant declarations
+- existing relationships
+- FCIS evidence
+- administrative review
+
+Website presence must not be mandatory for Organization existence.
+
+
+================================================================================
+CONFLICTING CONTRIBUTIONS
+================================================================================
+
+Multiple members may submit different facts about the same Organization.
+
+Example:
+
+Member A:
+location = Toronto
+
+Member B:
+location = Mississauga
+
+PurPaws must not treat:
+
+latest submission = canonical truth
+
+Conflicting observations must remain attributable evidence until appropriately
+resolved.
+
+
+================================================================================
+EVIDENCE DOES NOT DIRECTLY OVERWRITE CANONICAL TRUTH
+================================================================================
+
+Participant submissions are evidence.
+
+They may:
+
+- corroborate existing facts
+- add new facts
+- contradict existing facts
+- identify stale facts
+- identify possible duplicate entities
+- require review
+
+Canonical Organization truth must be determined through the appropriate
+authority rather than uncontrolled last-write-wins behavior.
+
+
+================================================================================
+USER / ORGANIZATION RELATIONSHIP
+================================================================================
+
+Canonical Organization creation or reuse and User/Organization relationship
+creation are distinct operations.
+
+An onboarding record linked to User X does not by itself prove:
+
+- ownership
+- employment
+- administration
+- volunteering
+- stewardship
+- edit authority
+- partnership
+
+Relationship semantics must be supported by evidence or explicit governance
+rules.
+
+
+================================================================================
+PERMISSIONS ARE DISTINCT FROM RELATIONSHIPS
+================================================================================
+
+Real-world relationship and application permission are separate concerns.
+
+A future Organization may support permissions such as:
+
+- steward/admin
+- editor
+- contributor
+- viewer
+
+A person's permission level must not redefine canonical Organization identity.
+
+
+================================================================================
+SCOPED PERMISSIONS
+================================================================================
+
+Future permissions may need scope.
+
+Examples:
+
+Organization-wide administration
+
+versus:
+
+Queen Street Location administration
+
+The v1 resolver need not implement scoped permissions.
+
+It must avoid architecture that makes them impossible later.
+
+
+================================================================================
+CANONICAL ORGANIZATION STARTER FACTS
+================================================================================
+
+For the Organization acting-capacity branch, starter facts may include:
+
+organization_name
+organization_type
+website_url
+location
+contact information
+participant relationship declaration
+declared activity nature
+supporting evidence
+
+These are intake facts.
+
+Their existence does not automatically determine:
+
+- final classification
+- eligibility
+- commerce requirement
+- commerce fulfillment
+- Partner status
+- Founder status
+- publication entitlement
+
+
+================================================================================
+CLASSIFICATION REMAINS DOWNSTREAM
+================================================================================
+
+Organization existence does not imply activity classification.
+
+Declared activity and reviewed activity are separate concepts.
+
+
+================================================================================
+ELIGIBILITY REMAINS DOWNSTREAM
+================================================================================
+
+Organization existence does not imply eligibility approval.
+
+
+================================================================================
+COMMERCE REMAINS DOWNSTREAM
+================================================================================
+
+Organization existence does not imply commerce requirement.
+
+Commerce requirement and commerce fulfillment remain distinct dimensions.
+
+
+================================================================================
+WORKSPACE ENTITLEMENT REMAINS DOWNSTREAM
+================================================================================
+
+Canonical Organization existence does not automatically grant every
+participant unrestricted Organization workspace authority.
+
+Workspace access must follow the appropriate entitlement and permission
+authority.
+
+
+================================================================================
+PUBLICATION REMAINS DOWNSTREAM
+================================================================================
+
+Canonical Organization existence does not mean public publication.
+
+Publication entitlement and publication state remain separate authorities.
+
+
+================================================================================
+DIRECTORY REMAINS DOWNSTREAM
+================================================================================
+
+Directory is an aggregator of published projections.
+
+Directory does not determine:
+
+- Organization identity
+- Person identity
+- Location identity
+- relationship
+- permission
+- classification
+- eligibility
+- commerce
+- publication
+
+Organization resolution must not depend on Directory identity.
+
+
+================================================================================
+PUBLIC PROJECTIONS MAY BE MORE GRANULAR THAN ORGANIZATION
+================================================================================
+
+Future public projections may include:
+
+- Organization profile
+- Location profile
+- branch presence
+- campaign presence
+- event presence
+- other eligible public views
+
+This reinforces:
+
+canonical entity != public listing
+
+
+================================================================================
+DUPLICATE ORGANIZATION RECONCILIATION
+================================================================================
+
+PurPaws must anticipate that duplicate canonical Organizations may eventually
+be discovered.
+
+Future reconciliation must preserve:
+
+- provenance
+- relationships
+- evidence
+- historical references
+- publication history
+- FCIS context
+
+Duplicate reconciliation must not be implemented as destructive deletion of
+history.
+
+This v1 lock does not implement merge/supersede authority.
+
+
+================================================================================
+FALSE OR UNAUTHORIZED CLAIMS
+================================================================================
+
+Email verification proves control of an email/account channel.
+
+It does not necessarily prove authority over an Organization.
+
+Organization access governance must therefore remain capable of:
+
+- steward invitation
+- teammate invitation
+- organizational-domain evidence
+- supporting evidence
+- administrative review
+- conflict resolution
+
+as later implementation requires.
+
+
+================================================================================
+RESOLVER V1 BOUNDARY
+================================================================================
+
+The first Organization Resolver implementation should remain intentionally
+small.
+
+It should be capable of reasoning toward:
+
+REUSE
+CREATE
+REVIEW
+REJECT
+
+using:
+
+- source provenance
+- Organization starter facts
+- normalized comparison signals
+- existing canonical Organizations
+- explicit established target when available
+- evidence sufficient for creation
+- collision / ambiguity detection
+
+It must not silently absorb:
+
+- OrganizationMember creation
+- invented User/Organization relationship semantics
+- permission assignment
+- teammate invitation
+- Location schema creation
+- Brand schema creation
+- eligibility approval
+- commerce completion
+- workspace entitlement
+- publication entitlement
+- public projection
+- Directory aggregation
+
+
+================================================================================
+MULTI-MEMBER SUCCESS CONDITION
+================================================================================
+
+The architecture must support:
+
+Onboarding A
+    ↓
+Organization X
+    ↑
+Onboarding B
+
+with separate provenance:
+
+onboarding_record:A -> organization:X
+
+onboarding_record:B -> organization:X
+
+without creating Organization Y merely because B is a distinct source.
+
+
+================================================================================
+MULTI-LOCATION SUCCESS CONDITION
+================================================================================
+
+The architecture must support:
+
+Organization X
+    ↓
+Location A
+Location B
+Location C
+
+without forcing each Location to become a duplicate Organization.
+
+
+================================================================================
+FOUNDATIONAL INVARIANTS
+================================================================================
+
+Person != Organization
+
+Organization != Location
+
+Organization != Brand
+
+Canonical Entity != Public Projection
+
+Observed Fact != Canonical Fact
+
+Similarity != Identity
+
+Domain Match = Strong Evidence
+
+Provenance = Durable Source History
+
+Relationship = Separate Authority
+
+Permission = Separate Authority
+
+Classification = Separate Authority
+
+Eligibility = Separate Authority
+
+Commerce = Separate Authority
+
+Publication = Separate Authority
+
+Directory = Aggregation / Projection
+
+
+================================================================================
+IMPLEMENTATION DISCIPLINE
+================================================================================
+
+Subsequent implementation must continue to follow:
+
+Observe
+    ↓
+Inspect
+    ↓
+Understand
+    ↓
+Replace / Add
+    ↓
+Verify
+    ↓
+Lock
+    ↓
+Continue
+
+When evidence is ambiguous:
+
+DEFER RATHER THAN GUESS.
+
+
+================================================================================
+LOCK
+================================================================================
+
+PURPAWS CANONICAL ORGANIZATION RESOLUTION INVARIANTS v1 — LOCKED.

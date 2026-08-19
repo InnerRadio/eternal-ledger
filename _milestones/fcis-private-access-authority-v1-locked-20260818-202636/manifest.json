@@ -1,0 +1,23 @@
+{
+  "milestone": "fcis-private-access-authority-v1-locked-20260818-202636",
+  "locked_at": "20260818-202636",
+  "authority": "FCIS Private Access Authority v1",
+  "module": "backend/app/fcis/access.py",
+  "authentication": "existing bearer token",
+  "live_user_check": true,
+  "active_account_required": true,
+  "allowed_roles": [
+    "admin"
+  ],
+  "active_admins_authorized": 2,
+  "active_non_admins_authorized": 0,
+  "live_role_authoritative": true,
+  "token_role_override_allowed": false,
+  "routes_created": 0,
+  "users_changed": false,
+  "roles_changed": false,
+  "statuses_changed": false,
+  "database_changed": false,
+  "public_exposure": false,
+  "next_hill": "FCIS Private Route v1"
+}

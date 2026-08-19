@@ -1,0 +1,35 @@
+PURPAWS CANONICAL ORGANIZATION RESOLUTION REVIEW AUTHORITY v1
+STATUS: LOCKED
+
+Review authority: /var/www/eternal-ledger-github/_notes/purpaws-canonical-organization-resolution-review-authority-v1.txt
+Review SHA256: bee7f1f6bce4a12ac1333e944adfb26662e93263921f732b5f3851277300be5f
+
+Governing architecture: /var/www/eternal-ledger-github/_notes/purpaws-canonical-organization-resolution-invariants-v1.txt
+Governing SHA256: 672fd1ad305a675275f1e7a66ab72337231a05070fba2bef88bb8bdbfef58917
+
+LOCKED DECISIONS:
+- ESTABLISHED
+- NOT_SAME
+- DEFERRED
+
+LOCKED BOUNDARIES:
+- review establishes source -> candidate identity judgment
+- resolver consumes established target
+- review does not create membership
+- review does not grant permissions
+- review does not establish stewardship
+- review does not determine eligibility
+- review does not determine commerce
+- review does not grant workspace
+- review does not publish
+- review does not mutate Directory
+
+CONTROLLED SOURCE:
+- onboarding_record:15 remains unmodified
+- organization:2 remains unmodified
+- no review decision created
+- no provenance created
+
+NEXT:
+Inspect model/schema requirements for the smallest durable review record.
+Then implement Organization Resolution Review Authority v1.

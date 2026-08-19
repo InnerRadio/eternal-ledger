@@ -1,0 +1,59 @@
+PURPAWS — REVIEW → RESOLVER REUSE → CANONICAL PROVENANCE HANDOFF v1
+
+STATUS
+LOCKED
+
+CONTROLLED SOURCE
+onboarding_record:15
+
+CONTROLLED TARGET
+organization:2
+
+IDENTITY CHAIN
+
+onboarding_record:15
+    ->
+Organization Resolution Review
+    decision = ESTABLISHED
+    ->
+trusted established target = partner_organization:2
+    ->
+Organization Resolver
+    decision = REUSE
+    reason = explicitly_established_target
+    ->
+Canonicalization Provenance
+    onboarding_record:15 -> organization:2
+    ->
+future resolver execution
+    decision = REUSE
+    reason = existing_source_provenance
+
+LOCKED PROOF
+- established review exists
+- exactly one #15 organization provenance row exists
+- provenance target is Organization #2
+- future same-source resolution reuses Organization #2
+- no duplicate Organization created
+- review history preserved
+- review and provenance remain separate durable authorities
+
+NOT ESTABLISHED
+- User↔Organization relationship
+- membership
+- ownership
+- stewardship
+- permission
+- invitation authority
+- eligibility
+- commerce
+- workspace entitlement
+- publication
+- Directory state
+- reconciliation
+
+NEXT
+Inspect User #8 / onboarding #15 / Organization #2 relationship and access state.
+
+Then define the smallest launch-safe User↔Organization relationship /
+access-governance handoff without confusing identity with authority.

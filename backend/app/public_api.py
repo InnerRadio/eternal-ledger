@@ -5,7 +5,7 @@ import secrets
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
-from backend.app.models import Memorial, MediaAsset, Contribution, MetricEvent, User, AffiliateCampaign, PartnerOrganization, AffiliateConversion, AffiliateClick, AffiliateCommission, AffiliateCampaignEnrollment, OrganizationMember, RescueProfile, RescueAnimal, PublicProfile, FounderProfile, ContactRelayMessage, CommunicationPermission, OnboardingRecord
+from backend.app.models import Memorial, MediaAsset, Contribution, MetricEvent, User, AffiliateCampaign, PartnerOrganization, AffiliateConversion, AffiliateClick, AffiliateCommission, AffiliateCampaignEnrollment, OrganizationMember, RescueProfile, RescueAnimal, PublicProfile, FounderProfile, ContactRelayMessage, CommunicationPermission, OnboardingRecord, CanonicalPublication, CanonicalizationProvenance
 from backend.app.environment_themes import ENVIRONMENT_THEMES
 from backend.app.account import generate_affiliate_id, generate_referral_code
 from backend.app.cms.security import get_password_hash, create_access_token
@@ -1424,6 +1424,132 @@ def public_directory(
                 "status": onboarding.status,
             })
 
+    # =========================================================================
+    # DIRECTORY MULTI-FEED AGGREGATION v1
+    #
+    # First controlled source-supersession case:
+    #
+    # onboarding_record -> canonical organization
+    #
+    # This runs only for the unfiltered multi-feed Directory.
+    #
+    # Explicit listing_type=directory and listing_type=organization behavior
+    # remains legacy-compatible in v1.
+    #
+    # Source supersession is provenance-driven.
+    # Projection coexistence is semantics-driven.
+    # =========================================================================
+
+    if include_all:
+
+        aggregated_records = []
+
+        for record in records:
+
+            if (
+                record.get("source") == "onboarding_records"
+                and
+                record.get("listing_type") == "directory"
+            ):
+
+                source_id = record.get("listing_id")
+
+                provenance = db.query(
+                    CanonicalizationProvenance
+                ).filter(
+                    CanonicalizationProvenance.source_type
+                    == "onboarding_record",
+                    CanonicalizationProvenance.source_id
+                    == source_id,
+                    CanonicalizationProvenance.target_type
+                    == "organization",
+                ).first()
+
+                if provenance:
+
+                    publication = db.query(
+                        CanonicalPublication
+                    ).filter(
+                        CanonicalPublication.target_type
+                        == "organization",
+                        CanonicalPublication.target_id
+                        == provenance.target_id,
+                        CanonicalPublication.publication_status
+                        == "published",
+                    ).first()
+
+                    organization = db.query(
+                        PartnerOrganization
+                    ).filter(
+                        PartnerOrganization.id
+                        == provenance.target_id
+                    ).first()
+
+                    if publication and organization:
+
+                        legacy_profile = dict(
+                            record.get("profile")
+                            or {}
+                        )
+
+                        # Preserve approved presentation from the original
+                        # onboarding projection while making canonical
+                        # Organization identity authoritative.
+                        legacy_profile[
+                            "organization_type"
+                        ] = organization.organization_type
+
+                        canonical_metrics = (
+                            public_directory_metrics(
+                                db=db,
+                                listing_type="organization",
+                                listing_id=organization.id,
+                            )
+                        )
+
+                        aggregated_records.append({
+                            "id": f"organization-{organization.id}",
+                            "listing_id": organization.id,
+                            "listing_type": "organization",
+                            "source": "canonical_organizations",
+                            "name": organization.organization_name,
+                            "headline": (
+                                record.get("headline")
+                                or
+                                organization.organization_type
+                            ),
+                            "description": record.get("description"),
+                            "location": organization.location,
+                            "project": organization.project,
+                            "website_url": organization.website_url,
+                            "organization_name": organization.organization_name,
+                            "profile": legacy_profile,
+                            "metrics": canonical_metrics,
+                            "communication": (
+                                public_directory_communication_metadata(
+                                    db=db,
+                                    project=organization.project or "PurPaws",
+                                    listing_type="organization",
+                                    listing_id=organization.id,
+                                )
+                            ),
+                            "actions": public_directory_actions(
+                                "organization"
+                            ),
+                            "discovery": public_directory_discovery(
+                                listing_type="organization",
+                                metrics=canonical_metrics,
+                                status="published",
+                            ),
+                            "status": "published",
+                        })
+
+                        continue
+
+            aggregated_records.append(record)
+
+        records = aggregated_records
+
     filtered_records = records
 
     if search:
@@ -2059,6 +2185,111 @@ def public_campaigns(
     }
 
 
+
+@router.get("/canonical/organizations")
+def public_canonical_organizations(
+    project: str | None = None,
+    organization_type: str | None = None,
+    db: Session = Depends(get_db)
+):
+    """
+    Canonical Organization Projection Feed v1.
+
+    Publication authority comes exclusively from:
+
+        CanonicalPublication.publication_status == "published"
+
+    PartnerOrganization.status is not publication authority.
+    """
+
+    query = db.query(
+        CanonicalPublication,
+        PartnerOrganization
+    ).join(
+        PartnerOrganization,
+        CanonicalPublication.target_id
+        == PartnerOrganization.id
+    ).filter(
+        CanonicalPublication.target_type
+        == "organization",
+        CanonicalPublication.publication_status
+        == "published"
+    )
+
+    if project:
+        query = query.filter(
+            PartnerOrganization.project
+            == project
+        )
+
+    if organization_type:
+        query = query.filter(
+            PartnerOrganization.organization_type
+            == organization_type
+        )
+
+    rows = query.order_by(
+        PartnerOrganization.organization_name.asc()
+    ).all()
+
+    records = []
+
+    for publication, organization in rows:
+
+        active_member_count = db.query(
+            OrganizationMember
+        ).filter(
+            OrganizationMember.organization_id
+            == organization.id,
+            OrganizationMember.status
+            == "active"
+        ).count()
+
+        records.append({
+            "id": organization.id,
+            "type": "organization",
+            "identity": None,
+            "organization": {
+                "id": organization.id,
+                "organization_name": organization.organization_name,
+                "organization_type": organization.organization_type,
+                "project": organization.project,
+                "website_url": organization.website_url,
+                "location": organization.location,
+                "created_at": organization.created_at,
+            },
+            "profile": None,
+            "metrics": {
+                "active_member_count": active_member_count
+            },
+            "canonical_publication": {
+                "id": publication.id,
+                "status": publication.publication_status,
+            },
+            "status": "published",
+        })
+
+    return {
+        "module": "Canonical Public Organizations",
+        "status": "active",
+        "version": "canonical-organization-projection-v1",
+        "privacy": (
+            "Public-safe canonical organization records exclude "
+            "contact_name, contact_email, notes, eligibility review data, "
+            "commerce fields, and internal member details."
+        ),
+        "publication_authority": (
+            "canonical_publications.publication_status=published"
+        ),
+        "filters": {
+            "project": project,
+            "organization_type": organization_type,
+        },
+        "count": len(records),
+        "records": records,
+    }
+
+
 @router.get("/organizations")
 def public_organizations(
     project: str | None = None,
@@ -2082,9 +2313,9 @@ def public_organizations(
     records = []
 
     for organization in organizations:
-        active_members = db.query(OrganizationMember, RescueProfile, RescueAnimal, PublicProfile).filter(
-            OrganizationMember, RescueProfile, RescueAnimal, PublicProfile.organization_id == organization.id,
-            OrganizationMember, RescueProfile, RescueAnimal, PublicProfile.status == "active"
+        active_members = db.query(OrganizationMember).filter(
+            OrganizationMember.organization_id == organization.id,
+            OrganizationMember.status == "active"
         ).all()
 
         records.append({
@@ -2204,7 +2435,7 @@ def public_create_onboarding_record(
     db.commit()
     db.refresh(record)
 
-    verification_url = "https://purpaws.ca/21/verify.html?token=" + verification_token
+    verification_url = "https://purpaws.ca/verify.html?token=" + verification_token
 
     mail_result = send_onboarding_verification_email(
         to_email=record.email,
@@ -2482,35 +2713,21 @@ def public_complete_onboarding_account(
         existing_linked_user = db.query(User).filter(User.id == record.user_id).first()
 
         if existing_linked_user:
-            token_value = create_access_token({
-                "sub": existing_linked_user.email,
-                "role": existing_linked_user.role,
-                "user_id": existing_linked_user.id
-            })
-
             return {
                 "module": "Public Onboarding Account Completion",
-                "status": "already_completed",
-                "version": "public-onboarding-complete-account-v1",
-                "message": "Account already exists for this onboarding record.",
-                "access_token": token_value,
-                "token_type": "bearer",
-                "user": {
-                    "id": existing_linked_user.id,
-                    "email": existing_linked_user.email,
-                    "role": existing_linked_user.role,
-                    "status": existing_linked_user.status,
-                    "affiliate_id": existing_linked_user.affiliate_id,
-                    "referral_code": existing_linked_user.referral_code
-                },
+                "status": "login_required",
+                "version": "public-onboarding-complete-account-v2",
+                "message": "This onboarding record is linked to an existing PurPaws account. Please log in to continue.",
                 "onboarding": {
                     "id": record.id,
                     "path": record.path,
                     "status": record.status,
-                    "verification_status": record.verification_status
+                    "verification_status": record.verification_status,
+                    "user_id": record.user_id
                 },
                 "next": {
-                    "dashboard_status": "enabled"
+                    "authentication": "existing_account_login_required",
+                    "dashboard_status": "locked_until_authenticated"
                 }
             }
 
@@ -2588,8 +2805,7 @@ def public_complete_onboarding_account(
             "user_id": record.user_id
         },
         "next": {
-            "dashboard_status": "enabled",
-            "dashboard_url": "/21/dashboard.html?onboarding_id=" + str(record.id) + "&path=" + str(record.path)
+            "dashboard_status": "enabled"
         }
     }
 

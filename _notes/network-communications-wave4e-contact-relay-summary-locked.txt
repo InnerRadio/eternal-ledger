@@ -1,0 +1,42 @@
+NETWORK COMMUNICATIONS WAVE 4E CONTACT RELAY SUMMARY LOCKED
+
+Implemented:
+- GET /account/contact-relay/summary
+- Contact relay dashboard summary
+- Counts by relay message status
+- Recent relay messages for dashboard display
+
+Verified:
+- eternal-ledger-api.service restarts successfully
+- OpenAPI exposes /account/contact-relay/summary before /account/contact-relay/{message_id}
+- Admin token can access summary endpoint
+- Summary returns total count
+- Summary returns by_status counts
+- Summary returns new/reviewed/resolved counts
+- Summary returns recent relay messages
+- Inbox filter status=new verified
+
+Endpoint:
+- /account/contact-relay/summary
+
+Current Verified Summary:
+- total: 2
+- new: 1
+- reviewed: 0
+- resolved: 1
+
+Workflow Context:
+- Public visitor submits message through /public/contact-relay
+- Permission enforcement checks CommunicationPermission
+- Relay message is stored
+- Account/admin inbox can list messages
+- Individual message can be reviewed
+- Individual message can be resolved
+- Summary endpoint provides dashboard-friendly counts
+
+Protocol:
+- Inspect → Replace → Verify
+- Python-only
+- Backups before replacement
+- No look-and-find
+- No patching

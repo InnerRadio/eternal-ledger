@@ -1,0 +1,35 @@
+{
+  "milestone": "canonical-context-write-authority-v1-locked-20260817-141126",
+  "locked_at": "20260817-141126",
+  "authority": "Canonical Context Write Authority v1",
+  "module": "backend/app/context_authority.py",
+  "canonical_context_rows": 0,
+  "canonical_relationship_rows": 3,
+  "canonical_provenance_rows": 4,
+  "canonical_publication_rows": 1,
+  "partner_organization_rows": 5,
+  "supported_context_types": [
+    "availability",
+    "capability",
+    "constraint",
+    "goal",
+    "interest",
+    "need",
+    "offer",
+    "preference",
+    "requirement",
+    "resource"
+  ],
+  "supported_context_statuses": [
+    "active",
+    "expired",
+    "inactive",
+    "pending",
+    "revoked"
+  ],
+  "rollback_integration_passed": true,
+  "validation_tests_passed": 14,
+  "durable_synthetic_context_created": false,
+  "public_api_changed": false,
+  "private_intelligence_changed": false
+}

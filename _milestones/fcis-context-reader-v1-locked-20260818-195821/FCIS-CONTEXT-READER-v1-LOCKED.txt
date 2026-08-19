@@ -1,0 +1,80 @@
+FCIS — CONTEXT READER v1
+LOCKED
+
+PURPOSE
+
+Provide a pure internal factual read layer over CanonicalContext.
+
+MODULE
+
+backend/app/fcis/context_reader.py
+
+V1 READER CAPABILITIES
+
+get_context
+get_context_for_node
+get_active_context_for_node
+get_needs
+get_offers
+get_capabilities
+get_active_context_graph
+get_context_index
+
+SEMANTIC CONTRACT
+
+Context Reader reports established canonical context truth.
+
+It does NOT:
+
+- create context
+- modify context
+- infer compatibility
+- score matches
+- generate opportunities
+- recommend connections
+- create relationships
+- publish anything
+
+VERIFIED SYNTHETIC LABORATORY
+
+Alpha
+- need: event_photography
+- offer: community_audience
+
+Beta
+- offer: event_photography
+- need: promotional_support
+
+Gamma
+- offer: promotional_support
+- capability: sponsorship
+
+ACTIVE CONTEXT ROWS
+
+6
+
+CANONICAL RELATIONSHIPS
+
+3
+
+PUBLIC EXPOSURE
+
+NONE
+
+NEXT HILL
+
+FCIS Correlation Engine v1.
+
+The Correlation Engine may consume factual context and generate
+private hypotheses.
+
+A correlation is NOT:
+
+- canonical context
+- canonical relationship
+- recommendation
+- deal
+- authorization
+
+FCIS discovers opportunity.
+Humans authorize action.
