@@ -1,0 +1,62 @@
+PURPAWS — CREATOR / RESCUE DASHBOARD MEMORIAL TIMESTAMP REPAIR v1
+
+STATUS
+LOCKED
+
+UTC
+2026-08-20T22:25:12.829791+00:00
+
+PARENT CHECKPOINT
+6b1a511fa5ad7bf40a5b6e4f95d56f8f70ec90f0
+
+ACCOUNT.PY SHA256
+f0443e1e32bbbb3c42d70ff588a8798844c8096bf2f10a63d957d739f74d9979
+
+MODELS.PY SHA256
+d411c6ca63e178db9fff9d64234dd279862ad8b38dc42c244277788ffd379339
+
+DEFECT
+
+Creator and Rescue dashboards attempted to serialize:
+
+memorial.created_at
+
+The Memorial model has no created_at field.
+
+REPAIR
+
+Removed the nonexistent created_at presentation field from:
+- Creator Dashboard recent memorial records
+- Rescue Dashboard recent memorial records
+
+NO SUBSTITUTE TIMESTAMP WAS INVENTED.
+
+PRESERVED
+
+- companion_name
+- status
+- created_by_user_id
+- Memorial model
+- database schema
+- dashboard access state
+- ranking architecture
+- organization visibility architecture
+
+ACCESS SEPARATION
+
+Dashboard status may be:
+active
+locked
+or another governed access state.
+
+Timestamp presentation validity
+!=
+Dashboard access authority
+
+DATABASE WRITES
+NONE
+
+NEXT
+
+Return to Creator / Rescue / Partner Dashboard Ranking Integration v1
+using this repaired account.py as the new protected baseline.
