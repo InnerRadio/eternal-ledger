@@ -1,0 +1,88 @@
+PURPAWS — NETWORK PULSE LEADERBOARD CONTAMINATION REMOVAL v1
+
+STATUS
+LOCKED
+
+UTC
+2026-08-20T20:48:04.957908+00:00
+
+PARENT CHECKPOINT
+876481c9890374f37de37e7335655430140a9f2c
+
+ACCOUNT.PY SHA256
+89d20ff3b1dbb510b918fa366659edc9544a77609672aa8d6c1bece6f490ce6b
+
+PUBLIC_API.PY SHA256
+ce871c90a3d98b86eb184f609511be00bd7c9723f632171e24eebfcaeb504028
+
+COUNT AGGREGATION SHA256
+275ea131ad5ec4b9b76e1a74d59eb852adba5970b9208b6d38be1ff55eaa9270
+
+NETWORK PULSE GOVERNANCE SHA256
+2128e43446e9587814914764a34d99a53e1143b8d855a779fc99dff082d02858
+
+PLATFORM RANKING AGGREGATION SHA256
+dbdbe902d4aa77e133e5c3f96a6f963b3effbc2335c8befcb90fe3bdca6c6066
+
+PUBLIC AGGREGATION PROJECTION SHA256
+4f4ca154c689c5aee8b8ea76571137bf5bb5f48ec9991abc0892b658377aa78d
+
+CANONICAL SEPARATION
+
+NETWORK PULSE
+= NETWORK SIZE + COMMUNITY ACTIVITY
+
+LEADERBOARD
+= RANKED PARTICIPANT / ORGANIZATION PERFORMANCE
+
+NETWORK PULSE != LEADERBOARD
+
+REMOVED FROM ACCOUNT PULSE
+
+- leaderboard_highlights
+- leaderboard Pulse layer
+- Leaderboard Highlights coming_soon entry
+
+REMOVED FROM PUBLIC PULSE
+
+- creator_score
+- rescue_score
+- affiliate_score
+- partner_score
+- creator_rankings
+- rescue_rankings
+- affiliate_rankings
+- partner_rankings
+- top_public_record
+- leaderboard_highlights
+- leaderboard Pulse layer
+- Leaderboard Highlights coming_soon entry
+
+PRESERVED
+
+- locked Network Pulse count truth
+- account Pulse network counts
+- account Pulse activity counts
+- public Pulse metrics
+- public Pulse continuity
+- public Pulse community
+- public Pulse opportunities
+- featured campaign
+- public systems metadata
+- Platform Leaderboard behavior
+- Platform Ranking Aggregation
+- Public Aggregation Projection
+
+DATABASE WRITES
+NONE
+
+SERVICES RESTARTED
+NO
+
+NEXT
+
+Commit and push this exact cleanup.
+
+Then continue from a clean separation:
+Pulse for aggregate health/activity.
+Leaderboard for ranked performance.
