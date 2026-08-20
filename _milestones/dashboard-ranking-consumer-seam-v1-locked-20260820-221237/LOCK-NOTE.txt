@@ -1,0 +1,79 @@
+PURPAWS — DASHBOARD RANKING CONSUMER SEAM v1
+
+STATUS
+LOCKED
+
+UTC
+2026-08-20T22:12:37.780480+00:00
+
+PARENT CHECKPOINT
+785dad4990bf24a158591b7a41c539d29bb7dc6d
+
+DASHBOARD RANKING CONSUMER SHA256
+ef63a0dd188386fd6276b430615d7b59522e14b2a200f64ff2f9952606bb3519
+
+PLATFORM RANKING AGGREGATION SHA256
+dbdbe902d4aa77e133e5c3f96a6f963b3effbc2335c8befcb90fe3bdca6c6066
+
+CANONICAL SEPARATION
+
+Platform Ranking Aggregation
+    calculates:
+    - score
+    - rank
+    - ranking components
+
+Dashboard Ranking Consumer Seam
+    selects:
+    - creator record by user_id
+    - rescue record by user_id
+    - partner records by supplied organization_ids
+
+Dashboard presentation
+    consumes selected canonical records
+
+RANKING TRUTH != DASHBOARD PRESENTATION
+
+ORGANIZATION VISIBILITY
+
+This seam does NOT decide organization visibility.
+
+organization_ids must already be authorized / visible before being
+passed into this selector.
+
+ORGANIZATION VISIBILITY
+!= RANKING SELECTION
+
+NON-GRANTS
+
+This seam grants no:
+- organization access
+- membership authority
+- campaign authority
+- relationship authority
+- publication authority
+- taxonomy authority
+- ownership
+- stewardship
+
+RUNTIME MODIFICATIONS
+
+account.py:
+NOT MODIFIED
+
+Platform Ranking Aggregation:
+NOT MODIFIED
+
+Database:
+NOT MODIFIED
+
+NEXT
+
+Commit and push this seam.
+
+Then integrate:
+- account_creator_dashboard
+- account_rescue_dashboard
+- account_partner_dashboard
+
+with this locked selector and remove local dashboard scoring formulas.
