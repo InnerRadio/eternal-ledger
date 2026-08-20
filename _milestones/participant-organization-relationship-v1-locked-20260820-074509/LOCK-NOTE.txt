@@ -1,0 +1,72 @@
+PURPAWS — FIRST CONTROLLED PARTICIPANT → ORGANIZATION RELATIONSHIP v1
+
+STATUS
+LOCKED
+
+SOURCE
+user:8
+
+TARGET
+organization:2
+
+CANONICAL RELATIONSHIP
+id=4
+
+relationship_type
+representative
+
+relationship_basis
+verified_onboarding_submission
+
+relationship_status
+active
+
+scope
+organization
+
+EVIDENCE
+onboarding_record:15
+
+LIVE PROOF
+
+Before:
+canonical_relationships = 3
+
+After:
+canonical_relationships = 4
+
+Controlled persistent relationship rows:
+1
+
+Controlled OrganizationMember rows:
+0
+
+LOCKED INTERPRETATION
+
+This relationship records an evidence-backed representative association.
+
+It does not establish:
+- ownership
+- employment
+- stewardship
+- administration
+- workspace access
+- publication authority
+- commerce authority
+- teammate invitation authority
+
+ACCESS BOUNDARY
+
+CanonicalRelationship != OrganizationMember
+
+RELATIONSHIP != PERMISSION
+
+NEXT
+
+Define Access Decision Authority v1.
+
+The next authority must determine whether a recognized canonical relationship
+is sufficient to grant operational access and, if so, what explicit role and
+status should be created in OrganizationMember.
+
+No access may be inferred merely from relationship existence.

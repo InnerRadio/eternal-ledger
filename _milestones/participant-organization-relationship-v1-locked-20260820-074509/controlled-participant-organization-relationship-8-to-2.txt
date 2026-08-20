@@ -1,0 +1,35 @@
+PURPAWS CONTROLLED PARTICIPANT → ORGANIZATION RELATIONSHIP
+
+SOURCE
+user:8
+
+TARGET
+organization:2
+
+CANONICAL RELATIONSHIP
+id=4
+relationship_type=representative
+relationship_basis=verified_onboarding_submission
+relationship_status=active
+scope=organization
+
+EVIDENCE
+evidence_source_type=onboarding_record
+evidence_source_id=15
+evidence_reference=onboarding_record:15
+
+ACCESS STATE
+OrganizationMember rows user:8 -> organization:2 = 0
+
+NOT ESTABLISHED BY THIS RELATIONSHIP
+ownership
+employment
+stewardship
+administration
+workspace access
+publication authority
+commerce authority
+teammate invitation authority
+
+PRINCIPLE
+RELATIONSHIP != PERMISSION
