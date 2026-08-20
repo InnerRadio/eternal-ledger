@@ -1,0 +1,94 @@
+PURPAWS — PLATFORM LEADERBOARD CONSUMER INTEGRATION v1
+
+STATUS
+LOCKED
+
+Locked UTC:
+2026-08-20T19:50:52.688518+00:00
+
+STARTING CHECKPOINT
+5b0e5d951e10042d634baadce193e375165327c9
+
+ACCOUNT.PY BEFORE SHA256
+06789c50b9ea9e87430934825598fb71b5db771e833404e31fa743c07ac06472
+
+ACCOUNT.PY AFTER SHA256
+3d6d6e51b6d026283d4bb2fb2ca5d3826700fafc3c03c95cf774597d460295e3
+
+PLATFORM RANKING AGGREGATION SHA256
+dbdbe902d4aa77e133e5c3f96a6f963b3effbc2335c8befcb90fe3bdca6c6066
+
+INTEGRATION
+
+/account/leaderboard
+    ->
+build_platform_ranking_aggregation(db)
+
+ONE SCORING TRUTH
+
+YES
+
+DUPLICATE ENDPOINT SCORING BODY
+
+REMOVED
+
+ENDPOINT CONTRACT
+
+module:
+PRESERVED
+
+status:
+PRESERVED
+
+version:
+PRESERVED
+
+viewer:
+PRESERVED
+
+summary:
+PRESERVED
+
+leaderboards:
+PRESERVED
+
+notes:
+PRESERVED
+
+user-not-found behavior:
+PRESERVED
+
+RANKING FAMILIES
+
+creators:
+LOCKED AGGREGATION TRUTH
+
+rescues:
+LOCKED AGGREGATION TRUTH
+
+partners:
+LOCKED AGGREGATION TRUTH
+
+affiliates:
+LOCKED AGGREGATION TRUTH
+
+AUTHORITY BOUNDARY
+
+Platform aggregation
+!= Public projection
+!= Organization access
+!= Membership
+!= Relationship
+!= Publication
+!= Taxonomy authority
+
+DATABASE WRITES
+
+NONE
+
+NEXT
+
+Commit and push this exact consumer integration.
+
+Then begin Network Pulse consumer integration against the same
+locked aggregation truth and locked public projection seam.
