@@ -1,0 +1,71 @@
+PURPAWS — PUBLIC AGGREGATION PROJECTION SEAM v1
+LOCKED
+
+Locked UTC:
+2026-08-20T19:23:59.168470+00:00
+
+Source checkpoint:
+cab0c93922b37bf20de54fa7f3862b373a4c930c
+
+Projection seam:
+backend/app/public_aggregation_projection.py
+
+SHA256:
+4f4ca154c689c5aee8b8ea76571137bf5bb5f48ec9991abc0892b658377aa78d
+
+GOVERNING PRINCIPLE
+
+Aggregation Truth != Public Projection.
+
+Analytical input is not automatically a public field.
+
+PUBLIC PROJECTION CONTRACT
+
+Participant ranking projection:
+- rank
+- score
+
+Participant account identity is NOT public projection:
+- user_id
+- email
+- role
+- affiliate_id
+- referral_code
+- components
+- commission_points
+
+Organization ranking projection:
+- organization_id
+- organization_name
+- organization_type
+- project
+- rank
+- score
+
+Projection behavior:
+- explicit allow-list only
+- returns new dictionaries
+- does not mutate aggregation truth
+- does not query or write database
+- does not grant organization access
+- does not create OrganizationMember
+- does not create relationships
+- does not make publication decisions
+- does not make taxonomy decisions
+
+AUTHORITY SEPARATION
+
+Platform aggregation truth
+!= Public projection
+!= Organization access
+!= Campaign authority
+!= Membership
+!= Relationship
+!= Publication
+!= Taxonomy authority
+
+NETWORK PULSE
+
+Network Pulse integration is NOT part of this lock.
+
+This milestone locks the pure projection seam only.
