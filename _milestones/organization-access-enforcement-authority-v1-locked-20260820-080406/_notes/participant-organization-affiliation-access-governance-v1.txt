@@ -1,0 +1,271 @@
+PURPAWS / ETERNAL LEDGER
+PARTICIPANT ↔ ORGANIZATION AFFILIATION + ACCESS GOVERNANCE v1
+
+STATUS
+LOCKED ARCHITECTURAL CONTRACT
+
+PURPOSE
+
+Define the boundary between:
+
+1. evidence,
+2. canonical identity resolution,
+3. canonical relationships,
+4. operational organization membership,
+5. permissions and workspace authority.
+
+CORE PRINCIPLE
+
+A relationship is not a permission.
+
+Evidence that a Participant is associated with an Organization may justify
+recognition of a canonical relationship.
+
+It does not, by itself, authorize that Participant to control, edit, publish,
+administer, or otherwise act on behalf of that Organization.
+
+ARCHITECTURAL FLOW
+
+Evidence
+    ↓
+Canonical Organization Resolution
+    ↓
+Canonical Participant ↔ Organization Relationship
+    ↓
+Explicit Access Decision
+    ↓
+OrganizationMember
+    ↓
+Workspace / Dashboard Authority
+
+LAYER 1 — EVIDENCE
+
+Evidence records what was observed, submitted, verified, reviewed, or otherwise
+established.
+
+Evidence may support identity resolution or relationship recognition.
+
+Evidence does not itself grant operational authority.
+
+LAYER 2 — CANONICAL ORGANIZATION RESOLUTION
+
+Canonical organization resolution determines which canonical Organization an
+incoming source record refers to.
+
+Resolution answers:
+
+    "Which Organization is this?"
+
+Resolution does not answer:
+
+    "Who may control this Organization?"
+
+Resolution must not create membership or permission.
+
+LAYER 3 — CANONICAL RELATIONSHIP
+
+CanonicalRelationship represents an evidence-backed relationship between
+canonical subjects.
+
+Examples may include:
+
+    Participant → Organization
+    Organization → Organization
+    Organization → Campaign
+    Participant → Campaign
+
+A canonical relationship contains explicit semantics including:
+
+    source
+    target
+    relationship_type
+    relationship_basis
+    relationship_status
+    scope
+    evidence
+
+CanonicalRelationship belongs to the intelligence / truth layer.
+
+It is not an access-control record.
+
+LAYER 4 — ACCESS DECISION
+
+Operational authority requires a separate explicit decision.
+
+The system must determine whether the recognized relationship is sufficient
+to grant access and, if so, what access is appropriate.
+
+The decision must not be inferred merely from:
+
+    matching email addresses
+    onboarding ownership
+    canonicalization provenance
+    organization resolution
+    contact information
+    public profile information
+    relationship existence
+
+The access decision must be explicit and auditable.
+
+LAYER 5 — ORGANIZATION MEMBER
+
+OrganizationMember belongs to the operational authority layer.
+
+It connects:
+
+    user_id
+    organization_id
+    role
+    status
+
+An active OrganizationMember record may enable organization-specific account,
+dashboard, workspace, campaign, or management functionality according to the
+existing account authority.
+
+OrganizationMember must not be silently created by canonical resolution.
+
+OrganizationMember must not be silently created merely because a canonical
+relationship exists.
+
+LAYER 6 — WORKSPACE / DASHBOARD AUTHORITY
+
+Workspace and dashboard authority are downstream consequences of approved
+operational membership and account authority.
+
+The UI must consume authority.
+
+The UI must not invent authority.
+
+GOVERNANCE INVARIANTS
+
+INVARIANT 1
+
+Canonical identity resolution and operational access are separate concerns.
+
+INVARIANT 2
+
+CanonicalRelationship and OrganizationMember are separate records with
+separate responsibilities.
+
+INVARIANT 3
+
+CanonicalRelationship records recognized truth.
+
+OrganizationMember records operational authority.
+
+INVARIANT 4
+
+Relationship recognition must not automatically grant permission.
+
+INVARIANT 5
+
+Organization resolution must not automatically create OrganizationMember.
+
+INVARIANT 6
+
+A participant may have a legitimate canonical relationship to an Organization
+without having administrative or publishing authority over that Organization.
+
+INVARIANT 7
+
+Operational authority must be explicit, reviewable, and revocable.
+
+INVARIANT 8
+
+Access roles must describe operational authority rather than merely describing
+the real-world relationship.
+
+INVARIANT 9
+
+Evidence supporting relationship recognition must remain distinguishable from
+the decision granting operational access.
+
+INVARIANT 10
+
+Public discovery, publication, canonical intelligence, communication permission,
+and organization operational authority remain separate governance domains.
+
+CURRENT CONTROLLED CASE
+
+Participant:
+
+    User #8
+
+Canonical Organization:
+
+    Organization #2
+    PurPaws Testing
+
+Current inspected state:
+
+    User #8 exists.
+    Organization #2 exists.
+    Organization #2 is canonical.
+    No direct User #8 ↔ Organization #2 OrganizationMember link exists.
+
+Therefore:
+
+    No OrganizationMember record is to be inferred merely from canonical
+    organization resolution.
+
+The next controlled operation may establish an evidence-backed canonical
+Participant ↔ Organization relationship.
+
+Only after that relationship is understood and verified should a separate
+operational access decision be considered.
+
+DO NOT COLLAPSE
+
+Do not collapse:
+
+    Evidence
+    CanonicalizationProvenance
+    CanonicalRelationship
+    OrganizationMember
+    CommunicationPermission
+    Publication authority
+    Workspace authority
+
+into one concept.
+
+They answer different questions.
+
+QUESTIONS ANSWERED
+
+CanonicalizationProvenance:
+
+    "Where did this canonical identity resolution come from?"
+
+CanonicalRelationship:
+
+    "What recognized relationship exists between these canonical subjects?"
+
+OrganizationMember:
+
+    "What operational role does this account have inside this Organization?"
+
+CommunicationPermission:
+
+    "What communications are permitted?"
+
+Publication authority:
+
+    "What may be published, and under whose authority?"
+
+Workspace authority:
+
+    "What operational interfaces and actions may this account access?"
+
+LOCK
+
+This governance contract must be preserved as Participant ↔ Organization
+affiliation and access functionality evolves.
+
+Future implementations may extend roles, review workflows, invitations,
+verification, stewardship, ownership transfer, and delegated authority.
+
+They must preserve the separation:
+
+    RELATIONSHIP ≠ PERMISSION
+
+END

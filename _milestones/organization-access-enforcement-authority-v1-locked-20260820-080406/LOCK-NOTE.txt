@@ -1,0 +1,89 @@
+PURPAWS — ORGANIZATION ACCESS ENFORCEMENT AUTHORITY v1
+LOCKED
+
+Locked UTC:
+2026-08-20T08:04:06.270511+00:00
+
+Authority:
+backend/app/organization_access_authority.py
+
+Authority SHA256:
+4cad454ce1473b6d121e65e3783c31c996479035ff0862dc0f1a5c9716220eaa
+
+ROLE HIERARCHY
+
+viewer
+editor
+manager
+steward
+owner
+
+CAPABILITY THRESHOLDS
+
+view_organization     -> viewer
+edit_organization     -> editor
+manage_campaigns      -> manager
+administer_members    -> steward
+
+OWNER
+
+owner satisfies all v1 organization capabilities.
+
+ADMIN ACCOUNT BYPASS
+
+admin / super_admin account roles remain explicit
+administrative bypass authorities.
+
+CONTROLLED ZERO-ACCESS PROOF
+
+user:8
+organization:2
+
+OrganizationMember rows:
+0
+
+Therefore:
+
+view_organization     DENIED
+edit_organization     DENIED
+manage_campaigns      DENIED
+administer_members    DENIED
+
+reason:
+no_active_membership
+
+EXISTING OWNER PROOF
+
+user:2
+organization:1
+membership role: owner
+membership status: active
+
+All four v1 organization capabilities:
+AUTHORIZED
+
+BOUNDARIES
+
+CanonicalRelationship != OrganizationMember.
+Relationship != Permission.
+Active membership alone is not sufficient.
+Membership role must authorize capability.
+
+This authority does not grant publication authority.
+This authority does not grant commerce authority.
+This authority does not grant communication permission.
+This authority does not establish canonical relationship truth.
+This authority does not establish ownership evidence.
+This authority does not establish location scope.
+
+LIVE ROUTE INTEGRATION
+
+NOT YET PERFORMED.
+
+account.py remains unchanged by this milestone.
+
+NEXT
+
+Route existing organization and campaign authorization gates
+through Organization Access Enforcement Authority v1,
+one controlled route family at a time.
