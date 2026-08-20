@@ -1,0 +1,81 @@
+PURPAWS — NETWORK PULSE GOVERNANCE v1
+
+STATUS
+LOCKED
+
+UTC
+2026-08-20T20:28:21.934924+00:00
+
+PARENT CHECKPOINT
+c5e925e06f4a14472d6df87af872a4668ca33d03
+
+GOVERNANCE SHA256
+2128e43446e9587814914764a34d99a53e1143b8d855a779fc99dff082d02858
+
+CANONICAL MEANING
+
+NETWORK PULSE
+= NETWORK SIZE + COMMUNITY ACTIVITY
+
+LEADERBOARD
+= RANKED PARTICIPANT / ORGANIZATION PERFORMANCE
+
+NETWORK PULSE != LEADERBOARD
+
+PUBLIC COUNT SEMANTICS
+
+members
+public-safe participant count
+
+organizations
+active organization count
+
+creators
+recognized creator count
+
+rescues
+recognized rescue count
+
+rescue_organizations
+active rescue organization count
+
+affiliates
+affiliate participant count
+
+memorials
+published memorial count
+
+media_assets
+published media asset count
+
+contributions
+published contribution count
+
+active_opportunities
+active public opportunity count
+
+EXCLUDED FROM NETWORK PULSE
+
+rank
+score
+top_creator
+top_rescue
+top_partner
+top_affiliate
+leaderboard_highlights
+leaderboard scoring
+
+RUNTIME SOURCE MODIFIED
+NO
+
+DATABASE MODIFIED
+NO
+
+NEXT
+
+Commit and push this governance contract.
+
+Then create Network Pulse Count Aggregation Seam v1.
+
+After that, integrate account Pulse and public Pulse into the shared
+count truth and remove historical leaderboard contamination.
