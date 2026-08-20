@@ -1,0 +1,91 @@
+PURPAWS — PLATFORM RANKING AGGREGATION SEAM v1
+
+STATUS
+LOCKED
+
+Locked UTC:
+2026-08-20T19:35:46.756580+00:00
+
+SOURCE CHECKPOINT
+e495097bfccf26edb74c62d2217801ce8a3821d9
+
+PLATFORM RANKING AGGREGATION SHA256
+dbdbe902d4aa77e133e5c3f96a6f963b3effbc2335c8befcb90fe3bdca6c6066
+
+PUBLIC AGGREGATION PROJECTION SHA256
+4f4ca154c689c5aee8b8ea76571137bf5bb5f48ec9991abc0892b658377aa78d
+
+GOVERNING PRINCIPLE
+
+One scoring truth.
+Multiple consumers.
+Explicit projection boundaries.
+
+RANKING FAMILIES
+
+creator
+rescue
+partner
+affiliate
+
+AGGREGATION CONTRACT
+
+The seam computes platform-wide aggregation truth.
+
+It retains internal analytical identity and component values.
+
+It does not perform public projection.
+
+It does not decide organization access.
+
+It does not grant permission.
+
+It does not create OrganizationMember.
+
+It does not create CanonicalRelationship.
+
+It does not publish canonical records.
+
+It does not administer taxonomy.
+
+It does not write the database.
+
+PARITY
+
+Existing Platform Leaderboard summary:
+MATCHED
+
+Existing creator top-25:
+MATCHED
+
+Existing rescue top-25:
+MATCHED
+
+Existing partner top-25:
+MATCHED
+
+Existing affiliate top-25:
+MATCHED
+
+PUBLIC PROJECTION
+
+Compatibility with locked Public Aggregation Projection Seam:
+VERIFIED
+
+CONSUMER INTEGRATION
+
+account.py:
+NOT YET INTEGRATED
+
+public_api.py:
+NOT YET INTEGRATED
+
+Network Pulse:
+NOT YET INTEGRATED
+
+NEXT
+
+Commit and push this aggregation seam.
+
+Then integrate Platform Leaderboard as the first consumer of the
+locked aggregation-truth authority.
