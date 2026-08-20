@@ -1,0 +1,93 @@
+PURPAWS — ACCOUNT NETWORK PULSE COUNT CONSUMER INTEGRATION v1
+
+STATUS
+LOCKED
+
+UTC
+2026-08-20T20:39:53.159151+00:00
+
+PARENT CHECKPOINT
+7f9de5d8cae2e10d525bf7e150b563f7e0cb7111
+
+ACCOUNT.PY SHA256
+a3b5ac0e357b10f616486b5b62b1a84af3eceef18ba8f4ffe97c742a2a869a29
+
+COUNT AGGREGATION SHA256
+275ea131ad5ec4b9b76e1a74d59eb852adba5970b9208b6d38be1ff55eaa9270
+
+NETWORK PULSE GOVERNANCE SHA256
+2128e43446e9587814914764a34d99a53e1143b8d855a779fc99dff082d02858
+
+INTEGRATION
+
+account_network_pulse
+    ->
+build_network_pulse_counts(db)
+
+CANONICAL COUNT TRUTH
+
+network:
+- members
+- organizations
+- creators
+- rescues
+- rescue_organizations
+- affiliates
+
+activity:
+- memorials
+- media_assets
+- contributions
+- active_opportunities
+
+ACCOUNT COMPATIBILITY
+
+The existing account Pulse response key:
+
+active_campaigns
+
+is preserved and maps to:
+
+pulse_counts["activity"]["active_opportunities"]
+
+PUBLIC-SAFE SEMANTIC CHANGE
+
+Before:
+memorials = 3
+media_assets = 10
+
+After:
+memorials = 2
+media_assets = 2
+
+The new values represent published/public-safe activity truth.
+
+NON-COUNT PRESENTATION
+
+Featured campaign:
+PRESERVED
+
+Leaderboard placeholder:
+PRESERVED TEMPORARILY
+
+Leaderboard cleanup:
+NOT PART OF THIS LOCK
+
+PUBLIC NETWORK PULSE
+
+NOT MODIFIED
+
+DATABASE WRITES
+
+NONE
+
+NETWORK PULSE != LEADERBOARD
+
+NEXT
+
+Commit and push this account consumer integration.
+
+Then integrate public_network_pulse into the same locked count truth.
+
+After both consumers are integrated, perform the dedicated Leaderboard
+contamination cleanup from both Pulse surfaces.
