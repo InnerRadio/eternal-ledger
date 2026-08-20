@@ -1,0 +1,61 @@
+PURPAWS — PLATFORM AGGREGATION GOVERNANCE v1
+
+STATUS
+LOCKED
+
+GOVERNANCE SHA256
+221269fe99488fbe8db943b8f70e666bfa1e9fcd14e4846c46028fc422e6bb39
+
+ACCOUNT SNAPSHOT SHA256
+06789c50b9ea9e87430934825598fb71b5db771e833404e31fa743c07ac06472
+
+CLASSIFICATION
+
+/account/leaderboard
+PLATFORM / COMMUNITY AGGREGATOR
+
+/account/network-pulse
+PUBLIC COMMUNITY AGGREGATOR
+
+CORE SEPARATION
+
+Platform Aggregation
+!= Organization Access
+!= Campaign Authority
+!= Membership
+!= Relationship
+!= Publication
+!= Taxonomy Authority
+
+Aggregation Truth
+!= Public Projection
+
+ORGANIZATION MEMBER
+
+May participate as aggregation evidence.
+Does not define viewer authorization for platform aggregation.
+
+ORGANIZATION VISIBILITY SEAM
+
+Must not redefine platform aggregation as "my organizations."
+
+PUBLIC PROMOTION
+
+Leaderboard data promoted into Network Pulse or another public surface
+must pass through an explicit public-safe projection boundary.
+
+RUNTIME SOURCE MODIFIED
+NO
+
+DATABASE MODIFIED
+NO
+
+ACCESS GRANTED
+NO
+
+NEXT
+
+Commit and push Platform Aggregation Governance v1.
+
+Then inspect/design the Public Aggregation Projection seam before
+enabling public leaderboard highlights.

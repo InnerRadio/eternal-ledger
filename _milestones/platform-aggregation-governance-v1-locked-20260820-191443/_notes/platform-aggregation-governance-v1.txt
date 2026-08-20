@@ -1,0 +1,357 @@
+PURPAWS — PLATFORM AGGREGATION GOVERNANCE v1
+
+STATUS
+GOVERNING ARCHITECTURE
+
+PURPOSE
+
+Define the authority boundary for platform-wide aggregation systems,
+including Platform Leaderboard and Network Pulse.
+
+This contract prevents platform intelligence from being incorrectly
+collapsed into organization access authority.
+
+======================================================================
+CORE SEPARATION
+======================================================================
+
+Platform Aggregation
+!= Organization Access
+!= Campaign Authority
+!= Membership
+!= Relationship
+!= Publication
+!= Taxonomy Authority
+
+Aggregation Truth
+!= Public Projection
+
+======================================================================
+1. PLATFORM AGGREGATION
+======================================================================
+
+Platform aggregation answers questions about the network as a whole.
+
+Examples:
+
+- How large is the community?
+- How much activity exists across the network?
+- Which participants or organizations rank according to defined metrics?
+- What patterns, counts, scores, and signals exist across the platform?
+- What public-safe community heartbeat should be surfaced?
+
+Platform aggregation may consume records from multiple canonical and
+operational domains as source data.
+
+The presence of organization, membership, campaign, relationship,
+publication, or taxonomy data inside an aggregate does not transfer
+authority from those domains to the aggregation system.
+
+DATA INPUT != AUTHORITY GRANT.
+
+======================================================================
+2. PLATFORM LEADERBOARD
+======================================================================
+
+Platform Leaderboard is a platform/community intelligence aggregator.
+
+Its purpose is to calculate comparative network rankings and reputation
+signals across participants and organizations.
+
+OrganizationMember may participate as source evidence for ranking
+components.
+
+OrganizationMember is NOT an authorization gate for the leaderboard.
+
+The leaderboard MUST NOT be converted into a "my organizations" feature
+by filtering its platform-wide inputs through dashboard organization
+visibility.
+
+Therefore:
+
+get_visible_organizations()
+MUST NOT define the leaderboard population.
+
+view_organization
+MUST NOT define the leaderboard population.
+
+Organization access roles
+MUST NOT determine whether an otherwise eligible platform entity exists
+inside platform-wide ranking calculations.
+
+======================================================================
+3. NETWORK PULSE
+======================================================================
+
+Network Pulse is the public-facing community heartbeat aggregator.
+
+It describes network-scale state and activity.
+
+Examples include:
+
+- participant counts
+- organization counts
+- creator counts
+- rescue counts
+- affiliate counts
+- memorial counts
+- contribution counts
+- media activity
+- active public opportunity/campaign counts
+- future public-safe leaderboard highlights
+
+Network Pulse is NOT private organization analytics.
+
+Network Pulse is NOT a participant-specific organization dashboard.
+
+Organization access authority MUST NOT determine the population of
+community-wide Pulse metrics.
+
+======================================================================
+4. AGGREGATION TRUTH
+======================================================================
+
+Aggregation Truth is the internal evidence-backed analytical result.
+
+It may use data that is legitimate for internal computation but is not
+appropriate for unrestricted public exposure.
+
+Examples may include:
+
+- internal user identifiers
+- internal organization identifiers
+- account roles
+- membership relationships
+- referral identifiers
+- analytical component values
+- internal scoring inputs
+- other operational identifiers
+
+The fact that data may be used to calculate an aggregate does NOT mean
+that data may be publicly exposed.
+
+ANALYTICAL INPUT != PUBLIC FIELD.
+
+======================================================================
+5. PUBLIC AGGREGATION PROJECTION
+======================================================================
+
+Any platform aggregation promoted to a public surface MUST pass through
+a public-safe projection boundary.
+
+Public-safe projection may expose only fields intentionally approved for
+public/community discovery.
+
+Examples may include:
+
+- approved public display identity
+- public organization identity
+- rank
+- score where appropriate
+- aggregate counts
+- public badges/status
+- public-safe metric components
+- approved public profile references
+
+Public projection MUST NOT automatically expose:
+
+- private email addresses
+- private phone numbers
+- account credentials
+- authentication information
+- private referral identifiers
+- internal-only account identifiers where unnecessary
+- private membership administration data
+- organization permissions
+- unpublished operational records
+- private commerce data
+
+PUBLIC PROJECTION MUST BE EXPLICIT.
+
+======================================================================
+6. LEADERBOARD PUBLICATION BOUNDARY
+======================================================================
+
+The current Platform Leaderboard may contain fields appropriate for an
+authenticated/internal analytical response that are not automatically
+approved for public promotion.
+
+Therefore:
+
+Platform Leaderboard
+        ->
+Aggregation Truth
+        ->
+Public-Safe Projection
+        ->
+Network Pulse / Public Discovery
+
+NOT:
+
+Platform Leaderboard
+        ->
+raw public exposure
+
+Any future promotion of leaderboard highlights into Network Pulse MUST
+use an explicit public-safe projection.
+
+======================================================================
+7. MEMBERSHIP SEMANTICS
+======================================================================
+
+Membership can be evidence inside aggregation.
+
+Membership does not become aggregation authority.
+
+For example:
+
+An active OrganizationMember row may contribute to a count, score,
+relationship signal, or ranking component.
+
+That does NOT mean:
+
+- the viewer receives organization access;
+- the member receives campaign authority;
+- the member receives publication authority;
+- the member receives taxonomy authority;
+- the leaderboard becomes membership-scoped;
+- the Network Pulse becomes membership-scoped.
+
+MEMBERSHIP AS DATA != MEMBERSHIP AS PERMISSION.
+
+======================================================================
+8. RELATIONSHIP SEMANTICS
+======================================================================
+
+CanonicalRelationship may become an analytical input to future
+aggregation systems.
+
+CanonicalRelationship remains intelligence/truth.
+
+CanonicalRelationship does not grant permission.
+
+RELATIONSHIP AS SIGNAL != RELATIONSHIP AS PERMISSION.
+
+======================================================================
+9. TAXONOMY SEMANTICS
+======================================================================
+
+Platform-curated taxonomy may become an input to aggregation,
+segmentation, discovery, ranking, or community intelligence.
+
+Taxonomy remains platform-curated intelligence.
+
+Taxonomy does not become organization access.
+
+TAXONOMY SIGNAL != ORGANIZATION AUTHORITY.
+
+======================================================================
+10. CAMPAIGN SEMANTICS
+======================================================================
+
+Campaign activity may contribute to aggregate scores and community
+activity metrics.
+
+Campaign data appearing inside an aggregate does not grant campaign
+management authority.
+
+CAMPAIGN METRIC != MANAGE_CAMPAIGNS.
+
+======================================================================
+11. PUBLICATION SEMANTICS
+======================================================================
+
+Published records may contribute to public aggregation.
+
+Aggregation does not itself publish canonical records.
+
+AGGREGATION != PUBLICATION AUTHORITY.
+
+======================================================================
+12. AUTHORITY BOUNDARIES
+======================================================================
+
+Organization Access Authority answers:
+
+"What may this participant do with this organization?"
+
+Platform Aggregation answers:
+
+"What does the network evidence tell us?"
+
+Public Aggregation Projection answers:
+
+"What portion of that aggregate intelligence is safe and appropriate
+to expose on this public surface?"
+
+These are three separate responsibilities.
+
+======================================================================
+13. CURRENT ROUTE CLASSIFICATION
+======================================================================
+
+/account/leaderboard
+
+Classification:
+PLATFORM / COMMUNITY AGGREGATOR
+
+Organization membership:
+SOURCE DATA / RANKING EVIDENCE
+
+Organization access authority:
+NOT POPULATION AUTHORITY
+
+Public-safe projection:
+REQUIRED BEFORE RAW LEADERBOARD RECORDS ARE PROMOTED TO PUBLIC SURFACES
+
+
+/account/network-pulse
+
+Classification:
+PUBLIC COMMUNITY AGGREGATOR
+
+Purpose:
+PUBLIC-SAFE COMMUNITY HEARTBEAT
+
+Organization access authority:
+NOT POPULATION AUTHORITY
+
+Leaderboard promotion:
+MUST USE PUBLIC-SAFE PROJECTION
+
+======================================================================
+14. NON-GRANTS
+======================================================================
+
+This governance contract does NOT grant:
+
+- organization access
+- organization editing
+- campaign management
+- member administration
+- publication authority
+- taxonomy authority
+- commerce authority
+- communication permission
+- ownership
+- stewardship
+- teammate invitation authority
+
+======================================================================
+15. GOVERNING PRINCIPLE
+======================================================================
+
+Platform Aggregation
+!= Organization Access
+!= Campaign Authority
+!= Membership
+!= Relationship
+!= Publication
+!= Taxonomy Authority
+
+Aggregation Truth
+!= Public Projection
+
+Data may inform intelligence without transferring authority.
+
+Public exposure must be an explicit projection decision.
