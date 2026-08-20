@@ -1,0 +1,104 @@
+PURPAWS — PUBLIC NETWORK PULSE COUNT CONSUMER INTEGRATION v1
+
+STATUS
+LOCKED
+
+UTC
+2026-08-20T20:44:06.319668+00:00
+
+PARENT CHECKPOINT
+c77546e558d371b6f1c7c8d2f5e2e50b05307426
+
+PUBLIC_API.PY SHA256
+ba57bbe2f98404aa9d0898a55a4ad1411123e2a7bcc19700556fa7b5395472c9
+
+ACCOUNT.PY SHA256
+a3b5ac0e357b10f616486b5b62b1a84af3eceef18ba8f4ffe97c742a2a869a29
+
+COUNT AGGREGATION SHA256
+275ea131ad5ec4b9b76e1a74d59eb852adba5970b9208b6d38be1ff55eaa9270
+
+NETWORK PULSE GOVERNANCE SHA256
+2128e43446e9587814914764a34d99a53e1143b8d855a779fc99dff082d02858
+
+INTEGRATION
+
+public_network_pulse
+    ->
+build_network_pulse_counts(db)
+
+CANONICAL COUNT TRUTH
+
+metrics:
+- published_memorials
+- published_media_assets
+- published_contributions
+- members
+- organizations
+- creators
+- rescues
+- rescue_organizations
+- affiliates
+- active_opportunities
+
+compatibility objects:
+- continuity
+- community
+
+opportunities.count:
+- canonical active opportunity count
+
+PRESENTATION PRESERVED
+
+Opportunity records:
+PRESERVED
+
+Featured opportunity:
+PRESERVED
+
+Pulse layer metadata:
+PRESERVED
+
+Systems:
+PRESERVED
+
+HISTORICAL LEADERBOARD CONTAMINATION
+
+PRESERVED TEMPORARILY
+
+creator_score:
+PRESENT
+
+rescue_score:
+PRESENT
+
+affiliate_score:
+PRESENT
+
+partner_score:
+PRESENT
+
+leaderboard_highlights:
+PRESENT
+
+This contamination is NOT canonical Pulse architecture.
+
+NETWORK PULSE != LEADERBOARD.
+
+It will be removed in the dedicated cleanup pass after both Pulse
+consumers are safely locked to one count truth.
+
+ACCOUNT NETWORK PULSE
+
+ALREADY LOCKED TO SAME COUNT TRUTH
+
+DATABASE WRITES
+
+NONE
+
+NEXT
+
+Commit and push this public consumer integration.
+
+Then perform Network Pulse Leaderboard Contamination Removal v1 across
+both Pulse surfaces while proving Platform Leaderboard remains unchanged.
