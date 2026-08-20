@@ -1,0 +1,105 @@
+PURPAWS — DASHBOARD ORGANIZATION VISIBILITY SEAM v1
+
+STATUS
+LOCKED
+
+VISIBILITY SEAM SHA256
+6dbf433f612fcb68411a2b9f78d5121f576cf86d51a144ef6bd1cb007b9a6ce2
+
+ORGANIZATION ACCESS AUTHORITY SHA256
+4cad454ce1473b6d121e65e3783c31c996479035ff0862dc0f1a5c9716220eaa
+
+PURPOSE
+
+Provide one reusable role-aware Organization visibility seam for
+account/dashboard presentation surfaces.
+
+VISIBILITY CONTRACT
+
+Active OrganizationMember
+    ->
+Organization Access Enforcement Authority
+    ->
+view_organization
+    ->
+dashboard-visible Organization
+
+ACTIVE MEMBERSHIP ALONE
+
+NOT SUFFICIENT
+
+CAPABILITY
+
+view_organization
+
+WRITE AUTHORITY
+
+NOT GRANTED
+
+CAMPAIGN AUTHORITY
+
+NOT GRANTED
+
+MEMBER ADMINISTRATION
+
+NOT GRANTED
+
+PUBLICATION AUTHORITY
+
+NOT GRANTED
+
+TAXONOMY AUTHORITY
+
+NOT GRANTED
+
+CONTROLLED CASE
+
+user:8
+organization:2
+
+OrganizationMember:
+NONE
+
+Visible memberships:
+0
+
+Visible organizations:
+0
+
+EXISTING OWNER CASE
+
+user:2
+organization:1
+
+membership:
+owner / active
+
+Visible memberships:
+1
+
+Visible organizations:
+1
+
+BOUNDARY
+
+Dashboard visibility != edit authority.
+Dashboard visibility != campaign authority.
+Dashboard visibility != member administration.
+Dashboard visibility != publication authority.
+Dashboard visibility != taxonomy authority.
+
+RELATIONSHIP != ACCESS.
+ROLE MUST BE ENFORCED.
+
+DASHBOARD ROUTE INTEGRATION
+
+NOT YET PERFORMED.
+
+account.py remains unchanged by this milestone.
+
+NEXT
+
+Commit and push this seam.
+
+Then integrate the six dashboard presentation routes through this
+locked visibility authority.
