@@ -1,0 +1,54 @@
+PURPAWS — PARTICIPANT ↔ ORGANIZATION ACCESS DECISION AUTHORITY v1
+
+STATUS
+LOCKED
+
+AUTHORITY SHA256
+0b9219380086db20596091e026d32cd9f723291cb24522141ac02876cee17a72
+
+DECISION VOCABULARY
+GRANT
+DENY
+DEFER
+REVOKE
+
+CONTROLLED CASE
+user:8 -> organization:2
+
+CANONICAL RELATIONSHIP
+id=4
+relationship_type=representative
+relationship_basis=verified_onboarding_submission
+
+CURRENT ACCESS DECISION
+NONE
+
+CURRENT ORGANIZATION MEMBER
+NONE
+
+CURRENT EFFECTIVE ACCESS
+NOT ESTABLISHED
+
+LOCKED PRINCIPLES
+
+CanonicalRelationship != AccessDecision
+AccessDecision != OrganizationMember
+Relationship existence does not imply access
+First submitter does not automatically receive privileged authority
+Operational role must be explicit
+Operational role vocabulary is deferred to a separate lock
+OrganizationMember is an enforcement record
+Access history should become append-only
+Revocation must not destroy canonical relationship history
+Teammate invitation is separate authority
+DEFER RATHER THAN GUESS
+
+RELATIONSHIP != PERMISSION
+
+NEXT
+
+Inspect current OrganizationMember role semantics and application enforcement.
+
+Then define launch-safe Organization Access Role Vocabulary v1.
+
+NO ACCESS GRANT IS AUTHORIZED BY THIS LOCK.
