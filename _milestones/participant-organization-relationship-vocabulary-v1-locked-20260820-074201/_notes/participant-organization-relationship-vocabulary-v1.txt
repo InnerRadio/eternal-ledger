@@ -1,0 +1,193 @@
+PURPAWS / ETERNAL LEDGER
+PARTICIPANT → ORGANIZATION RELATIONSHIP VOCABULARY v1
+
+STATUS
+LOCKED ARCHITECTURAL VOCABULARY
+
+PURPOSE
+
+Define conservative canonical relationship semantics for evidence-backed
+Participant → Organization relationships.
+
+This vocabulary records what the evidence supports.
+
+It must not exaggerate participant authority.
+
+PRIMARY RELATIONSHIP TYPE
+
+representative
+
+DEFINITION
+
+A Participant is recognized as a representative of an Organization when
+verified evidence establishes that the Participant acted in an organization
+capacity in connection with that canonical Organization.
+
+"representative" means:
+
+    evidence-backed organizational association
+
+It does NOT automatically mean:
+
+    employee
+    owner
+    founder
+    director
+    officer
+    steward
+    administrator
+    authorized manager
+    authorized publisher
+    account owner
+    workspace controller
+
+PRIMARY RELATIONSHIP BASIS
+
+verified_onboarding_submission
+
+DEFINITION
+
+The relationship is supported by a verified onboarding submission that:
+
+1. belongs to the Participant,
+2. explicitly or structurally represents organization activity,
+3. has been canonically resolved to the Organization,
+4. has sufficient evidence to support the relationship assertion.
+
+CONTROLLED CASE
+
+Participant:
+
+    user:8
+
+Evidence:
+
+    onboarding_record:15
+
+Canonical Organization:
+
+    organization:2
+
+Established identity chain:
+
+    onboarding_record:15
+        ->
+    organization-resolution review = ESTABLISHED
+        ->
+    canonicalization provenance
+        ->
+    organization:2
+
+Supported relationship assertion:
+
+    source_type = user
+    source_id = 8
+
+    target_type = organization
+    target_id = 2
+
+    relationship_type = representative
+
+    relationship_basis = verified_onboarding_submission
+
+    relationship_status = active
+
+    scope = organization
+
+    evidence_source_type = onboarding_record
+    evidence_source_id = 15
+
+SEMANTIC BOUNDARY
+
+This relationship means:
+
+    User #8 has an evidence-backed representative relationship
+    to Organization #2.
+
+It does NOT mean:
+
+    User #8 owns Organization #2.
+
+It does NOT mean:
+
+    User #8 is an employee of Organization #2.
+
+It does NOT mean:
+
+    User #8 is a steward of Organization #2.
+
+It does NOT mean:
+
+    User #8 has administrative authority over Organization #2.
+
+It does NOT mean:
+
+    User #8 has workspace access.
+
+It does NOT mean:
+
+    User #8 may publish for Organization #2.
+
+It does NOT mean:
+
+    User #8 may invite teammates.
+
+It does NOT mean:
+
+    User #8 has commerce authority.
+
+ACCESS BOUNDARY
+
+CanonicalRelationship != OrganizationMember.
+
+Relationship recognition must not automatically create:
+
+    OrganizationMember
+    workspace entitlement
+    dashboard authority
+    campaign authority
+    publication authority
+    communication authority
+    commerce authority
+
+FUTURE RELATIONSHIP TYPES
+
+Future evidence may support stronger or different canonical semantics.
+
+Examples may include:
+
+    employee
+    owner
+    founder
+    director
+    officer
+    volunteer
+    contractor
+    steward
+
+These terms require independent evidence and must not be inferred from the
+"representative" relationship.
+
+VOCABULARY PRINCIPLE
+
+USE THE NARROWEST RELATIONSHIP TYPE SUPPORTED BY THE EVIDENCE.
+
+Do not upgrade relationship semantics merely because stronger semantics would
+be operationally convenient.
+
+Observed Fact != Assumed Authority.
+
+Relationship != Permission.
+
+LOCK
+
+For Participant → Organization relationships supported only by verified
+organization onboarding evidence, the canonical v1 vocabulary is:
+
+    relationship_type:
+        representative
+
+    relationship_basis:
+        verified_onboarding_submission
+
+END

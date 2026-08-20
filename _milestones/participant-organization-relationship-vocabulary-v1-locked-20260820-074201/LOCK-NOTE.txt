@@ -1,0 +1,48 @@
+PURPAWS — PARTICIPANT → ORGANIZATION RELATIONSHIP VOCABULARY v1
+
+STATUS
+LOCKED
+
+VOCABULARY SHA256
+364efb0f195d3e63d838aab27c9458850918ed9c830abbe1584e1d3aff827580
+
+RELATIONSHIP TYPE
+representative
+
+RELATIONSHIP BASIS
+verified_onboarding_submission
+
+CONTROLLED CASE
+user:8 -> organization:2
+
+EVIDENCE
+onboarding_record:15
+
+SEMANTIC RULE
+Use the narrowest relationship type supported by evidence.
+
+DO NOT INFER
+ownership
+employment
+stewardship
+administration
+workspace access
+publication authority
+commerce authority
+teammate invitation authority
+
+ACCESS BOUNDARY
+CanonicalRelationship != OrganizationMember
+Relationship != Permission
+
+NEXT
+Create the first controlled persistent CanonicalRelationship:
+
+user:8
+    ->
+organization:2
+
+relationship_type = representative
+relationship_basis = verified_onboarding_submission
+
+Then verify that no OrganizationMember or permission is created.
