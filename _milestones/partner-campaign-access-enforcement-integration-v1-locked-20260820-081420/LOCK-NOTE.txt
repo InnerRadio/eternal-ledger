@@ -1,0 +1,77 @@
+PURPAWS — PARTNER CAMPAIGN ACCESS ENFORCEMENT INTEGRATION v1
+
+STATUS
+LOCKED
+
+ACCOUNT SOURCE SHA256
+8d947531bf5daef27cf83af58949fa432f5c53b9da0cfc1dd4fef2b791de048b
+
+ORGANIZATION ACCESS AUTHORITY SHA256
+4cad454ce1473b6d121e65e3783c31c996479035ff0862dc0f1a5c9716220eaa
+
+ROUTE FAMILY
+
+GET /account/partner-campaigns
+
+    required capability:
+    view_organization
+
+GET /account/partner-campaigns/{campaign_id}
+
+    required capability:
+    view_organization
+
+POST /account/partner-campaigns
+
+    required capability:
+    manage_campaigns
+
+CONTROLLED CASE
+
+user:8
+organization:2
+
+OrganizationMember:
+NONE
+
+Campaign list:
+0 records visible
+
+Campaign create/update:
+DENIED
+
+Denial reason:
+no_active_membership
+
+Runtime denial message:
+You do not have access to create or update campaigns for this organization.
+
+Denied test campaign persisted:
+NO
+
+EXISTING OWNER CASE
+
+user:2
+organization:1
+
+Campaign list:
+AUTHORIZED
+
+BOUNDARIES
+
+No membership created.
+No membership modified.
+No canonical relationship modified.
+No publication authority changed.
+No commerce authority changed.
+No communication permission changed.
+No location authority changed.
+
+ROLE MUST BE ENFORCED.
+RELATIONSHIP != ACCESS.
+
+NEXT
+
+Commit and push this exact integration checkpoint.
+
+Then inspect the next Organization-owned route family.
