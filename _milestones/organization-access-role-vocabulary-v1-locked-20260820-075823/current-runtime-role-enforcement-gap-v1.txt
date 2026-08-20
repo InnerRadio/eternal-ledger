@@ -1,0 +1,49 @@
+PURPAWS — CURRENT ORGANIZATION ROLE ENFORCEMENT GAP
+
+MODEL DEFAULT
+
+role=viewer
+status=active
+
+CURRENT RUNTIME AUTHORIZATION CHARACTERISTIC
+
+Important Organization / Partner capability is primarily gated by active
+OrganizationMember existence.
+
+Role-specific enforcement is not yet sufficient.
+
+KNOWN CONSEQUENCE
+
+An active viewer may currently satisfy capability checks intended for stronger
+Organization operations, including campaign operations.
+
+THEREFORE
+
+No active OrganizationMember may be created for controlled user:8 ->
+organization:2 until role-aware enforcement is implemented and verified.
+
+TARGET
+
+viewer
+    read only
+
+editor
+    content edit
+
+manager
+    operational / campaign management
+
+steward
+    access governance
+
+owner
+    strongest operational authority with separate ownership evidence
+
+PUBLICATION
+separate authority
+
+LOCATION AUTHORITY
+separate / deferred
+
+RELATIONSHIP != ACCESS
+ROLE != RELATIONSHIP

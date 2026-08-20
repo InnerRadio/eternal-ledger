@@ -1,0 +1,67 @@
+PURPAWS — ORGANIZATION ACCESS ROLE VOCABULARY v1
+
+STATUS
+LOCKED
+
+SHA256
+d0772824bf2db53a59bd8f4b8af3c95f30d450e5585cf40f2178ac0ddf75783a
+
+ROLES
+
+viewer
+editor
+manager
+steward
+owner
+
+CORE RULE
+
+ROLE NAME MUST MATCH ENFORCED CAPABILITY.
+
+CURRENT RUNTIME GAP
+
+Active OrganizationMember status currently governs important access paths
+without sufficient role-specific enforcement.
+
+Therefore:
+
+NO ACTIVE OrganizationMember FOR user:8 -> organization:2 YET.
+
+CAPABILITY PRINCIPLES
+
+viewer
+read only
+
+editor
+content editing
+no campaign management
+no teammate administration
+
+manager
+operational / campaign management
+no teammate administration
+
+steward
+access governance / teammate administration
+
+owner
+strongest operational authority
+requires separately governed ownership evidence / transfer
+
+SEPARATE AUTHORITIES
+
+publication
+communication permission
+commerce
+location scope
+ownership evidence
+
+NEXT
+
+Implement Organization Access Enforcement Authority v1.
+
+Verify the role capability matrix before any controlled access GRANT.
+
+RELATIONSHIP != ACCESS
+ROLE != RELATIONSHIP
+ROLE MUST BE ENFORCED

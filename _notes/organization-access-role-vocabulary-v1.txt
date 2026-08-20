@@ -1,0 +1,348 @@
+PURPAWS / ETERNAL LEDGER
+ORGANIZATION ACCESS ROLE VOCABULARY v1
+
+STATUS
+LOCKED ARCHITECTURAL VOCABULARY
+
+PURPOSE
+
+Define launch-safe operational Organization access roles.
+
+These roles describe operational capability.
+
+They are not canonical relationship claims.
+
+CORE PRINCIPLE
+
+ROLE NAME MUST MATCH ENFORCED CAPABILITY.
+
+A safe-sounding role must never silently receive stronger runtime authority.
+
+CURRENT RUNTIME GAP
+
+The current OrganizationMember model defaults to:
+
+    role = viewer
+    status = active
+
+The current application primarily authorizes Organization capability based on:
+
+    OrganizationMember.status == active
+
+rather than enforcing a role-specific capability matrix.
+
+Current runtime therefore does not safely distinguish:
+
+    viewer
+from:
+    owner
+
+for important Organization capability.
+
+In particular, an active OrganizationMember may currently satisfy Partner /
+Organization access checks and campaign access checks regardless of role.
+
+THIS IS NOT THE TARGET GOVERNANCE MODEL.
+
+Until role-aware enforcement is implemented and verified:
+
+    DO NOT CREATE AN ACTIVE OrganizationMember FOR user:8 -> organization:2.
+
+ROLE VOCABULARY
+
+VIEWER
+
+Purpose:
+
+    least-privileged Organization access
+
+May:
+
+    view Organization workspace information
+    view Organization operational summaries
+    view permitted Organization records
+
+May NOT:
+
+    edit Organization canonical or profile content
+    create or update campaigns
+    publish
+    invite teammates
+    change access
+    assign roles
+    assert ownership
+    perform destructive Organization operations
+
+EDITOR
+
+Purpose:
+
+    Organization content editing without access administration
+
+May:
+
+    perform explicitly authorized Organization content edits
+
+May NOT:
+
+    create or update campaigns unless separately elevated
+    invite teammates
+    grant or revoke access
+    assign roles
+    assert ownership
+    exercise publication authority merely because of editor status
+
+MANAGER
+
+Purpose:
+
+    operational Organization management
+
+May:
+
+    perform permitted Organization operational writes
+    create and update Organization campaigns
+    manage permitted non-governance Organization operations
+
+May NOT automatically:
+
+    assert ownership
+    invite teammates
+    grant elevated access
+    transfer Organization authority
+    exercise publication authority outside separate publication governance
+
+STEWARD
+
+Purpose:
+
+    elevated Organization access governance
+
+May, when implementation explicitly permits:
+
+    administer Organization operational membership
+    invite teammates
+    participate in access grant / revoke workflows
+    manage delegated Organization authority
+
+Steward does NOT mean:
+
+    legal owner
+    founder
+    director
+    employee
+
+Steward is an operational governance role.
+
+OWNER
+
+Purpose:
+
+    strongest Organization operational authority
+
+Owner requires independent evidence appropriate to ownership or an explicit,
+auditable authority-transfer process.
+
+Owner must never be inferred from:
+
+    first submission
+    verified onboarding
+    representative relationship
+    email domain
+    canonicalization provenance
+    pre-existing active membership
+    campaign participation
+
+Owner may eventually possess the broadest Organization operational capability,
+but ownership evidence and transfer governance must be separately protected.
+
+ROLE ORDER
+
+For access-control purposes only:
+
+    viewer
+        <
+    editor
+        <
+    manager
+        <
+    steward
+        <
+    owner
+
+This ordering describes increasing operational capability.
+
+It does NOT describe real-world social importance or canonical truth.
+
+CAPABILITY MATRIX v1
+
+VIEW ORGANIZATION WORKSPACE
+
+    viewer     YES
+    editor     YES
+    manager    YES
+    steward    YES
+    owner      YES
+
+EDIT ORGANIZATION CONTENT
+
+    viewer     NO
+    editor     YES
+    manager    YES
+    steward    YES
+    owner      YES
+
+CREATE / UPDATE CAMPAIGNS
+
+    viewer     NO
+    editor     NO
+    manager    YES
+    steward    YES
+    owner      YES
+
+ADMINISTER TEAMMATE ACCESS
+
+    viewer     NO
+    editor     NO
+    manager    NO
+    steward    YES
+    owner      YES
+
+ASSERT / TRANSFER OWNERSHIP
+
+    viewer     NO
+    editor     NO
+    manager    NO
+    steward    NO
+    owner      GOVERNED SEPARATELY
+
+PUBLICATION AUTHORITY
+
+    NOT IMPLIED BY ANY ORGANIZATION ACCESS ROLE.
+
+Publication remains separate authority.
+
+COMMUNICATION PERMISSION
+
+    NOT IMPLIED BY ANY ORGANIZATION ACCESS ROLE.
+
+Communication permission remains separate authority.
+
+COMMERCE AUTHORITY
+
+    NOT IMPLIED BY ROLE ALONE.
+
+Commerce remains separately governed.
+
+LOCATION AUTHORITY
+
+    Organization access does not automatically imply authority over every
+    physical Location associated with that Organization.
+
+Location-scoped access is deferred until explicit Location governance exists.
+
+TEAMMATE INVITATION
+
+Only:
+
+    steward
+    owner
+
+may eventually receive teammate-invitation capability.
+
+Even then, invitation capability must be explicitly implemented and governed.
+
+ACCESS DECISION MAPPING
+
+A GRANT decision must specify an explicit role from this vocabulary.
+
+A canonical relationship must not choose the role automatically.
+
+Example:
+
+    canonical relationship:
+        representative
+
+does NOT imply:
+
+        viewer
+        editor
+        manager
+        steward
+        owner
+
+The Access Decision Authority must independently decide whether access is
+appropriate and which role is justified.
+
+CURRENT CONTROLLED CASE
+
+Participant:
+
+    user:8
+
+Organization:
+
+    organization:2
+
+Canonical relationship:
+
+    representative
+
+Current OrganizationMember:
+
+    NONE
+
+Current AccessDecision:
+
+    NONE
+
+Current effective Organization access:
+
+    NOT ESTABLISHED
+
+The first future GRANT for this controlled case must not occur until:
+
+1. role-aware runtime enforcement exists,
+2. that enforcement has been dry-run verified,
+3. the executable access authority is locked,
+4. the explicit access decision is reviewed.
+
+LAUNCH SAFETY INVARIANT
+
+DO NOT USE OrganizationMember.role AS DOCUMENTATION ONLY.
+
+ROLE MUST BE ENFORCED.
+
+An active viewer must never receive manager capability.
+
+An active editor must never receive teammate-administration capability.
+
+A manager must never silently become a steward.
+
+A steward must never silently become an owner.
+
+ROLE != RELATIONSHIP.
+
+ROLE != PUBLICATION AUTHORITY.
+
+ROLE != COMMUNICATION PERMISSION.
+
+ROLE != OWNERSHIP EVIDENCE.
+
+DEFER RATHER THAN GUESS.
+
+IMPLEMENTATION SEQUENCE
+
+1. Lock Organization Access Role Vocabulary v1.
+2. Build centralized Organization Access Enforcement Authority v1.
+3. Route Organization read/write/campaign checks through that authority.
+4. Verify viewer cannot write.
+5. Verify editor cannot manage campaigns.
+6. Verify manager can manage permitted campaigns.
+7. Verify manager cannot administer teammates.
+8. Verify steward / owner elevation remains explicit.
+9. Lock enforcement authority.
+10. Implement durable Access Decision history.
+11. Only then consider the first controlled GRANT.
+
+END
