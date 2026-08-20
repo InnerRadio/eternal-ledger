@@ -1,0 +1,54 @@
+PURPAWS — PUBLIC NETWORK PULSE MEMBERSHIP QUERY REPAIR v1
+LOCKED
+
+UTC:
+2026-08-20T20:21:08.023364+00:00
+
+PARENT CHECKPOINT:
+b1d71d3eb396ed5f96260a78e1a2f0b2144ca8b2
+
+REPAIRED ARTIFACT:
+backend/app/public_api.py
+
+SHA256:
+4d4c85ba6535ed8e78bd24e2477398c26ab3e22df32062685aeb61779c244ca0
+
+DEFECT:
+public_network_pulse incorrectly queried:
+OrganizationMember + RescueProfile + RescueAnimal + PublicProfile
+
+and attempted:
+PublicProfile.status == "active"
+
+PublicProfile has no status field.
+
+REPAIR:
+memberships = db.query(OrganizationMember).filter(
+    OrganizationMember.status == "active"
+).all()
+
+VERIFIED:
+- public_api.py compiles
+- public_network_pulse runtime returned active
+- version remained v30b-public-network-pulse
+- visibility remained public
+- active OrganizationMember semantics verified
+- models.py unchanged
+- database unchanged
+
+ARCHITECTURAL BOUNDARY:
+This repair does NOT define Network Pulse ranking behavior.
+
+Network Pulse:
+aggregate network/community statistics and activity.
+
+Leaderboard:
+ranked participant / organization performance.
+
+NETWORK PULSE != LEADERBOARD
+
+NO leaderboard scoring change was made by this repair.
+NO ranking aggregation change was made.
+NO projection change was made.
+NO database write was made.
+NO access authority was changed.
