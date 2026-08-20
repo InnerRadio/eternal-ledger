@@ -1,0 +1,78 @@
+PURPAWS — CANONICAL RELATIONSHIP AUTHORITY v2
+
+STATUS
+LOCKED
+
+AUTHORITY
+backend/app/relationship_authority.py
+
+AUTHORITY SHA256
+7e44ffdf27c61fc38d77977a00c70972d8b980f6178a712a2bf66767629aa249
+
+SUPPORTED ENDPOINT TYPES
+user
+organization
+
+USER ENDPOINT RULE
+A user endpoint must resolve to an existing User record.
+
+User existence does not imply:
+- organization membership
+- workspace entitlement
+- permission
+- ownership
+- stewardship
+- publication authority
+- commerce authority
+
+ORGANIZATION ENDPOINT RULE
+An organization endpoint must:
+- resolve to an existing PartnerOrganization
+- possess established canonicalization provenance
+
+PRESERVED RELATIONSHIP RULES
+- explicit relationship_type
+- explicit relationship_basis
+- controlled relationship_status
+- required evidence_source_type
+- no identical self-edge
+- expiry cannot precede effective date
+- equivalent edge reuse is deterministic
+- caller owns commit / rollback
+
+AUTHORITY BOUNDARY
+CanonicalRelationship = intelligence / truth layer.
+
+CanonicalRelationship != OrganizationMember.
+CanonicalRelationship != permission.
+CanonicalRelationship != workspace entitlement.
+CanonicalRelationship != publication authority.
+CanonicalRelationship != commerce authority.
+
+CONTROLLED PROOF
+user:8 -> organization:2
+dry-run action = created
+transaction = rolled back
+
+PERSISTENT STATE AT LOCK
+user:8 -> organization:2 CanonicalRelationship rows = 0
+user:8 -> organization:2 OrganizationMember rows = 0
+
+IMPORTANT VOCABULARY BOUNDARY
+The dry-run values:
+
+relationship_type = representative
+relationship_basis = verified_onboarding_submission
+
+were execution fixtures only.
+
+They are NOT locked as final canonical relationship vocabulary by this
+authority milestone.
+
+NEXT
+Define and lock Participant -> Organization relationship vocabulary.
+
+Then create the first controlled persistent relationship only after the
+semantic vocabulary is explicitly approved and locked.
+
+RELATIONSHIP != PERMISSION
