@@ -1,0 +1,187 @@
+PURPAWS — TAXONOMY GOVERNANCE v1
+
+STATUS
+LOCKED ARCHITECTURAL AUTHORITY CONTRACT
+
+PURPOSE
+
+This contract defines the authority boundary for PurPaws taxonomy and
+classification.
+
+Taxonomy is part of the platform-curated intelligence layer.
+
+The presence of an organization, campaign, participant, relationship,
+membership, publication, or other entity in a taxonomy assignment does
+not transfer ownership of taxonomy authority to that entity or to a
+person who has operational authority over that entity.
+
+
+CORE AUTHORITY BOUNDARY
+
+Platform-curated intelligence
+!= Organization access
+!= Campaign authority
+!= Membership
+!= Relationship
+!= Publication
+
+
+TAXONOMY AUTHORITY
+
+PartnerTaxonomyCategory represents platform-defined taxonomy vocabulary.
+
+PartnerTaxonomyAssignment represents the application of platform taxonomy
+to an entity or governed context.
+
+Taxonomy authority is presently a platform administrative authority.
+
+Current taxonomy category and assignment management remains restricted
+to platform administrative authority.
+
+
+ORGANIZATION ACCESS SEPARATION
+
+Organization access does not imply taxonomy authority.
+
+The following capabilities do not, by themselves, authorize taxonomy
+creation, taxonomy modification, taxonomy assignment, taxonomy removal,
+or taxonomy administration:
+
+- view_organization
+- edit_organization
+- manage_campaigns
+- administer_members
+
+OrganizationMember existence does not confer taxonomy authority.
+
+Organization membership role does not confer taxonomy authority.
+
+
+CAMPAIGN AUTHORITY SEPARATION
+
+Campaign management does not imply taxonomy authority.
+
+A taxonomy assignment may reference a campaign without transferring
+classification authority to a campaign manager.
+
+Campaign operators may operate campaigns according to their separately
+governed capabilities.
+
+They do not thereby gain authority to alter PurPaws platform
+classification intelligence.
+
+
+RELATIONSHIP SEPARATION
+
+CanonicalRelationship does not confer taxonomy authority.
+
+A recognized relationship between a participant and an organization
+does not authorize taxonomy mutation.
+
+RELATIONSHIP != TAXONOMY AUTHORITY
+
+
+MEMBERSHIP SEPARATION
+
+OrganizationMember does not confer taxonomy authority merely through
+membership existence or role.
+
+MEMBERSHIP != TAXONOMY AUTHORITY
+
+
+PUBLICATION SEPARATION
+
+CanonicalPublication does not confer taxonomy authority.
+
+Publication eligibility, publication state, or public visibility does
+not authorize mutation of platform taxonomy.
+
+PUBLICATION != TAXONOMY AUTHORITY
+
+
+CANONICAL IDENTITY SEPARATION
+
+Canonicalization provenance establishes source-to-canonical identity.
+
+It does not establish taxonomy authority.
+
+Organization-resolution review establishes an identity judgment.
+
+It does not establish taxonomy authority.
+
+IDENTITY != TAXONOMY AUTHORITY
+
+
+CURRENT RUNTIME CLASSIFICATION
+
+The currently inspected taxonomy route family is platform-administered.
+
+Taxonomy category management is admin / super_admin controlled.
+
+Taxonomy assignment management is admin / super_admin controlled.
+
+No organization self-management semantics were established by the
+inspected runtime.
+
+No public taxonomy management route was established by the inspected
+runtime.
+
+Therefore no Organization Access Authority capability is added for
+taxonomy in v1.
+
+
+IMPORTANT DISTINCTION
+
+An entity may be the SUBJECT of classification without being the
+AUTHORITY over classification.
+
+An organization may have taxonomy assignments.
+
+A campaign may have taxonomy assignments.
+
+Neither fact means that organization operators or campaign operators
+control PurPaws taxonomy.
+
+
+FUTURE CHANGE RULE
+
+If PurPaws later introduces organization self-classification, campaign
+self-classification, public taxonomy editing, suggested classifications,
+or another non-admin taxonomy workflow, that capability must be designed
+as an explicit authority contract.
+
+It must not be inferred from:
+
+- organization membership
+- organization access
+- campaign management
+- canonical relationship
+- canonical identity
+- publication
+- provenance
+
+Any such future authority requires:
+
+Observe
+→ Inspect
+→ Understand
+→ Replace / Add
+→ Verify
+→ Lock
+→ Commit
+→ Push
+→ Continue
+
+
+v1 GOVERNING PRINCIPLE
+
+Taxonomy is platform-curated intelligence.
+
+Platform-curated intelligence
+!= Organization access
+!= Campaign authority
+!= Membership
+!= Relationship
+!= Publication
+
+No authority inheritance is implicit.

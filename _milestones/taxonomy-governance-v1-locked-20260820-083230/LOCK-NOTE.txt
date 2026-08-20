@@ -1,0 +1,48 @@
+PURPAWS — TAXONOMY GOVERNANCE v1
+LOCKED
+
+Locked UTC:
+2026-08-20T08:32:30.723139+00:00
+
+Governance SHA256:
+a2056e793c31702f6b9df44005d9618938c216281f11a15ac9eead20d2d08394
+
+GOVERNING BOUNDARY
+
+Platform-curated intelligence
+!= Organization access
+!= Campaign authority
+!= Membership
+!= Relationship
+!= Publication
+
+CURRENT AUTHORITY
+
+Taxonomy category management:
+platform admin / super_admin
+
+Taxonomy assignment management:
+platform admin / super_admin
+
+Organization self-management:
+NOT ESTABLISHED
+
+Campaign self-classification:
+NOT ESTABLISHED
+
+Organization Access Authority taxonomy capability:
+NOT CREATED
+
+RUNTIME MODIFIED:
+NO
+
+DATABASE MODIFIED:
+NO
+
+ACCESS GRANTED:
+NO
+
+AUTHORITY INHERITANCE:
+NO
+
+Taxonomy is a separate platform-curated intelligence authority domain.
