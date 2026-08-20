@@ -1,0 +1,87 @@
+PURPAWS — NETWORK PULSE COUNT AGGREGATION SEAM v1
+
+STATUS
+LOCKED
+
+UTC
+2026-08-20T20:32:03.190567+00:00
+
+PARENT CHECKPOINT
+4a1841f1971a485d309159eb430040346040d1b7
+
+COUNT AGGREGATION SHA256
+275ea131ad5ec4b9b76e1a74d59eb852adba5970b9208b6d38be1ff55eaa9270
+
+NETWORK PULSE GOVERNANCE SHA256
+2128e43446e9587814914764a34d99a53e1143b8d855a779fc99dff082d02858
+
+CANONICAL RESPONSIBILITY
+
+NETWORK PULSE
+= NETWORK SIZE + COMMUNITY ACTIVITY
+
+LEADERBOARD
+= RANKED PARTICIPANT / ORGANIZATION PERFORMANCE
+
+NETWORK PULSE != LEADERBOARD
+
+CANONICAL NETWORK COUNTS
+
+members
+organizations
+creators
+rescues
+rescue_organizations
+affiliates
+
+CANONICAL ACTIVITY COUNTS
+
+memorials
+media_assets
+contributions
+active_opportunities
+
+PUBLIC-SAFE SEMANTICS
+
+memorials
+= published memorials
+
+media_assets
+= published media assets
+
+contributions
+= published contributions
+
+active_opportunities
+= active public campaigns / opportunities
+
+EXPLICITLY EXCLUDED
+
+rank
+score
+top_creator
+top_rescue
+top_partner
+top_affiliate
+leaderboard_highlights
+leaderboard scoring
+
+CONSUMER INTEGRATION
+
+account Network Pulse:
+NOT YET INTEGRATED
+
+public Network Pulse:
+NOT YET INTEGRATED
+
+DATABASE WRITES
+NONE
+
+NEXT
+
+Commit and push this seam.
+
+Then integrate account Network Pulse and public Network Pulse into this
+single public-safe count truth.
+
+Remove historical leaderboard contamination from Pulse separately.

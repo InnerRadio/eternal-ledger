@@ -1,0 +1,398 @@
+PURPAWS — NETWORK PULSE GOVERNANCE v1
+
+STATUS
+GOVERNING ARCHITECTURE
+
+PURPOSE
+
+Define the canonical responsibility, count semantics, and authority
+boundary of the PurPaws Network Pulse.
+
+The Network Pulse is the public-facing heartbeat of the community.
+
+It answers:
+
+- How large is the network?
+- How active is the network?
+
+It does NOT answer:
+
+- Who is leading the network?
+
+That second question belongs to the Platform Leaderboard.
+
+======================================================================
+CORE SEPARATION
+======================================================================
+
+NETWORK PULSE
+!= LEADERBOARD
+!= ORGANIZATION ACCESS
+!= MEMBERSHIP AUTHORITY
+!= RELATIONSHIP AUTHORITY
+!= PUBLICATION AUTHORITY
+!= TAXONOMY AUTHORITY
+!= CAMPAIGN MANAGEMENT AUTHORITY
+
+Network Pulse = aggregate community state.
+
+Leaderboard = ranked participant / organization performance.
+
+======================================================================
+1. NETWORK PULSE RESPONSIBILITY
+======================================================================
+
+Network Pulse describes aggregate community scale and activity.
+
+Its canonical semantic families are:
+
+A. NETWORK SIZE
+
+- members
+- organizations
+- creators
+- rescues
+- rescue organizations
+- affiliates
+
+B. COMMUNITY ACTIVITY
+
+- memorials
+- media assets
+- contributions
+- active opportunities / campaigns
+
+The Pulse may describe whether these quantities are growing, active,
+available, or changing in future versions.
+
+It remains an aggregate community-statistics surface.
+
+======================================================================
+2. LEADERBOARD EXCLUSION
+======================================================================
+
+The following do NOT belong to Network Pulse:
+
+- rank
+- score
+- top creator
+- top rescue
+- top affiliate
+- top partner
+- leaderboard highlights
+- leaderboard scoring
+- ranked participant lists
+- ranked organization lists
+
+These belong to the Platform Leaderboard family.
+
+The existence of leaderboard data elsewhere in the system does not make
+leaderboard data a Pulse layer.
+
+NETWORK PULSE != LEADERBOARD.
+
+======================================================================
+3. PUBLIC COUNT SEMANTICS
+======================================================================
+
+The public Network Pulse MUST use public-safe count semantics.
+
+Canonical public count semantics:
+
+members
+    Public-safe recognized participant count.
+
+organizations
+    Active organization count.
+
+creators
+    Recognized creator participant count.
+
+rescues
+    Recognized rescue participant count.
+
+rescue_organizations
+    Active organizations classified as rescue.
+
+affiliates
+    Participants with affiliate identity or referral participation.
+
+memorials
+    Published memorial count.
+
+media_assets
+    Published media asset count.
+
+contributions
+    Published contribution count.
+
+active_opportunities
+    Active public opportunity / campaign count.
+
+======================================================================
+4. PUBLISHED VS INTERNAL COUNTS
+======================================================================
+
+Public Network Pulse is not an internal administrative total.
+
+Therefore:
+
+All memorial rows
+!= Public memorial count.
+
+All media rows
+!= Public media count.
+
+All contribution rows
+!= Public contribution count.
+
+For public Pulse output:
+
+memorials
+    means published memorials.
+
+media_assets
+    means published media assets.
+
+contributions
+    means published contributions.
+
+This preserves public-facing truth instead of leaking unpublished
+operational records into community statistics.
+
+======================================================================
+5. ACCOUNT PULSE SEMANTICS
+======================================================================
+
+The current account-side Network Pulse is also declared public-facing.
+
+Its present implementation counts some internal totals differently from
+the public endpoint.
+
+That divergence is NOT canonical.
+
+Future integration should converge both Pulse implementations onto one
+shared public-safe count aggregation contract.
+
+Until that shared count authority is implemented, the public-safe count
+semantics defined in this governance document are authoritative.
+
+======================================================================
+6. OPPORTUNITY SEMANTICS
+======================================================================
+
+Active opportunity count belongs to Network Pulse as an activity metric.
+
+Example:
+
+active_opportunities = 3
+
+This answers:
+
+"How much active opportunity exists in the community?"
+
+Full opportunity records, featured opportunity cards, and discovery
+content are separate presentation concerns.
+
+They may coexist with the Pulse UI, but they are not required by the
+minimal Network Pulse statistics contract.
+
+COUNT != DISCOVERY RECORD.
+
+======================================================================
+7. NETWORK IDENTITY COUNTS
+======================================================================
+
+Participant categories are aggregate classifications.
+
+Examples:
+
+creators = 12
+rescues = 4
+affiliates = 83
+
+These counts do NOT grant:
+
+- creator authority
+- rescue authority
+- affiliate authority
+- organization access
+- campaign authority
+- publication authority
+- membership authority
+
+COUNT != PERMISSION.
+
+======================================================================
+8. ORGANIZATION COUNTS
+======================================================================
+
+Organization count represents active organizations appropriate for
+public network statistics.
+
+Organization presence in the Pulse does not grant organization access.
+
+ORGANIZATION COUNT
+!= ORGANIZATION ACCESS.
+
+Rescue organization count is a classification statistic only.
+
+RESCUE ORGANIZATION COUNT
+!= RESCUE AUTHORITY.
+
+======================================================================
+9. RELATIONSHIP TO PLATFORM RANKING AGGREGATION
+======================================================================
+
+Platform Ranking Aggregation computes leaderboard truth.
+
+Network Pulse does NOT require Platform Ranking Aggregation to satisfy
+its minimal contract.
+
+Therefore:
+
+Network Pulse
+    MUST NOT depend on ranking scores merely to produce community counts.
+
+Platform Ranking Aggregation
+    remains the scoring authority for Leaderboard.
+
+Network Pulse
+    remains the aggregate network-state authority.
+
+======================================================================
+10. RELATIONSHIP TO PUBLIC AGGREGATION PROJECTION
+======================================================================
+
+The Public Aggregation Projection Seam exists to sanitize aggregate
+ranking records for public exposure.
+
+Network Pulse does NOT require ranking projection for its minimal count
+contract.
+
+Count aggregation should produce public-safe scalar totals directly.
+
+======================================================================
+11. MINIMAL CANONICAL CONTRACT
+======================================================================
+
+network:
+
+    members
+    organizations
+    creators
+    rescues
+    rescue_organizations
+    affiliates
+
+activity:
+
+    memorials
+    media_assets
+    contributions
+    active_opportunities
+
+These ten values form the canonical minimal Network Pulse aggregation
+contract v1.
+
+======================================================================
+12. OPTIONAL PRESENTATION LAYERS
+======================================================================
+
+The following may exist as presentation or discovery features but are
+not part of the minimal count contract:
+
+- featured opportunity
+- opportunity records
+- featured creator
+- featured rescue
+- featured organization
+- UI pulse layer metadata
+- system status labels
+- XRPL future state
+- compatibility aliases
+
+These must not redefine the canonical Pulse meaning.
+
+======================================================================
+13. CURRENT CLEANUP REQUIREMENT
+======================================================================
+
+Existing public Pulse code currently contains leaderboard scoring and
+leaderboard highlight logic.
+
+That is historical contamination.
+
+Future cleanup should remove:
+
+- creator_score
+- rescue_score
+- affiliate_score
+- partner_score
+- creator_rankings
+- rescue_rankings
+- affiliate_rankings
+- partner_rankings
+- top_public_record
+- leaderboard_highlights
+- Leaderboard Highlights pulse-layer semantics
+- Leaderboard Highlights from coming_soon
+
+Removing this contamination does NOT remove Leaderboard functionality.
+
+Leaderboard functionality remains protected by the separately locked
+Platform Ranking Aggregation and Platform Leaderboard consumer.
+
+======================================================================
+14. FUTURE SHARED COUNT AUTHORITY
+======================================================================
+
+Recommended future structure:
+
+Network Pulse Count Aggregation
+        |
+        +--> account Network Pulse
+        |
+        +--> public Network Pulse
+
+One count truth.
+
+Public-safe semantics.
+
+No ranking dependency.
+
+No authority bleed.
+
+======================================================================
+15. NON-GRANTS
+======================================================================
+
+Network Pulse does NOT grant:
+
+- organization access
+- organization editing
+- campaign management
+- member administration
+- ownership
+- stewardship
+- publication authority
+- taxonomy authority
+- commerce authority
+- communication permission
+- relationship authority
+
+======================================================================
+16. GOVERNING PRINCIPLE
+======================================================================
+
+NETWORK PULSE
+= NETWORK SIZE + COMMUNITY ACTIVITY
+
+LEADERBOARD
+= RANKED PARTICIPANT / ORGANIZATION PERFORMANCE
+
+NETWORK PULSE != LEADERBOARD
+
+COUNT != PERMISSION
+
+PUBLIC PULSE COUNT != INTERNAL UNPUBLISHED TOTAL
