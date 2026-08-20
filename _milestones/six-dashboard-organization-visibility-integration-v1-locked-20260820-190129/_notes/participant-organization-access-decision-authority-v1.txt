@@ -1,0 +1,334 @@
+PURPAWS / ETERNAL LEDGER
+PARTICIPANT ↔ ORGANIZATION ACCESS DECISION AUTHORITY v1
+
+STATUS
+LOCKED ARCHITECTURAL CONTRACT
+
+PURPOSE
+
+Define the authority boundary that determines whether a Participant with a
+recognized canonical relationship to an Organization may receive operational
+access to that Organization inside PurPaws / Eternal Ledger.
+
+CORE PRINCIPLE
+
+RELATIONSHIP != ACCESS
+
+A recognized canonical relationship is relevant evidence.
+
+It is not itself an access grant.
+
+THREE DISTINCT QUESTIONS
+
+CanonicalRelationship answers:
+
+    "What relationship do we recognize between these subjects?"
+
+AccessDecision answers:
+
+    "Should this account receive operational authority for this Organization?"
+
+OrganizationMember answers:
+
+    "What operational access is currently enforced by the application?"
+
+These concepts must remain separate.
+
+ACCESS DECISION VOCABULARY
+
+GRANT
+
+    Operational access is explicitly approved.
+
+DENY
+
+    Operational access is explicitly denied.
+
+DEFER
+
+    Available evidence is insufficient to safely grant or deny access.
+
+REVOKE
+
+    Previously granted operational access is explicitly withdrawn.
+
+DEFER RATHER THAN GUESS.
+
+ACCESS DECISION INPUTS
+
+A future executable Access Decision Authority must receive explicit inputs
+including:
+
+    participant user identity
+    canonical organization identity
+    supporting CanonicalRelationship
+    decision
+    decision basis
+    evidence summary
+    requested or approved operational role when applicable
+    reviewer / authority identity
+    decision timestamp
+
+A GRANT must never be produced merely because a CanonicalRelationship exists.
+
+RELATIONSHIP REQUIREMENT
+
+A canonical Participant → Organization relationship may be required before
+access consideration.
+
+The relationship may provide evidence that the Participant is genuinely
+associated with the Organization.
+
+That relationship alone is insufficient to grant operational authority.
+
+CURRENT CONTROLLED CASE
+
+Participant:
+
+    user:8
+
+Organization:
+
+    organization:2
+
+Canonical relationship:
+
+    relationship_type = representative
+    relationship_basis = verified_onboarding_submission
+    relationship_status = active
+    evidence = onboarding_record:15
+
+Current operational access state:
+
+    OrganizationMember user:8 → organization:2 = NONE
+
+Therefore:
+
+    User #8 has a recognized relationship to Organization #2.
+
+But:
+
+    User #8 has not yet been granted operational access to Organization #2.
+
+This is correct.
+
+FIRST SUBMITTER RULE
+
+The first Participant to submit verified Organization information does NOT
+automatically become:
+
+    owner
+    steward
+    administrator
+    manager
+    publisher
+    teammate inviter
+    workspace controller
+
+Submission sequence is not authority.
+
+Evidence of relationship is not evidence of ownership.
+
+MULTI-PARTICIPANT RULE
+
+Multiple Participants may legitimately have canonical relationships to the
+same Organization.
+
+Each Participant must receive an independent access decision.
+
+Example:
+
+    user:A -> representative -> organization:X
+    user:B -> representative -> organization:X
+
+does not imply:
+
+    user:A access = user:B access
+
+Each access decision stands on its own evidence and authority.
+
+MULTI-LOCATION RULE
+
+Operational access to an Organization must not silently imply operational
+authority over every physical Location belonging to that Organization.
+
+Organization authority and Location authority may require separate scopes in
+future versions.
+
+The v1 architecture must preserve that distinction.
+
+ORGANIZATION MEMBER RULE
+
+OrganizationMember is the current application enforcement record for
+Organization-specific operational access.
+
+An OrganizationMember record may be created only after explicit access
+authority has approved the grant.
+
+OrganizationMember must not be created automatically by:
+
+    onboarding creation
+    email verification
+    account creation
+    canonical organization resolution
+    canonicalization provenance
+    canonical relationship creation
+    public publication
+    Directory discovery
+
+ACCESS ROLE BOUNDARY
+
+A future GRANT must include an explicit operational role.
+
+Operational role vocabulary is NOT defined by this v1 authority contract.
+
+Do not infer an operational role from the canonical relationship type.
+
+In particular:
+
+    representative != owner
+    representative != manager
+    representative != administrator
+    representative != steward
+
+ROLE VOCABULARY MUST BE LOCKED SEPARATELY.
+
+CURRENT APPLICATION WARNING
+
+Existing application behavior uses active OrganizationMember records as an
+access signal.
+
+Therefore an OrganizationMember row is not a harmless descriptive record.
+
+Creating an active OrganizationMember may enable real application capability.
+
+For this reason:
+
+    DO NOT CREATE ORGANIZATION MEMBERSHIP BEFORE ACCESS AUTHORITY IS ESTABLISHED.
+
+HISTORY PRINCIPLE
+
+Access decisions are historically valuable.
+
+Future durable Access Decision records should preserve decision history rather
+than silently overwrite prior judgments.
+
+Historical decision != current-effective access state.
+
+A future durable implementation should support append-only access decision
+history and derive current-effective authority from that history.
+
+REVOCATION PRINCIPLE
+
+Operational access may be revoked without deleting or falsifying the historical
+canonical relationship.
+
+For example:
+
+    canonical relationship remains:
+        representative
+
+while:
+
+    access decision becomes:
+        REVOKE
+
+and:
+
+    OrganizationMember becomes inactive or otherwise loses effective access.
+
+Truth history and access state therefore remain independently governable.
+
+TEAMMATE INVITATION BOUNDARY
+
+Teammate invitation is separate authority.
+
+Access to an Organization does not automatically imply permission to grant
+access to other Participants.
+
+Future teammate invitation authority must explicitly define:
+
+    who may invite
+    whom they may invite
+    what Organization or Location scope applies
+    what role may be granted
+    whether acceptance is required
+    how invitations expire or are revoked
+
+INVITATION AUTHORITY != ACCESS AUTHORITY.
+
+OWNERSHIP / STEWARDSHIP BOUNDARY
+
+Ownership, stewardship, executive authority, employment, and administration
+are real-world relationship claims.
+
+They require evidence appropriate to those claims.
+
+Operational access must not silently rewrite canonical relationship truth.
+
+Likewise canonical relationship truth must not silently grant operational
+access.
+
+CURRENT CONTROLLED DECISION
+
+For:
+
+    user:8
+        ->
+    organization:2
+
+the current access state is:
+
+    NO ACCESS DECISION YET
+
+Therefore:
+
+    OrganizationMember remains absent.
+
+No GRANT is inferred by this architecture lock.
+
+NO ACCESS MUTATION IS AUTHORIZED BY THIS NOTE.
+
+IMPLEMENTATION SEQUENCE
+
+1. Lock Access Decision Authority architecture.
+2. Inspect operational role vocabulary and current enforcement semantics.
+3. Define and lock launch-safe operational role vocabulary.
+4. Define durable append-only Access Decision history.
+5. Implement executable Access Decision Authority.
+6. Dry-run the controlled user:8 -> organization:2 case.
+7. Lock executable authority.
+8. Create an explicit access decision only after review.
+9. Only then create or modify OrganizationMember if the effective decision
+   authorizes it.
+10. Verify application capability separately.
+
+LOCKED INVARIANTS
+
+CanonicalRelationship != AccessDecision.
+
+AccessDecision != OrganizationMember.
+
+Canonical relationship existence does not imply access.
+
+First submitter does not automatically receive privileged authority.
+
+Multiple Participants may relate to one Organization.
+
+Each Participant receives an independent access decision.
+
+Operational role must be explicit.
+
+Operational role must not be inferred from relationship_type.
+
+OrganizationMember is an enforcement record, not canonical relationship truth.
+
+Access can be revoked without deleting historical relationship truth.
+
+Teammate invitation is separate authority.
+
+DEFER RATHER THAN GUESS.
+
+RELATIONSHIP != PERMISSION.
+
+END

@@ -1,0 +1,106 @@
+PURPAWS — SIX DASHBOARD ORGANIZATION VISIBILITY INTEGRATION v1
+
+STATUS
+LOCKED
+
+ACCOUNT SOURCE SHA256
+06789c50b9ea9e87430934825598fb71b5db771e833404e31fa743c07ac06472
+
+DASHBOARD VISIBILITY SEAM SHA256
+6dbf433f612fcb68411a2b9f78d5121f576cf86d51a144ef6bd1cb007b9a6ce2
+
+ORGANIZATION ACCESS AUTHORITY SHA256
+4cad454ce1473b6d121e65e3783c31c996479035ff0862dc0f1a5c9716220eaa
+
+INTEGRATED ROUTES
+
+/account/dashboard
+/account/member
+/account/organization
+/account/creator
+/account/rescue
+/account/partner
+
+VISIBILITY CONTRACT
+
+OrganizationMember(active)
+    ->
+Dashboard Organization Visibility Seam
+    ->
+Organization Access Enforcement Authority
+    ->
+view_organization
+    ->
+dashboard-visible Organization
+
+ACTIVE MEMBERSHIP ALONE
+
+NOT SUFFICIENT
+
+WRITE AUTHORITY
+
+NOT GRANTED
+
+CAMPAIGN AUTHORITY
+
+NOT GRANTED
+
+MEMBER ADMINISTRATION
+
+NOT GRANTED
+
+PUBLICATION AUTHORITY
+
+NOT GRANTED
+
+TAXONOMY AUTHORITY
+
+NOT GRANTED
+
+COMMERCE AUTHORITY
+
+NOT GRANTED
+
+COMMUNICATION PERMISSION
+
+NOT GRANTED
+
+CONTROLLED CASE
+
+user:8
+organization:2
+
+OrganizationMember:
+NONE
+
+Dashboard organization visibility:
+DENIED ACROSS ALL SIX ROUTES
+
+EXISTING OWNER CASE
+
+user:2
+organization:1
+
+owner / active
+
+Dashboard visibility:
+PRESERVED
+
+BOUNDARIES
+
+Dashboard visibility != edit authority.
+Dashboard visibility != campaign authority.
+Dashboard visibility != member administration.
+Dashboard visibility != publication authority.
+Dashboard visibility != taxonomy authority.
+Dashboard visibility != commerce authority.
+Dashboard visibility != communication permission.
+
+RELATIONSHIP != ACCESS.
+ROLE MUST BE ENFORCED.
+
+NEXT
+
+Commit and push this exact six-route integration checkpoint.
+
+Then continue to the next unresolved authority family.
