@@ -1,0 +1,185 @@
+PURPAWS
+SERVER-ISSUED JOURNEY REFERENCE AUTHORITY v1
+
+STATUS
+LOCKED
+
+LOCKED UTC
+2026-08-21T05:40:52.170258+00:00
+
+PARENT CHECKPOINT
+75c22cf568695faeb148b14b860798c2683a0384
+
+CONTRACT
+_notes/server-issued-journey-reference-authority-v1.txt
+
+CONTRACT SHA256
+dff7a29bf51dbbd93e7d387bc87a9e2e1d066cc6faed9ceac8fa41c5df1a23c4
+
+REFERENCE AUTHORITY
+
+Reference:
+SERVER-ISSUED
+
+Reference form:
+OPAQUE
+CRYPTOGRAPHICALLY RANDOM
+VERSIONABLE
+
+Conceptual generation:
+secrets.token_urlsafe(32)
+
+Raw reference persisted:
+NO
+
+Persisted authority:
+SHA-256 digest
+
+Expected semantic field:
+journey_reference_hash
+
+Digest uniqueness:
+REQUIRED
+
+SHARE LINK SEPARATION
+
+Reusable Campaign / referral link:
+PROVENANCE TRANSPORT
+
+Journey reference:
+INDIVIDUAL CONTINUITY
+
+Journey reference in reusable share URL:
+NO
+
+BROWSER TRANSPORT
+
+Secure:
+YES
+
+HttpOnly:
+YES
+
+SameSite=Lax:
+YES
+
+Path=/:
+YES
+
+HTTPS:
+REQUIRED
+
+AUTHORITY SEPARATION
+
+Journey reference is authentication:
+NO
+
+Journey reference is participant identity:
+NO
+
+Journey reference is Campaign Enrollment:
+NO
+
+Journey reference is Conversion authority:
+NO
+
+Journey reference is Reward authority:
+NO
+
+Journey reference is Commission authority:
+NO
+
+Journey reference is Settlement authority:
+NO
+
+PARTICIPANT BINDING
+
+Anonymous → authenticated participant:
+SERVER IDENTITY RESOLUTION
+
+Reference rotation on participant binding:
+REQUIRED
+
+Rotation creates new Attribution Context:
+NO
+
+Resolved participant B may become C:
+NO
+
+PRIVACY
+
+Invasive browser fingerprinting:
+NO
+
+Anonymous cross-device continuity guaranteed:
+NO
+
+COOKIE / DATABASE
+
+Cookie:
+TRANSPORT
+
+Database:
+CANONICAL AUTHORITY
+
+SCHEMA CONSEQUENCE
+
+AttributionContext requires future persisted:
+
+journey_reference_hash
+
+Semantic requirements:
+
+String
+unique
+indexed
+non-null for journey-enabled contexts
+
+Schema changed by this lock:
+NO
+
+Database changed by this lock:
+NO
+
+IMPLEMENTATION STATE
+
+Journey-reference persistence:
+NOT IMPLEMENTED
+
+Journey-reference cookie:
+NOT IMPLEMENTED
+
+Reference generator:
+NOT IMPLEMENTED
+
+Hash resolver:
+NOT IMPLEMENTED
+
+Rotation:
+NOT IMPLEMENTED
+
+Creation endpoint:
+NOT IMPLEMENTED
+
+Registration continuity:
+NOT IMPLEMENTED
+
+Campaign Enrollment continuity:
+NOT IMPLEMENTED
+
+NEXT AUTHORITY
+
+ATTRIBUTION CONTEXT JOURNEY-REFERENCE SCHEMA EVOLUTION
+
+Protocol:
+
+Observe
+Inspect
+Understand
+Define
+Verify
+Lock
+Continue
+
+No destructive recreation.
+No layer impersonates another.
