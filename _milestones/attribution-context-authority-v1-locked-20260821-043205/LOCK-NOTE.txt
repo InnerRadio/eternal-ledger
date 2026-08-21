@@ -1,0 +1,125 @@
+PURPAWS
+ATTRIBUTION CONTEXT AUTHORITY CONTRACT v1
+
+STATUS
+LOCKED
+
+LOCKED UTC
+2026-08-21T04:32:05.747504+00:00
+
+PARENT CHECKPOINT
+003eb541247a7efd98d0661a0dead0ecd3b17bbe
+
+CONTRACT
+_notes/attribution-context-authority-v1.txt
+
+CONTRACT SHA256
+46cee17543bb7c19105a9abb92d58ffb7c38356d330c3dd156c7adb111469470
+
+FOUNDATIONAL AUTHORITY
+
+Attribution Context may exist BEFORE membership.
+
+Campaign Participation requires an identified member.
+
+Referrer identity != participant identity.
+
+Referring Affiliate ID != participant Affiliate ID.
+
+Original Campaign provenance survives membership resolution.
+
+Original referrer provenance survives membership resolution.
+
+Click evidence != Campaign Participation.
+
+Campaign Participation != Attribution Context.
+
+Conversion != Attribution Context.
+
+Attribution Context != Reward Policy.
+
+Attribution Context remains reward-neutral.
+
+Context must be captured before or during the attributed journey.
+
+Transport mechanism != attribution authority.
+
+LIFECYCLE
+
+ANONYMOUS / INBOUND
+    ↓
+IDENTIFIED
+    ↓
+PARTICIPANT
+    ↓
+CONVERTED
+    ↓
+REWARD-CONSUMABLE
+
+EXAMPLE
+
+Member A shares Campaign X.
+
+Person B arrives through A.
+
+Attribution preserves:
+- Campaign X
+- A as referrer
+- A Affiliate identity
+- inbound evidence
+
+B then registers.
+
+B receives:
+- B user_id
+- B Affiliate ID
+- B referral code
+
+If B joins Campaign X:
+- Campaign Participation belongs to B
+- original attribution to A remains preserved
+
+CURRENT EXISTING RECORDS
+
+AffiliateClick
+= inbound evidence
+
+AffiliateCampaignEnrollment
+= Campaign Participation
+
+AffiliateConversion
+= qualifying event
+
+AffiliateCommission
+= downstream cash-specific economic record
+
+None of these records is the entire Attribution Context authority.
+
+FIRST-CLASS AUTHORITY
+
+A first-class Attribution Context is justified because no existing
+record can preserve all of:
+
+- pre-membership origin
+- Campaign identity
+- referrer identity
+- inbound evidence
+- later member identity
+- later Campaign Participation identity
+- subsequent Conversion lineage
+
+without changing the meaning of that existing record.
+
+NO IMPLEMENTATION IN THIS LOCK
+
+No schema change.
+No database migration.
+No model change.
+No registration change.
+No click change.
+No conversion change.
+No reward change.
+
+NEXT
+
+Design minimal Attribution Context schema.

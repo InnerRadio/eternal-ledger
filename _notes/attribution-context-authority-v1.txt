@@ -1,0 +1,744 @@
+PURPAWS
+ATTRIBUTION CONTEXT AUTHORITY CONTRACT v1
+
+STATUS
+DEFINED — NOT YET LOCKED
+
+CREATED UTC
+2026-08-21T04:30:17.019457+00:00
+
+PARENT CHECKPOINT
+003eb541247a7efd98d0661a0dead0ecd3b17bbe
+
+======================================================================
+PURPOSE
+======================================================================
+
+Attribution Context is the first-class authority that preserves:
+
+WHO REFERRED OR ORIGINATED THE ACTIVITY
+
+FOR WHICH CAMPAIGN
+
+THROUGH WHAT INBOUND EVIDENCE
+
+BEFORE MEMBERSHIP EXISTS
+
+THROUGH ACCOUNT CREATION
+
+INTO CAMPAIGN PARTICIPATION
+
+AND EVENTUALLY INTO CONVERSION
+
+Attribution Context exists because:
+
+AffiliateClick
+    captures inbound evidence
+
+AffiliateCampaignEnrollment
+    captures identified Campaign participation
+
+AffiliateConversion
+    captures a qualifying event
+
+but no existing record canonically preserves the lineage between them.
+
+======================================================================
+1. FOUNDATIONAL PRINCIPLE
+======================================================================
+
+Attribution Context may exist BEFORE membership.
+
+Campaign Participation requires an identified member.
+
+Membership resolution MUST preserve:
+
+- original Campaign
+- original referrer
+- original Affiliate identity of the referrer
+- original referral code
+- original inbound evidence
+- original attribution origin
+
+The new member receives their OWN Affiliate identity.
+
+Referrer identity MUST NOT become participant identity.
+
+Participant identity MUST NOT overwrite referrer identity.
+
+======================================================================
+2. EXAMPLE LIFECYCLE
+======================================================================
+
+Member A has:
+
+    user_id = A
+    Affiliate ID = AFF-A
+    referral code = REF-A
+
+Member A shares:
+
+    "Support Campaign X on PurPaws"
+
+Person B clicks.
+
+At that moment:
+
+    B may not yet have a PurPaws account.
+
+Therefore B CANNOT yet have:
+
+    Campaign Enrollment
+    participant user_id
+    participant Affiliate ID
+
+But Attribution Context CAN already preserve:
+
+    Campaign X
+    referring Member A
+    AFF-A
+    REF-A
+    inbound click
+    source
+    destination
+    timestamp
+    other evidence
+
+Then B registers.
+
+B receives:
+
+    user_id = B
+    Affiliate ID = AFF-B
+    referral code = REF-B
+
+B may then join Campaign X.
+
+Campaign Participation belongs to B:
+
+    campaign_id = X
+    user_id = B
+    affiliate_id = AFF-B
+    referral_code = REF-B
+
+Original attribution remains:
+
+    referrer = A
+    referring affiliate = AFF-A
+    referring referral code = REF-A
+
+These identities MUST remain distinct.
+
+======================================================================
+3. ATTRIBUTION CONTEXT LIFECYCLE
+======================================================================
+
+STATE 1
+ANONYMOUS / INBOUND
+
+Known:
+
+- Campaign may be known
+- referring Affiliate may be known
+- referring referral code may be known
+- click or source evidence may be known
+
+Unknown:
+
+- future member user_id
+- future participant Affiliate ID
+- future Enrollment
+
+STATE 2
+IDENTIFIED
+
+Membership has been created.
+
+Attribution Context may now additionally know:
+
+- resolved user_id
+- account creation event
+- registration target
+
+Original referrer evidence MUST remain immutable in meaning.
+
+STATE 3
+PARTICIPANT
+
+The identified member joins the Campaign.
+
+Attribution Context may now additionally know:
+
+- Campaign Enrollment / Participation identity
+- participant Affiliate ID
+- participant referral code
+
+STATE 4
+CONVERTED
+
+A qualifying event occurs.
+
+Attribution Context may now be associated with:
+
+- Conversion
+- conversion type
+- conversion target
+- conversion status
+
+STATE 5
+REWARD-CONSUMABLE
+
+Once attribution is proven, downstream Reward Policy may consume it.
+
+Attribution Context itself MUST NOT calculate reward value.
+
+======================================================================
+4. REFERRER VS PARTICIPANT
+======================================================================
+
+REFERRER
+
+Answers:
+
+WHO BROUGHT THIS PERSON OR ACTIVITY HERE?
+
+May contain:
+
+- referring_user_id
+- referring_affiliate_id
+- referring_referral_code
+
+PARTICIPANT
+
+Answers:
+
+WHO IS NOW PARTICIPATING IN THIS CAMPAIGN?
+
+May contain:
+
+- participant_user_id
+- participant_affiliate_id
+- participant_referral_code
+- enrollment_id
+
+These authorities MUST NOT collapse.
+
+Example:
+
+A refers B.
+
+A's Affiliate ID proves referral provenance.
+
+B receives a new Affiliate ID.
+
+B's Affiliate ID belongs to B's future participation.
+
+A remains the historical referrer.
+
+======================================================================
+5. CAMPAIGN AUTHORITY
+======================================================================
+
+Attribution Context may reference one Campaign.
+
+Campaign identity must come from proven inbound context.
+
+Campaign identity MUST NOT be reconstructed later from Affiliate ID alone.
+
+Campaign identity MUST NOT be reconstructed later merely because a
+current Enrollment happens to share the same Affiliate ID or referral code.
+
+Historical proof must originate at or before the attributed event.
+
+======================================================================
+6. PARTICIPATION AUTHORITY
+======================================================================
+
+Campaign Participation remains authoritative for:
+
+- identified user
+- Campaign membership
+- participant Affiliate ID
+- participant referral code
+- participation status
+- joined_at
+
+Attribution Context may link to Campaign Participation.
+
+It MUST NOT replace Campaign Participation.
+
+Before membership:
+
+    enrollment_id = unavailable
+
+After the user joins the Campaign:
+
+    enrollment_id may be resolved
+
+Attribution Context may therefore mature over time without changing
+the historical meaning of the inbound evidence.
+
+======================================================================
+7. CLICK / INBOUND EVIDENCE AUTHORITY
+======================================================================
+
+AffiliateClick remains evidence of an inbound interaction.
+
+It may preserve:
+
+- campaign_id
+- affiliate_id
+- referral_code
+- ad_id
+- source_url
+- destination_url
+- IP address
+- user agent
+- created_at
+
+AffiliateClick does NOT prove:
+
+- authenticated user identity
+- Campaign Enrollment
+- Conversion
+- Reward eligibility
+
+Attribution Context may reference AffiliateClick as evidence.
+
+Click is optional evidence.
+
+Not every legitimate attribution requires a browser click.
+
+======================================================================
+8. NON-CLICK ATTRIBUTION
+======================================================================
+
+Valid future attribution evidence may include:
+
+- Campaign share link
+- QR code
+- event check-in
+- referral code
+- invitation
+- admin-verified referral
+- in-person Campaign registration
+- partner-originated referral
+- other explicit provenance
+
+Therefore Attribution Context MUST NOT require click_id universally.
+
+Evidence source should remain extensible.
+
+======================================================================
+9. CONTEXT HANDOFF
+======================================================================
+
+Current inspected architecture captures raw Campaign/referral context
+but does not carry it durably into registration.
+
+A future handoff mechanism may use:
+
+- signed attribution token
+- attribution context ID
+- cookie
+- browser storage
+- query parameter
+- registration payload field
+- authenticated session reference
+
+These are TRANSPORT mechanisms.
+
+They are NOT canonical attribution truth.
+
+The authoritative record is Attribution Context.
+
+Transport mechanisms may point to or carry an Attribution Context
+reference.
+
+======================================================================
+10. REGISTRATION CONTRACT
+======================================================================
+
+Registration MUST NOT infer Campaign from Affiliate ID alone.
+
+Registration may receive a valid Attribution Context reference.
+
+Registration should verify that context before resolving it to the
+newly created user.
+
+On successful account creation:
+
+- original referrer remains preserved
+- resolved user_id may be added
+- participant Affiliate ID is newly issued to the new user
+- participant Affiliate ID MUST NOT overwrite referring Affiliate ID
+
+The registration experience may remain continuous for the user:
+
+    Join Campaign X
+        ↓
+    Create free PurPaws account
+        ↓
+    Account created
+        ↓
+    Campaign participation completed
+
+The authority model behind that experience remains separated.
+
+======================================================================
+11. CAMPAIGN PARTICIPATION AFTER REGISTRATION
+======================================================================
+
+If the inbound action expresses intent to join Campaign X:
+
+after account creation the system may create or complete:
+
+    AffiliateCampaignEnrollment
+
+for the NEW member.
+
+Enrollment should use:
+
+- Campaign X
+- new user_id
+- new member Affiliate ID
+- new member referral code
+
+Attribution Context then links the original inbound provenance
+to the resulting Participation.
+
+======================================================================
+12. CONVERSION CONTRACT
+======================================================================
+
+AffiliateConversion currently loses Campaign / Participation context.
+
+Future Conversion attribution MUST be able to prove:
+
+- which Attribution Context produced it
+- which Campaign applies
+- which Campaign Participation applies where relevant
+- which participant applies
+- which evidence supports the attribution
+
+Conversion MUST NOT independently reconstruct Campaign lineage.
+
+Conversion should consume already-proven attribution.
+
+======================================================================
+13. REWARD BOUNDARY
+======================================================================
+
+Attribution Context establishes provenance.
+
+Reward Policy establishes treatment.
+
+Reward Decision establishes value.
+
+Therefore:
+
+Attribution Context
+    != Reward Policy
+
+Attribution Context
+    != Reward Amount
+
+Attribution Context
+    != Commission
+
+Attribution Context must remain reward-neutral.
+
+The same attribution authority must be usable for:
+
+- cash commission
+- percentage reward
+- PurPaws token
+- network credit
+- retailer discount
+- organization benefit
+- campaign perk
+- no reward
+
+======================================================================
+14. MUTABILITY / RESOLUTION
+======================================================================
+
+Attribution Context may gain resolved identities over time:
+
+anonymous
+    ↓
+identified
+    ↓
+participant
+    ↓
+converted
+
+However, historical provenance fields must not silently change meaning.
+
+Examples of historical provenance:
+
+- original Campaign
+- original referrer
+- original referring Affiliate ID
+- original referring referral code
+- original evidence source
+- original click reference
+- original inbound timestamp
+
+Resolution may ADD later identity.
+
+Resolution must not rewrite historical origin.
+
+======================================================================
+15. EXPIRY / VALIDITY
+======================================================================
+
+Attribution Context may eventually require:
+
+- expiry rules
+- validity window
+- invalidation state
+- supersession rules
+- conflict resolution
+- source confidence
+
+These rules are NOT defined in this v1 contract.
+
+They require later inspection and policy design.
+
+======================================================================
+16. CURRENT EXISTING RECORDS
+======================================================================
+
+AffiliateClick
+
+Role:
+Inbound evidence
+
+Preserve.
+
+AffiliateCampaignEnrollment
+
+Role:
+Campaign Participation
+
+Preserve.
+
+AffiliateConversion
+
+Role:
+Qualifying event
+
+Preserve, but future attribution linkage is required.
+
+AffiliateCommission
+
+Role:
+Cash-specific downstream economic record
+
+Preserve.
+
+None of these records should be overloaded to become the entire
+Attribution Context authority.
+
+======================================================================
+17. REQUIRED FIRST-CLASS AUTHORITY
+======================================================================
+
+A first-class Attribution Context record is justified because no
+existing inspected model can represent all of:
+
+- pre-membership origin
+- Campaign identity
+- referrer identity
+- inbound evidence
+- later resolved member identity
+- later Campaign Participation identity
+- subsequent Conversion lineage
+
+without changing the meaning of that existing model.
+
+======================================================================
+18. CONCEPTUAL FIELD FAMILIES — NOT YET SCHEMA
+======================================================================
+
+Possible future field families include:
+
+IDENTITY
+
+- attribution_context_id
+- status
+
+CAMPAIGN
+
+- campaign_id
+
+REFERRER
+
+- referring_user_id
+- referring_affiliate_id
+- referring_referral_code
+
+PARTICIPANT RESOLUTION
+
+- participant_user_id
+- participant_affiliate_id
+- participant_referral_code
+
+PARTICIPATION
+
+- enrollment_id
+
+EVIDENCE
+
+- evidence_source_type
+- evidence_source_id
+- click_id
+- source_reference
+
+LIFECYCLE
+
+- created_at
+- identified_at
+- participated_at
+- converted_at
+- expires_at
+
+These are conceptual families only.
+
+This contract does NOT establish the final schema.
+
+======================================================================
+19. HARD INVARIANTS
+======================================================================
+
+1.
+Attribution Context may precede membership.
+
+2.
+Campaign Participation requires an identified member.
+
+3.
+Referrer identity != participant identity.
+
+4.
+Referring Affiliate ID != participant Affiliate ID.
+
+5.
+Original Campaign provenance must survive membership resolution.
+
+6.
+Original referrer provenance must survive membership resolution.
+
+7.
+Click evidence != Campaign Participation.
+
+8.
+Campaign Participation != Attribution Context.
+
+9.
+Conversion != Attribution Context.
+
+10.
+Attribution Context != Reward Policy.
+
+11.
+Attribution Context must remain reward-neutral.
+
+12.
+Campaign must not be reconstructed from Affiliate ID alone.
+
+13.
+Current Enrollment state must not be used as retroactive historical
+proof for an earlier Conversion.
+
+14.
+Context must be captured before or during the attributed journey,
+not manufactured after the fact.
+
+15.
+Transport mechanism != attribution authority.
+
+======================================================================
+20. USER EXPERIENCE PRINCIPLE
+======================================================================
+
+The authority architecture may be complex internally.
+
+The user journey should remain simple.
+
+Example:
+
+    Click "Support Campaign X"
+        ↓
+    Campaign page
+        ↓
+    "Join this Campaign"
+        ↓
+    Create free PurPaws account
+        ↓
+    Account created
+        ↓
+    Campaign joined
+        ↓
+    Continue supporting Campaign X
+
+The system must preserve provenance without forcing the user to
+manually rediscover the Campaign after registration.
+
+======================================================================
+21. NOT YET DECIDED
+======================================================================
+
+This contract intentionally does NOT decide:
+
+- final table name
+- final column names
+- exact foreign keys
+- cookie design
+- signed token design
+- browser storage design
+- attribution expiry period
+- attribution overwrite rules
+- multi-touch attribution policy
+- first-touch vs last-touch policy
+- conflict resolution
+- anonymous identity mechanics
+- public URL format
+- QR encoding
+- historical backfill strategy
+- Conversion migration strategy
+- Reward implementation
+
+These require subsequent design / inspection.
+
+======================================================================
+22. IMPLEMENTATION ORDER
+======================================================================
+
+After this contract is locked:
+
+1. Design minimal Attribution Context schema.
+
+2. Add schema without changing existing behavior.
+
+3. Add creation authority for inbound context.
+
+4. Add context handoff mechanism.
+
+5. Add registration context consumption.
+
+6. Resolve new member identity.
+
+7. Create / resolve Campaign Participation.
+
+8. Link Conversion to proven Attribution Context.
+
+9. Verify old non-Campaign Conversion paths remain valid.
+
+10. Only after attribution is trustworthy:
+    proceed to Reward Policy / Reward Decision work.
+
+======================================================================
+END
+======================================================================
