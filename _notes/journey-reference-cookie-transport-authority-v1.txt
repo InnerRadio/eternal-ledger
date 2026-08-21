@@ -1,0 +1,1075 @@
+PURPAWS
+JOURNEY-REFERENCE COOKIE TRANSPORT AUTHORITY v1
+
+STATUS
+DEFINED
+VERIFIED
+NOT YET LOCKED
+
+
+======================================================================
+1. PURPOSE
+======================================================================
+
+This contract defines browser transport authority for the raw PurPaws
+journey reference.
+
+It governs:
+
+    cookie name
+    cookie value
+    security attributes
+    set conditions
+    read conditions
+    replacement conditions
+    deletion conditions
+    malformed / unknown / expired handling
+    authority separation
+    privacy boundary
+
+It does NOT implement cookie behavior.
+
+
+======================================================================
+2. GOVERNING PRINCIPLE
+======================================================================
+
+COOKIE != CANONICAL AUTHORITY
+
+The cookie carries a raw journey reference.
+
+The database remains canonical Attribution Context authority.
+
+A browser possessing a journey-reference cookie does NOT thereby become:
+
+    authenticated
+    a member
+    a participant
+    enrolled
+    converted
+    reward-eligible
+    commission-eligible
+    settlement-eligible
+
+
+======================================================================
+3. COOKIE NAME
+======================================================================
+
+v1 cookie name:
+
+    pp_journey
+
+This cookie name identifies:
+
+    PurPaws journey-continuity transport
+
+It is not an authentication cookie.
+
+
+======================================================================
+4. COOKIE VALUE
+======================================================================
+
+The cookie value is:
+
+    raw ppj1_ journey reference
+
+Example conceptual form:
+
+    ppj1_<opaque-random-value>
+
+The cookie MUST NOT contain:
+
+    journey_reference_hash
+    Campaign ID
+    Referrer user ID
+    Affiliate ID
+    Referral code
+    Participant user ID
+    Enrollment ID
+    Conversion ID
+    Reward amount
+    Commission amount
+    Token amount
+    Settlement claim
+
+
+======================================================================
+5. RAW REFERENCE TRANSPORT
+======================================================================
+
+The browser may carry the raw journey reference.
+
+The server stores only the corresponding digest in canonical
+Attribution Context persistence.
+
+Therefore:
+
+    browser
+        raw ppj1_ reference
+
+    database
+        SHA-256 digest
+
+The cookie is transport.
+
+The database is authority.
+
+
+======================================================================
+6. COOKIE SECURITY ATTRIBUTES
+======================================================================
+
+v1 journey cookie MUST use:
+
+    Secure=True
+    HttpOnly=True
+    SameSite=Lax
+    Path=/
+
+Production transport therefore requires HTTPS.
+
+
+======================================================================
+7. SECURE
+======================================================================
+
+Secure=True is mandatory in production.
+
+The journey-reference cookie MUST NOT be transmitted over plain HTTP in
+production.
+
+A deployment unable to satisfy HTTPS MUST NOT silently weaken this
+requirement.
+
+
+======================================================================
+8. HTTPONLY
+======================================================================
+
+HttpOnly=True is mandatory.
+
+Browser JavaScript does not require access to the journey reference.
+
+The system MUST NOT make the raw journey reference script-readable merely
+for convenience.
+
+
+======================================================================
+9. SAMESITE
+======================================================================
+
+SameSite=Lax is the v1 default.
+
+Reason:
+
+    preserve ordinary top-level navigation continuity
+
+while reducing unnecessary cross-site cookie transmission.
+
+This contract does not authorize SameSite=None.
+
+
+======================================================================
+10. PATH
+======================================================================
+
+Path=/
+
+Reason:
+
+Journey continuity may span:
+
+    public Campaign page
+    onboarding
+    registration
+    account transition
+    Campaign join flow
+
+Path scoping must not accidentally break the continuous journey.
+
+
+======================================================================
+11. DOMAIN
+======================================================================
+
+v1 does not require an explicit Domain attribute.
+
+Prefer host-only cookie behavior unless a future cross-subdomain
+requirement is explicitly defined.
+
+Do not broaden cookie scope preemptively.
+
+
+======================================================================
+12. COOKIE LIFETIME
+======================================================================
+
+Cookie lifetime must not outlive canonical journey validity.
+
+AttributionContext.expires_at remains the canonical lifecycle boundary.
+
+The cookie's Max-Age / Expires behavior must be selected consistently
+with the canonical Attribution Context expiry policy.
+
+The exact attribution-window duration is NOT selected by this contract.
+
+
+======================================================================
+13. COOKIE EXPIRY IS NOT CANONICAL EXPIRY
+======================================================================
+
+Browser cookie expiry and canonical AttributionContext.expires_at are
+related but distinct.
+
+If the browser retains a cookie beyond canonical context expiry:
+
+    Resolver classification remains EXPIRED.
+
+The cookie does not extend canonical validity.
+
+
+======================================================================
+14. COOKIE LOSS
+======================================================================
+
+Cookie loss may cause anonymous journey continuity to be lost.
+
+Examples:
+
+    browser clearing cookies
+    private browsing termination
+    browser policy
+    device change
+
+PurPaws MUST NOT compensate using invasive device fingerprinting.
+
+
+======================================================================
+15. CROSS-DEVICE CONTINUITY
+======================================================================
+
+Anonymous cross-device continuity is not guaranteed.
+
+A raw journey-reference cookie on Device A does not magically exist on
+Device B.
+
+Authenticated continuity may later rely on trusted account authority.
+
+This contract does not invent anonymous cross-device identity.
+
+
+======================================================================
+16. COOKIE CREATION AUTHORITY
+======================================================================
+
+Cookie Transport Authority does NOT decide whether a new Attribution
+Context should exist.
+
+It may carry a journey reference only after a separate authority has
+provided valid journey material.
+
+Conceptually:
+
+    Creation Authority
+        ↓
+    generated raw reference
+        ↓
+    Cookie Transport Authority
+        ↓
+    browser cookie
+
+Transport MUST NOT manufacture provenance.
+
+
+======================================================================
+17. SET AUTHORITY
+======================================================================
+
+A journey cookie may be set only from server-controlled journey
+reference material.
+
+The client MUST NOT choose canonical journey identity.
+
+The server MUST NOT blindly accept an arbitrary client-submitted value
+and re-set it as trusted journey continuity.
+
+
+======================================================================
+18. READ AUTHORITY
+======================================================================
+
+Reading the cookie provides:
+
+    presented journey-reference material
+
+Nothing more.
+
+A cookie read must feed into:
+
+    Validator
+        ↓
+    Hasher
+        ↓
+    Resolver
+
+Cookie presence alone is never sufficient.
+
+
+======================================================================
+19. MALFORMED COOKIE
+======================================================================
+
+If the cookie value resolves as:
+
+    MALFORMED_REFERENCE
+
+the system must treat it as invalid transport.
+
+It MUST NOT:
+
+    create Attribution Context
+    infer Campaign provenance
+    infer Referrer provenance
+    bind a participant
+
+The cookie should be eligible for deletion.
+
+
+======================================================================
+20. UNSUPPORTED VERSION
+======================================================================
+
+If the cookie value resolves as:
+
+    UNSUPPORTED_VERSION
+
+the system must not silently reinterpret it as v1.
+
+The cookie may be cleared according to explicit transport policy.
+
+Unknown version does not become canonical continuity.
+
+
+======================================================================
+21. UNKNOWN REFERENCE
+======================================================================
+
+If a structurally valid cookie resolves as:
+
+    UNKNOWN_REFERENCE
+
+the system must not manufacture a new Attribution Context merely because
+the browser presented the token.
+
+Unknown reference means:
+
+    no canonical continuity exists for that digest
+
+The stale / unknown cookie may be deleted.
+
+
+======================================================================
+22. EXPIRED REFERENCE
+======================================================================
+
+If Resolver classification is:
+
+    EXPIRED
+
+the cookie must not reactivate the context.
+
+Transport may remove the expired browser reference.
+
+Expiry extension is not Cookie Transport Authority.
+
+
+======================================================================
+23. INVALID CONTEXT
+======================================================================
+
+If Resolver classification is:
+
+    INVALID_CONTEXT
+
+the cookie must not be treated as valid continuity.
+
+Transport may clear the browser reference.
+
+Transport MUST NOT repair canonical provenance.
+
+
+======================================================================
+24. ACTIVE REFERENCE
+======================================================================
+
+If Resolver classification is:
+
+    ACTIVE
+
+the cookie may continue carrying the same raw journey reference.
+
+ACTIVE means only:
+
+    canonical journey continuity exists
+
+It does not mean:
+
+    authenticated
+    member
+    participant
+    enrolled
+    converted
+    rewarded
+    settled
+
+
+======================================================================
+25. PARTICIPANT CONFLICT
+======================================================================
+
+If a future integration classifies:
+
+    PARTICIPANT_CONFLICT
+
+Cookie Transport Authority MUST NOT:
+
+    rebind participant
+    replace canonical participant identity
+    silently issue authority for the conflicting account
+
+Conflict resolution belongs elsewhere.
+
+
+======================================================================
+26. PROVENANCE CONFLICT
+======================================================================
+
+If a future integration classifies:
+
+    PROVENANCE_CONFLICT
+
+Cookie Transport Authority MUST NOT rewrite:
+
+    Campaign
+    Referrer
+    origin evidence
+
+Transport carries continuity.
+
+It does not repair or overwrite provenance.
+
+
+======================================================================
+27. COOKIE REPLACEMENT
+======================================================================
+
+Cookie replacement is permitted only when a separate trusted authority
+has generated replacement journey material.
+
+Primary expected case:
+
+    Journey Reference Rotation Authority
+
+Conceptually:
+
+    old raw reference
+        ↓
+    trusted rotation authority
+        ↓
+    new raw reference
+        ↓
+    Set-Cookie replacement
+
+Transport itself does not decide to rotate.
+
+
+======================================================================
+28. COOKIE DELETION
+======================================================================
+
+Cookie Transport Authority may delete a cookie when transport is no
+longer valid or useful.
+
+Expected deletion reasons may include:
+
+    malformed reference
+    unsupported version
+    unknown reference
+    expired reference
+    invalid canonical context
+    successful trusted rotation of old reference
+    explicit continuity termination
+
+Deletion removes browser transport only.
+
+It does not delete Attribution Context.
+
+
+======================================================================
+29. COOKIE DELETION != CONTEXT DELETION
+======================================================================
+
+Deleting:
+
+    pp_journey
+
+does NOT authorize:
+
+    DELETE AttributionContext
+
+Browser transport and canonical provenance are separate.
+
+
+======================================================================
+30. ROTATION
+======================================================================
+
+Rotation is a separate authority.
+
+Cookie Transport Authority may apply the resulting new value.
+
+It does not decide:
+
+    when rotation occurs
+    what new reference is generated
+    how journey_reference_hash changes
+    whether participant binding is valid
+
+Those belong to Journey Reference Rotation Authority.
+
+
+======================================================================
+31. REGISTRATION CONTINUITY
+======================================================================
+
+Future registration continuity may use:
+
+    cookie read
+    Resolver
+    trusted authenticated identity
+    Rotation Authority
+    Campaign Enrollment Authority
+
+Cookie Transport itself does not register the user.
+
+
+======================================================================
+32. MEMBERSHIP
+======================================================================
+
+Possession of pp_journey does NOT make a person a PurPaws member.
+
+Membership requires trusted account authority.
+
+Anonymous attribution may exist before membership.
+
+Settlement still requires membership according to the locked
+Attribution Context authority contracts.
+
+
+======================================================================
+33. CAMPAIGN PARTICIPATION
+======================================================================
+
+Possession of pp_journey does NOT establish Campaign Participation.
+
+Campaign Participation requires canonical Enrollment authority.
+
+Cookie transport MUST NOT manufacture enrollment.
+
+
+======================================================================
+34. REWARD AUTHORITY
+======================================================================
+
+Possession of pp_journey does NOT determine:
+
+    reward type
+    reward amount
+    payout type
+    payout amount
+    payout percentage
+    token amount
+
+Campaign Reward Policy remains economic / utility authority.
+
+
+======================================================================
+35. SETTLEMENT AUTHORITY
+======================================================================
+
+Possession of pp_journey does NOT authorize settlement.
+
+Settlement requires:
+
+    resolved participant identity
+    membership
+    valid Campaign Participation
+    attributable event
+    applicable Reward Policy
+    settlement authority
+
+Cookie presence is not payout authority.
+
+
+======================================================================
+36. CSRF BOUNDARY
+======================================================================
+
+SameSite=Lax reduces some cross-site cookie transmission.
+
+It is NOT a complete CSRF defense for state-changing application
+operations.
+
+Cookie Transport Authority must not be mistaken for CSRF protection.
+
+Future state-changing routes remain responsible for their own security
+controls.
+
+
+======================================================================
+37. XSS BOUNDARY
+======================================================================
+
+HttpOnly reduces JavaScript access to the raw journey reference.
+
+It does NOT eliminate all XSS risk.
+
+Application output encoding, CSP, and other web security controls remain
+separate responsibilities.
+
+
+======================================================================
+38. COOKIE FIXATION BOUNDARY
+======================================================================
+
+A client-supplied arbitrary journey reference MUST NOT become canonical
+authority merely because it is placed into a cookie.
+
+Server resolution remains mandatory.
+
+Future participant binding should rotate the reference.
+
+This limits continued use of a pre-authentication anonymous bearer
+reference.
+
+
+======================================================================
+39. COOKIE THEFT BOUNDARY
+======================================================================
+
+A stolen anonymous journey cookie may permit attempted continuation of
+the anonymous journey while the reference remains valid.
+
+It MUST NOT grant:
+
+    authentication
+    account access
+    participant rebinding
+    Campaign Enrollment
+    reward determination
+    Commission authority
+    settlement rights
+
+Participant-binding rotation reduces the useful lifetime of the original
+anonymous bearer reference.
+
+
+======================================================================
+40. RAW COOKIE LOGGING
+======================================================================
+
+Raw pp_journey values MUST NOT be logged by default.
+
+Do not place the raw cookie value into:
+
+    access logs intentionally
+    application logs
+    exception messages
+    analytics payloads
+    audit prose
+
+Where diagnosis is necessary, use safe classification and canonical
+internal identifiers.
+
+
+======================================================================
+41. PUBLIC RESPONSE DISCLOSURE
+======================================================================
+
+The server may transmit the raw reference through Set-Cookie.
+
+It SHOULD NOT also echo the raw reference in:
+
+    JSON response bodies
+    HTML
+    query parameters
+    redirects
+    public analytics
+
+The cookie is the transport channel.
+
+
+======================================================================
+42. SHARE URL SEPARATION
+======================================================================
+
+The journey-reference cookie MUST NOT be inserted into reusable share
+URLs.
+
+Reusable share link:
+
+    provenance transport
+
+Journey cookie:
+
+    individual journey continuity
+
+One shared Campaign link may create many independent journey cookies.
+
+
+======================================================================
+43. QUERY STRING
+======================================================================
+
+The raw journey reference MUST NOT be transported through ordinary
+query-string parameters in v1.
+
+Reason:
+
+Query strings may leak through:
+
+    browser history
+    referrer headers
+    server logs
+    analytics
+    copied URLs
+
+Cookie transport is deliberately separate.
+
+
+======================================================================
+44. FORM / CLIENT STORAGE
+======================================================================
+
+The raw journey reference SHOULD NOT be duplicated into:
+
+    hidden form fields
+    localStorage
+    sessionStorage
+    client JavaScript state
+
+unless a future authority explicitly requires it.
+
+HttpOnly cookie transport is the v1 browser mechanism.
+
+
+======================================================================
+45. COOKIE WRITE OWNER
+======================================================================
+
+Actual HTTP Set-Cookie behavior should live behind a narrow server-side
+transport helper.
+
+Conceptual future module:
+
+    backend/app/journey_cookie_authority.py
+
+Possible responsibilities:
+
+    read_journey_cookie()
+    set_journey_cookie()
+    clear_journey_cookie()
+
+The exact function names are not yet locked.
+
+The authority boundary is.
+
+
+======================================================================
+46. REQUEST / RESPONSE BOUNDARY
+======================================================================
+
+Cookie reading requires an HTTP request context.
+
+Cookie setting / clearing requires an HTTP response context.
+
+The Generator / Resolver module remains HTTP-independent.
+
+This separation must be preserved.
+
+
+======================================================================
+47. NO DATABASE ACCESS REQUIRED FOR BASIC TRANSPORT
+======================================================================
+
+Basic cookie set / clear helpers do not require direct database access.
+
+Resolution remains the responsibility of:
+
+    Journey Reference Resolver
+
+Transport should not duplicate database lookup logic.
+
+
+======================================================================
+48. NO SESSION OWNERSHIP
+======================================================================
+
+Cookie Transport Authority MUST NOT open its own SQLAlchemy Session merely
+to inspect journey continuity.
+
+Callers should compose:
+
+    request cookie
+    resolver with caller-supplied Session
+    decision
+    response cookie action
+
+Transport remains HTTP-focused.
+
+
+======================================================================
+49. FAILURE BEHAVIOR
+======================================================================
+
+Transport failures must not manufacture canonical state.
+
+If cookie setting fails:
+
+    do not pretend continuity was delivered
+
+If cookie reading fails:
+
+    do not invent a reference
+
+If cookie clearing fails:
+
+    do not delete canonical Attribution Context
+
+Transport failure and provenance authority remain distinct.
+
+
+======================================================================
+50. SECURITY INVARIANTS
+======================================================================
+
+1.
+Cookie name is pp_journey.
+
+2.
+Cookie carries raw ppj1_ reference only.
+
+3.
+Cookie is Secure in production.
+
+4.
+Cookie is HttpOnly.
+
+5.
+Cookie is SameSite=Lax.
+
+6.
+Cookie Path=/.
+
+7.
+Cookie is transport, not canonical authority.
+
+8.
+Database remains canonical.
+
+9.
+Cookie presence is not authentication.
+
+10.
+Cookie presence is not membership.
+
+11.
+Cookie presence is not Campaign Participation.
+
+12.
+Cookie presence is not reward authority.
+
+13.
+Cookie presence is not settlement authority.
+
+14.
+Cookie is validated before canonical resolution.
+
+15.
+Malformed cookie does not create provenance.
+
+16.
+Unknown cookie does not create provenance.
+
+17.
+Expired cookie does not reactivate provenance.
+
+18.
+Invalid context does not become active continuity.
+
+19.
+Cookie Transport does not bind participant.
+
+20.
+Cookie Transport does not rotate reference by itself.
+
+21.
+Cookie Transport does not create Attribution Context.
+
+22.
+Cookie Transport does not delete Attribution Context.
+
+23.
+Raw journey cookie is not logged by default.
+
+24.
+Raw journey reference is not placed in share URLs.
+
+25.
+Raw journey reference is not placed in ordinary query strings.
+
+26.
+HttpOnly cookie remains the v1 browser transport.
+
+27.
+Cookie loss does not justify invasive fingerprinting.
+
+28.
+Anonymous cross-device continuity is not guaranteed.
+
+29.
+Set-Cookie may carry raw reference; public bodies should not echo it.
+
+30.
+Cookie theft does not grant authentication or settlement rights.
+
+
+======================================================================
+51. IMPLEMENTATION BOUNDARY
+======================================================================
+
+This contract does NOT implement:
+
+    journey cookie reader
+    journey cookie setter
+    journey cookie clearer
+    HTTP route integration
+    Attribution Context Creation Authority
+    Journey Reference Rotation Authority
+    registration continuity
+    Campaign Enrollment continuity
+    Conversion integration
+    Reward integration
+    Commission integration
+    settlement
+    token implementation
+
+
+======================================================================
+52. IMPLEMENTATION ORDER
+======================================================================
+
+After this contract is locked:
+
+1. inspect existing FastAPI Request / Response cookie conventions
+
+2. inspect HTTPS / proxy assumptions
+
+3. define exact helper module shape
+
+4. define cookie lifetime behavior
+
+5. implement read helper
+
+6. implement set helper
+
+7. implement clear helper
+
+8. verify exact cookie attributes
+
+9. verify JavaScript cannot access HttpOnly cookie
+
+10. verify no query-string journey transport
+
+11. verify zero database writes
+
+12. verify Generator / Resolver remains unchanged
+
+13. lock Cookie Transport implementation
+
+Only then:
+
+    define Attribution Context Creation integration
+
+
+======================================================================
+53. CURRENT STATE
+======================================================================
+
+Journey Reference Generator:
+    IMPLEMENTED
+    LOCKED
+
+Journey Reference Validator:
+    IMPLEMENTED
+    LOCKED
+
+Journey Reference Hasher:
+    IMPLEMENTED
+    LOCKED
+
+Journey Reference Resolver:
+    IMPLEMENTED
+    LOCKED
+    READ-ONLY
+
+Cookie Transport Authority:
+    DEFINED BY THIS CONTRACT
+    NOT YET LOCKED
+
+Cookie implementation:
+    NOT IMPLEMENTED
+
+Attribution Context Creation implementation:
+    NOT IMPLEMENTED
+
+Reference Rotation implementation:
+    NOT IMPLEMENTED
+
+Registration continuity:
+    NOT IMPLEMENTED
+
+
+======================================================================
+54. FINAL AUTHORITY STATEMENT
+======================================================================
+
+The cookie carries continuity material.
+
+It does not create continuity authority.
+
+The browser carries the raw reference.
+
+The database carries the canonical digest.
+
+The Validator checks structure.
+
+The Resolver determines canonical journey state.
+
+Authentication determines identity.
+
+Enrollment determines Campaign Participation.
+
+Reward Policy determines economic treatment.
+
+Settlement Authority determines settlement.
+
+Cookie Transport impersonates none of them.
+
+
+======================================================================
+END
+======================================================================

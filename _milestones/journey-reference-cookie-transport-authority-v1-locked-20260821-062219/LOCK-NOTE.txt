@@ -1,0 +1,138 @@
+PURPAWS
+JOURNEY-REFERENCE COOKIE TRANSPORT AUTHORITY v1
+
+STATUS
+LOCKED
+
+LOCKED UTC
+2026-08-21T06:22:19.461176+00:00
+
+PARENT CHECKPOINT
+773a1f60eae427ed2e475728b8607ec62d67b099
+
+CONTRACT
+_notes/journey-reference-cookie-transport-authority-v1.txt
+
+CONTRACT SHA256
+c4d8c881fe1b7f5a5727dbc0bb1d6d28bc6cfc4489cc60b873e08d5970ae6aa5
+
+COOKIE
+
+Name:
+pp_journey
+
+Value:
+raw ppj1_ journey reference
+
+Secure:
+YES
+
+HttpOnly:
+YES
+
+SameSite:
+Lax
+
+Path:
+/
+
+Explicit Domain:
+NO
+
+AUTHORITY
+
+Cookie is authentication:
+NO
+
+Cookie is membership:
+NO
+
+Cookie is Campaign Participation:
+NO
+
+Cookie is reward authority:
+NO
+
+Cookie is settlement authority:
+NO
+
+Database remains canonical:
+YES
+
+INVALID TRANSPORT
+
+Malformed creates provenance:
+NO
+
+Unknown creates provenance:
+NO
+
+Expired reactivates provenance:
+NO
+
+Invalid context becomes active:
+NO
+
+COOKIE DELETION
+
+Deletes Attribution Context:
+NO
+
+ROTATION
+
+Transport decides rotation:
+NO
+
+Transport may apply trusted rotated value:
+YES
+
+PRIVACY
+
+Raw cookie logging:
+NO
+
+Query-string transport:
+NO
+
+localStorage transport:
+NO
+
+sessionStorage transport:
+NO
+
+Invasive fingerprinting:
+NO
+
+Anonymous cross-device continuity guaranteed:
+NO
+
+IMPLEMENTATION STATE
+
+Cookie reader:
+NOT IMPLEMENTED
+
+Cookie setter:
+NOT IMPLEMENTED
+
+Cookie clearer:
+NOT IMPLEMENTED
+
+HTTP route integration:
+NOT IMPLEMENTED
+
+Creation Authority:
+NOT IMPLEMENTED
+
+Rotation Authority:
+NOT IMPLEMENTED
+
+NEXT
+
+INSPECT FASTAPI COOKIE CONVENTIONS
+
+Then:
+
+DEFINE EXACT COOKIE HELPER SHAPE
+IMPLEMENT NARROW TRANSPORT MODULE
+
+No layer impersonates another.
