@@ -1,0 +1,156 @@
+PURPAWS
+ATTRIBUTION CONTEXT CREATION AUTHORITY CONTRACT v1
+
+STATUS
+LOCKED
+
+LOCKED UTC
+2026-08-21T05:06:29.299304+00:00
+
+PARENT CHECKPOINT
+276b8d69fef1fe368623b089bfb4164b80eee4f1
+
+CONTRACT
+_notes/attribution-context-creation-authority-v1.txt
+
+CONTRACT SHA256
+c500dc28793e347a61e7769fd26fda012ea97c2028fa39bd9cb4249e74150751
+
+GOVERNING SECURITY PRINCIPLE
+
+CLIENT INPUT IS NOT CANONICAL ATTRIBUTION TRUTH.
+
+The client may present evidence.
+
+The server decides what that evidence proves.
+
+Canonical attribution is server-resolved.
+
+TRUST BOUNDARY
+
+Client-supplied values may be:
+
+- claims
+- references
+- evidence
+- transport
+
+They do not automatically establish:
+
+- Campaign authority
+- referrer authority
+- participant identity
+- Campaign Participation
+- Conversion
+- Reward
+- Commission
+- Token
+- Settlement
+
+ACTOR SEPARATION
+
+System actor != Referrer != Participant
+
+ANONYMOUS STATE
+
+Anonymous Attribution Context:
+PERMITTED
+
+Anonymous Campaign Participation:
+NOT CANONICAL
+
+Anonymous settlement:
+PROHIBITED
+
+Participant-specific settlement requires membership.
+
+SPOOF RESISTANCE
+
+Client participant identity trusted:
+NO
+
+Client enrollment identity trusted:
+NO
+
+Client reward / payout value trusted:
+NO
+
+Client Campaign claim canonical by itself:
+NO
+
+Client referrer claim canonical by itself:
+NO
+
+DUPLICATE / REPLAY
+
+Explicit duplicate / idempotency policy is REQUIRED before creation
+implementation.
+
+Replay resistance is REQUIRED before reusable attribution references
+become authoritative.
+
+HISTORICAL PROVENANCE
+
+Later lifecycle resolution may ADD trusted knowledge.
+
+It must not falsify or overwrite historical origin.
+
+SAFE FAILURE
+
+If provenance cannot be established:
+
+DO NOT INVENT IT.
+
+ADMINISTRATION
+
+Administrative privilege does not eliminate provenance requirements.
+
+CURRENT IMPLEMENTATION STATE
+
+AttributionContext model:
+LOCKED
+
+attribution_contexts table:
+VERIFIED
+
+Attribution Context Creation Authority:
+NOT IMPLEMENTED
+
+Registration integration:
+NO
+
+AffiliateClick integration:
+NO
+
+Campaign Enrollment integration:
+NO
+
+Conversion integration:
+NO
+
+Reward integration:
+NO
+
+Commission integration:
+NO
+
+Token integration:
+NO
+
+NEXT
+
+Observe:
+
+1. existing Campaign/referral/share routes
+2. AffiliateClick creation semantics
+3. authentication / identity resolution
+4. duplicate / replay behavior
+
+Then define explicit Attribution Context idempotency policy before
+implementing creation.
+
+No manufactured provenance.
+No self-assigned participant identity.
+No self-assigned Campaign Participation.
+No self-awarded payout.
+No Wally gaggers.

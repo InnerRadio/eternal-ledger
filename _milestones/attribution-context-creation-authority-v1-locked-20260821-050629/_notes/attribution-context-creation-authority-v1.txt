@@ -1,0 +1,997 @@
+PURPAWS
+ATTRIBUTION CONTEXT CREATION AUTHORITY CONTRACT v1
+
+STATUS
+DEFINED
+VERIFIED
+NOT YET LOCKED
+
+
+======================================================================
+1. PURPOSE
+======================================================================
+
+This contract defines the authority boundary for creation of a
+first-class Attribution Context.
+
+Attribution Context already exists as an isolated persistence record.
+
+This contract does NOT implement creation.
+
+This contract determines:
+
+- what may initiate creation
+- what client input means
+- what the server must resolve
+- what constitutes sufficient provenance
+- which identities remain unresolved
+- which fields are forbidden at creation
+- how duplicate creation must be treated
+- how expiry and invalidation relate to historical provenance
+- where creation authority ends
+
+
+======================================================================
+2. GOVERNING SECURITY PRINCIPLE
+======================================================================
+
+CLIENT INPUT IS NOT CANONICAL ATTRIBUTION TRUTH.
+
+Client input may provide:
+
+    evidence
+    hints
+    references
+    transport values
+    claims
+
+The server must determine whether those claims are sufficient to create
+canonical Attribution Context.
+
+Canonical attribution exists only after server-side validation and
+resolution.
+
+Therefore:
+
+    claim != authority
+
+    URL parameter != authority
+
+    form value != authority
+
+    cookie != authority
+
+    browser storage != authority
+
+    QR payload != authority
+
+    Affiliate ID string != authority
+
+    referral code string != authority
+
+    campaign identifier != authority
+
+Transport mechanisms may carry evidence.
+
+They do not become canonical truth merely because the client supplied
+them.
+
+
+======================================================================
+3. SECURITY CONSEQUENCE
+======================================================================
+
+Attribution Context sits upstream of potentially valuable consequences:
+
+    Attribution Context
+        ↓
+    Participant Resolution
+        ↓
+    Campaign Participation
+        ↓
+    Conversion
+        ↓
+    Reward Policy
+        ↓
+    Reward Event
+        ↓
+    Settlement
+
+Therefore weak attribution creation could eventually become:
+
+    false participation
+    false referral credit
+    false conversion lineage
+    false commission
+    false token entitlement
+    false discount entitlement
+    false organizational benefit
+    false settlement
+
+Creation authority must therefore be conservative.
+
+
+======================================================================
+4. ACTOR SEPARATION
+======================================================================
+
+The following are distinct concepts:
+
+    SYSTEM ACTOR
+    REFERRER
+    PARTICIPANT
+
+They MUST NOT be conflated.
+
+
+SYSTEM ACTOR
+
+The system or trusted server authority that creates the canonical
+Attribution Context record.
+
+
+REFERRER
+
+The previously identified PurPaws identity whose verified referral
+provenance led to the attributed journey.
+
+
+PARTICIPANT
+
+The person who is undertaking the journey and may later become an
+identified PurPaws member and Campaign participant.
+
+
+Example:
+
+    Member A shares Campaign X
+        ↓
+    Person B follows the journey
+        ↓
+    PurPaws server creates Attribution Context
+
+Then:
+
+    creator / authority = PurPaws server
+    referrer            = Member A
+    participant         = unresolved Person B
+
+These identities MUST remain separate.
+
+
+======================================================================
+5. ANONYMOUS ATTRIBUTION IS PERMITTED
+======================================================================
+
+An Attribution Context may exist before the participant is a member.
+
+Therefore creation MUST NOT require:
+
+    participant_user_id
+    participant_affiliate_id
+    participant_referral_code
+    enrollment_id
+
+These values may legitimately be NULL when context is created.
+
+This is not incomplete data.
+
+It represents a real lifecycle state:
+
+    attributable journey exists
+        BEFORE
+    participant identity exists
+
+
+======================================================================
+6. MEMBERSHIP BOUNDARY
+======================================================================
+
+Attribution may precede membership.
+
+Campaign Participation requires an identified member.
+
+Participant-specific settlement requires an identified PurPaws member.
+
+Therefore:
+
+    anonymous attribution        = permitted
+    anonymous participation      = not canonical participation
+    anonymous reward provenance  = may accumulate as evidence
+    anonymous settlement         = prohibited
+
+When an anonymous participant later becomes a member:
+
+    Attribution Context
+        ↓
+    participant identity resolved
+        ↓
+    participant receives THEIR OWN Affiliate identity
+        ↓
+    Campaign Participation may be established
+        ↓
+    settlement eligibility may later exist
+
+The referring Affiliate identity MUST NOT become the participant's
+Affiliate identity.
+
+
+======================================================================
+7. CLIENT-SUPPLIED INPUT CLASSIFICATION
+======================================================================
+
+The client MAY present untrusted claims or references such as:
+
+    campaign reference
+    referral code
+    Affiliate ID
+    attribution token
+    share token
+    evidence token
+    click reference
+    inbound source
+    destination reference
+
+These are INPUT TO VALIDATION.
+
+They are not authoritative fields merely because they were supplied.
+
+
+======================================================================
+8. SERVER-RESOLVED TRUTH
+======================================================================
+
+Where applicable, the server MUST resolve authoritative values.
+
+This includes:
+
+    Campaign existence
+    Campaign eligibility for attribution
+    Referrer existence
+    Referrer identity
+    Referring Affiliate ID
+    Referring referral code
+    Internal evidence record existence
+    Internal evidence ownership / relationship
+    Evidence-to-Campaign consistency
+    Evidence-to-referrer consistency
+    validity
+    expiry
+    canonical status
+
+The server MUST prefer authoritative stored records over duplicated
+client-supplied identity values.
+
+
+======================================================================
+9. CAMPAIGN AUTHORITY
+======================================================================
+
+A client may indicate a Campaign.
+
+The client does not thereby establish Campaign provenance.
+
+Before storing canonical campaign_id, creation authority must establish
+that the referenced Campaign:
+
+    exists
+    is eligible for the requested attribution journey
+    is consistent with trusted evidence where evidence exists
+
+Campaign identity MUST NOT later be reconstructed from Affiliate ID
+alone.
+
+Affiliate identity answers WHO.
+
+Campaign identity answers WHERE.
+
+They are separate dimensions.
+
+
+======================================================================
+10. REFERRER AUTHORITY
+======================================================================
+
+A client may present:
+
+    Affiliate ID
+    referral code
+    share reference
+    attribution token
+
+These values may help locate a referrer.
+
+They MUST NOT independently establish canonical referrer identity.
+
+The server must resolve referrer provenance from authoritative PurPaws
+records.
+
+Where canonical referrer identity cannot be established, the system
+must not invent it.
+
+
+======================================================================
+11. PARTICIPANT AUTHORITY
+======================================================================
+
+Anonymous creation MUST NOT trust client-supplied:
+
+    participant_user_id
+    participant_affiliate_id
+    participant_referral_code
+
+Authenticated creation MUST NOT blindly trust those fields either.
+
+Participant identity must be derived from authenticated server context
+or a later trusted identity-resolution authority.
+
+A client MUST NOT be permitted to impersonate another participant by
+submitting identity identifiers.
+
+
+======================================================================
+12. ENROLLMENT AUTHORITY
+======================================================================
+
+Client-supplied enrollment_id MUST NOT establish Campaign Participation.
+
+Campaign enrollment is a separate authority.
+
+At initial anonymous Attribution Context creation:
+
+    enrollment_id should normally be NULL
+
+Later:
+
+    Campaign Participation Authority
+        ↓
+    creates or verifies enrollment
+        ↓
+    trusted resolution may attach enrollment_id
+
+Attribution creation itself MUST NOT manufacture Campaign enrollment.
+
+
+======================================================================
+13. EVIDENCE AUTHORITY
+======================================================================
+
+Evidence may include, but is not limited to:
+
+    AffiliateClick
+    trusted share record
+    signed server-generated reference
+    verified inbound campaign route
+    future canonical evidence types
+
+AffiliateClick is optional evidence.
+
+A click is NOT required for Attribution Context.
+
+A click is NOT itself Attribution Context.
+
+When evidence_source_type and evidence_source_id refer to an internal
+PurPaws record, creation authority must verify that the record exists
+and that its provenance is consistent with the context being created.
+
+The client MUST NOT be able to point at an unrelated internal record
+and thereby inherit its provenance.
+
+
+======================================================================
+14. TRANSPORT IS NOT AUTHORITY
+======================================================================
+
+The following may transport attribution information:
+
+    URL query parameters
+    path parameters
+    cookies
+    browser storage
+    QR codes
+    referral links
+    share links
+    POST bodies
+    signed tokens
+
+Transport answers:
+
+    HOW DID THE CLAIM ARRIVE?
+
+It does not necessarily answer:
+
+    IS THE CLAIM TRUE?
+
+Even a signed transport token establishes only the claims that the
+server intentionally signed and validated.
+
+Transport and canonical attribution remain distinct.
+
+
+======================================================================
+15. MINIMUM VALID PROVENANCE
+======================================================================
+
+Creation authority MUST NOT create meaningless empty Attribution
+Context records.
+
+A context requires sufficient validated provenance to represent a real
+attributed journey.
+
+The exact implementation-specific minimum may vary by supported
+creation scenario.
+
+However, creation MUST establish enough trusted context to answer:
+
+    What journey is being attributed?
+
+and, where referral-specific:
+
+    What verified provenance produced that journey?
+
+A context MUST NOT be created merely because a request asks for one.
+
+
+======================================================================
+16. ALLOWED CREATION SCENARIOS
+======================================================================
+
+Creation Authority MAY eventually support explicitly defined scenarios
+including:
+
+A. ANONYMOUS CAMPAIGN JOURNEY
+
+    Person follows a verified Campaign-specific route.
+
+    Campaign may be resolved.
+
+    Participant remains unresolved.
+
+
+B. ANONYMOUS REFERRED CAMPAIGN JOURNEY
+
+    Person follows a verified Campaign-specific referral route.
+
+    Campaign may be resolved.
+    Referrer may be resolved.
+    Participant remains unresolved.
+
+
+C. AUTHENTICATED MEMBER JOURNEY
+
+    An authenticated member follows or begins an attributable journey.
+
+    Participant identity may be server-resolved from authentication.
+
+    Client identity fields remain untrusted.
+
+
+D. TRUSTED SERVER-SIDE EVIDENCE
+
+    Another server authority possesses sufficient canonical provenance
+    to request Attribution Context creation.
+
+
+E. FUTURE ADMIN-VERIFIED PROVENANCE
+
+    Administrative creation may be supported only through an explicit
+    privileged authority with auditable provenance.
+
+Administrative privilege MUST NOT mean arbitrary economic truth.
+
+
+======================================================================
+17. FORBIDDEN CREATION INPUT
+======================================================================
+
+Attribution Context Creation Authority MUST NOT accept client control
+over economic treatment.
+
+The following do NOT belong to creation authority:
+
+    payout_type
+    payout_amount_cents
+    payout_percent
+    reward_amount
+    reward_type
+    commission_id
+    commission_status
+    token_amount
+    token_balance
+    settlement_status
+    payment_method
+
+Attribution Context remains reward-neutral.
+
+
+======================================================================
+18. CONVERSION BOUNDARY
+======================================================================
+
+Creation Authority MUST NOT create a Conversion merely because an
+Attribution Context was created.
+
+Attribution Context answers:
+
+    WHAT JOURNEY / PROVENANCE EXISTS?
+
+Conversion answers:
+
+    WHAT ATTRIBUTABLE EVENT OCCURRED?
+
+These are separate authorities.
+
+One Attribution Context may eventually support:
+
+    zero conversions
+    one conversion
+    multiple conversions
+
+Therefore creation authority does not own a singular conversion_id.
+
+
+======================================================================
+19. REWARD BOUNDARY
+======================================================================
+
+Creation Authority MUST NOT determine:
+
+    whether a reward is earned
+    reward type
+    reward value
+    commission amount
+    token amount
+    discount amount
+    settlement status
+
+Those belong downstream.
+
+The same Affiliate identity may participate in multiple Campaigns with
+different Reward Policies.
+
+Therefore:
+
+    Affiliate ID != payout authority
+
+and:
+
+    Attribution Context != Reward Policy
+
+
+======================================================================
+20. DUPLICATE / IDEMPOTENCY REQUIREMENT
+======================================================================
+
+Repeated presentation of the same attributable journey MUST NOT be
+allowed to manufacture unlimited economically meaningful provenance.
+
+Before implementation, Creation Authority must define an explicit
+idempotency or duplicate-handling strategy.
+
+That strategy may depend on:
+
+    trusted attribution token
+    evidence identity
+    Campaign
+    referrer
+    journey identifier
+    bounded validity window
+    other server-resolved provenance
+
+The exact key is NOT defined by this contract.
+
+The requirement IS defined:
+
+    repeated transport != unlimited new economic provenance
+
+Implementation MUST NOT proceed without an explicit duplicate policy.
+
+
+======================================================================
+21. REPLAY RESISTANCE
+======================================================================
+
+Any future signed or opaque attribution reference that can create
+canonical context must be evaluated for replay.
+
+A valid reference MUST NOT automatically imply unlimited reuse.
+
+Where replay matters, the server must be able to determine:
+
+    validity
+    expiry
+    scope
+    prior use where appropriate
+    Campaign consistency
+    referrer consistency
+
+Replay protection belongs at the trust boundary.
+
+
+======================================================================
+22. EXPIRY
+======================================================================
+
+Attribution Context may have expires_at.
+
+Expiry means the context is no longer eligible for whatever future
+resolution rules require a live context.
+
+Expiry MUST NOT mean historical provenance never existed.
+
+Historical origin should remain inspectable according to applicable
+retention and privacy rules.
+
+
+======================================================================
+23. INVALIDATION
+======================================================================
+
+A context may later require invalidation because provenance is:
+
+    fraudulent
+    malformed
+    inconsistent
+    revoked
+    administratively rejected
+    otherwise invalid
+
+Invalidation SHOULD preserve the historical fact that the context
+existed.
+
+Invalidation MUST NOT silently rewrite the original referrer,
+Campaign, or evidence into different provenance.
+
+
+======================================================================
+24. IMMUTABLE ORIGIN PRINCIPLE
+======================================================================
+
+Later lifecycle resolution may ADD trusted information.
+
+For example:
+
+    participant_user_id
+    participant_affiliate_id
+    participant_referral_code
+    enrollment_id
+    identified_at
+    participated_at
+
+Later resolution MUST NOT silently rewrite historical origin.
+
+In particular:
+
+    participant identity MUST NOT overwrite referrer identity
+
+    later Campaign Participation MUST NOT rewrite original Campaign
+    provenance into another Campaign
+
+    later evidence MUST NOT silently replace original evidence in a way
+    that falsifies history
+
+
+======================================================================
+25. CREATION VS RESOLUTION
+======================================================================
+
+CREATION AUTHORITY owns:
+
+    validation of creation request
+    trusted Campaign resolution where applicable
+    trusted referrer resolution where applicable
+    trusted evidence resolution where applicable
+    initial context creation
+    initial status
+    initial timestamps
+    initial expiry where applicable
+
+
+CREATION AUTHORITY does NOT own:
+
+    participant registration
+    Affiliate identity issuance
+    Campaign enrollment
+    Conversion creation
+    Reward calculation
+    Commission creation
+    token issuance
+    settlement
+
+
+Later authorities may resolve lifecycle fields.
+
+They must not become creation authority retroactively.
+
+
+======================================================================
+26. REGISTRATION CONTINUITY
+======================================================================
+
+The desired journey is continuous:
+
+    Member A shares Campaign X
+        ↓
+    Person B follows link
+        ↓
+    Attribution Context created
+        ↓
+    B chooses "Join this Campaign"
+        ↓
+    B creates free PurPaws account
+        ↓
+    B receives B's own Affiliate identity
+        ↓
+    original Attribution Context resolves B
+        ↓
+    B joins Campaign X
+        ↓
+    enrollment is resolved
+        ↓
+    later attributable activity may produce Conversion
+        ↓
+    Campaign Reward Policy determines treatment
+
+B MUST NOT be forced to rediscover Campaign X after registration.
+
+Continuity must be preserved without confusing A's referral identity
+with B's participant identity.
+
+
+======================================================================
+27. TRUSTED IDENTITY RULE
+======================================================================
+
+Identity must come from the authority that owns identity.
+
+Therefore:
+
+    authenticated user identity
+        comes from authentication / account authority
+
+    Affiliate identity
+        comes from Affiliate identity authority
+
+    Campaign identity
+        comes from Campaign authority
+
+    enrollment identity
+        comes from Campaign Participation authority
+
+    Conversion identity
+        comes from Conversion authority
+
+    reward value
+        comes from Reward Policy / Reward authority
+
+Creation Authority may resolve and reference these authorities.
+
+It MUST NOT impersonate them.
+
+
+======================================================================
+28. FAILURE MUST BE SAFE
+======================================================================
+
+If required canonical provenance cannot be established:
+
+    DO NOT INVENT IT.
+
+Depending on the future creation scenario, the request must either:
+
+    fail safely
+
+or:
+
+    create only the narrower context actually supported by trusted
+    evidence
+
+The system must not upgrade uncertain claims into stronger provenance.
+
+
+======================================================================
+29. AUDITABILITY
+======================================================================
+
+Creation decisions should eventually be explainable.
+
+For a canonical Attribution Context, the system should be capable of
+answering:
+
+    Why was this context created?
+
+    Which Campaign was resolved?
+
+    Which referrer was resolved?
+
+    What evidence supported creation?
+
+    Was the participant known at creation?
+
+    What was added later?
+
+This contract does not implement an audit log.
+
+It establishes auditability as a design requirement.
+
+
+======================================================================
+30. PRIVILEGED CREATION
+======================================================================
+
+Privileged administrative access does not remove provenance
+requirements.
+
+An administrator may have authority to correct or establish records
+through a future explicit workflow.
+
+That workflow must remain auditable.
+
+Privilege MUST NOT silently become:
+
+    arbitrary Campaign attribution
+    arbitrary referral attribution
+    arbitrary reward entitlement
+    arbitrary settlement entitlement
+
+
+======================================================================
+31. SECURITY INVARIANTS
+======================================================================
+
+The following invariants are LOCK TARGETS:
+
+1. Client claims are not canonical attribution truth.
+
+2. Server resolution establishes canonical attribution.
+
+3. System actor, referrer, and participant are distinct.
+
+4. Anonymous Attribution Context is permitted.
+
+5. Anonymous Campaign Participation is not canonical participation.
+
+6. Participant settlement requires membership.
+
+7. Referrer identity MUST NOT become participant identity.
+
+8. Participant identity MUST NOT overwrite referrer provenance.
+
+9. Client-supplied participant identity is not trusted.
+
+10. Client-supplied enrollment identity is not trusted.
+
+11. Client-supplied reward or payout values are forbidden.
+
+12. Campaign identity must be server-validated.
+
+13. Referrer identity must be server-resolved where claimed.
+
+14. Internal evidence references must be server-validated.
+
+15. Click is optional evidence.
+
+16. Transport mechanism is not attribution authority.
+
+17. Empty meaningless contexts must not be created.
+
+18. Repeated transport must not manufacture unlimited economic
+    provenance.
+
+19. Replay risk must be addressed before reusable attribution tokens
+    become authoritative.
+
+20. Later resolution may add identity but must not falsify origin.
+
+21. Creation does not create Conversion.
+
+22. Creation does not determine Reward.
+
+23. Creation does not create Commission.
+
+24. Creation does not issue token value.
+
+25. Failure to establish provenance must fail safely.
+
+26. Administrative privilege does not eliminate provenance.
+
+
+======================================================================
+32. IMPLEMENTATION ORDER
+======================================================================
+
+After this contract is reviewed and locked:
+
+    1. OBSERVE existing public / referral / campaign route conventions.
+
+    2. OBSERVE existing authentication and identity-resolution
+       authorities.
+
+    3. OBSERVE AffiliateClick creation and trust semantics.
+
+    4. DEFINE explicit Attribution Context duplicate /
+       idempotency policy.
+
+    5. DEFINE supported Creation Request contract.
+
+    6. IMPLEMENT server-side creation authority.
+
+    7. VERIFY anonymous creation.
+
+    8. VERIFY authenticated creation.
+
+    9. VERIFY spoof resistance.
+
+    10. VERIFY replay / duplicate behavior.
+
+    11. LOCK creation authority.
+
+Only after that should registration continuity or Campaign
+Participation resolution be connected.
+
+
+======================================================================
+33. CURRENT IMPLEMENTATION STATE
+======================================================================
+
+AttributionContext model:
+    IMPLEMENTED + LOCKED
+
+attribution_contexts table:
+    IMPLEMENTED + VERIFIED
+
+Attribution Context creation:
+    NOT IMPLEMENTED
+
+Registration integration:
+    NOT IMPLEMENTED
+
+AffiliateClick integration:
+    NOT IMPLEMENTED
+
+Campaign enrollment integration:
+    NOT IMPLEMENTED
+
+Conversion integration:
+    NOT IMPLEMENTED
+
+Reward integration:
+    NOT IMPLEMENTED
+
+Commission integration:
+    NOT IMPLEMENTED
+
+Token integration:
+    NOT IMPLEMENTED
+
+
+======================================================================
+34. FINAL AUTHORITY STATEMENT
+======================================================================
+
+Attribution Context Creation Authority exists to convert sufficiently
+validated provenance into canonical Attribution Context.
+
+It does not exist to trust arbitrary client claims.
+
+The client may present evidence.
+
+The server decides what that evidence proves.
+
+Canonical attribution is created only from the authority the server can
+actually establish.
+
+No manufactured provenance.
+
+No self-assigned participant identity.
+
+No self-assigned Campaign Participation.
+
+No self-awarded payout.
+
+No Wally gaggers.
+
+
+======================================================================
+END
+======================================================================
