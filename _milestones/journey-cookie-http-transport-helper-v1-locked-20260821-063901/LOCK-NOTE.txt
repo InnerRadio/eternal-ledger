@@ -1,0 +1,96 @@
+PURPAWS
+JOURNEY COOKIE HTTP TRANSPORT HELPER v1
+
+STATUS
+LOCKED
+
+LOCKED UTC
+2026-08-21T06:39:01.475015+00:00
+
+PARENT CHECKPOINT
+ee5556a4e7eab58d6b3f78bdd2981667bad1e638
+
+MODULE
+backend/app/journey_cookie_authority.py
+
+MODULE SHA256
+e4832e6dca68883d9b962fc27245ab7bc73506dc1f91fd0d3f635806b69f888e
+
+RESPONSIBILITIES
+
+read_journey_cookie
+set_journey_cookie
+clear_journey_cookie
+
+COOKIE
+
+Name:
+pp_journey
+
+Secure:
+YES
+
+HttpOnly:
+YES
+
+SameSite:
+Lax
+
+Path:
+/
+
+Explicit Domain:
+NO
+
+SET
+
+Carries already-authorized raw journey reference.
+
+Does not generate.
+Does not validate independently.
+Does not resolve.
+Does not create Attribution Context.
+Does not rotate.
+Does not bind participant.
+
+CLEAR
+
+Uses:
+Max-Age=0
+Expires=0
+Path=/
+Secure=True
+HttpOnly=True
+SameSite=Lax
+
+Database deletion:
+NO
+
+DATABASE AUTHORITY
+NO
+
+AUTHENTICATION AUTHORITY
+NO
+
+ECONOMIC AUTHORITY
+NO
+
+ROUTE INTEGRATION
+NO
+
+GLOBAL COOKIE ISSUANCE
+NO
+
+DATABASE STATE AT LOCK
+
+Integrity:
+PASS
+
+Attribution Context rows:
+0
+
+NEXT
+
+DEFINE FIRST ROUTE / ORCHESTRATION INTEGRATION AUTHORITY
+
+No route integration is part of this lock.
