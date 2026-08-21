@@ -1,0 +1,715 @@
+PURPAWS
+JOURNEY COOKIE HELPER SHAPE v1
+
+STATUS
+Architecture contract only.
+
+This contract defines the narrow implementation shape for:
+
+    backend/app/journey_cookie_authority.py
+
+It does not implement the helper.
+
+It does not integrate the helper into any route.
+
+It does not create an Attribution Context.
+
+It does not resolve an Attribution Context.
+
+It does not rotate a journey reference.
+
+It does not bind a participant.
+
+It does not authenticate a user.
+
+It does not authorize economic activity.
+
+
+======================================================================
+1. PURPOSE
+======================================================================
+
+journey_cookie_authority.py is a pure HTTP transport helper.
+
+Its responsibility is limited to:
+
+    read the browser-carried journey reference from the request
+
+    set the browser-carried journey reference on the response
+
+    clear the browser-carried journey reference from the response
+
+Nothing more.
+
+The database remains canonical authority for journey continuity.
+
+The cookie remains transport.
+
+
+======================================================================
+2. COOKIE NAME
+======================================================================
+
+Canonical cookie name:
+
+    pp_journey
+
+No alternate cookie name is authorized by this contract.
+
+
+======================================================================
+3. COOKIE CONTENT
+======================================================================
+
+The cookie carries the raw server-issued opaque journey reference.
+
+Expected representation:
+
+    ppj1_<opaque-random-value>
+
+The cookie MUST NOT contain:
+
+    journey_reference_hash
+    Attribution Context id
+    participant id
+    user id
+    affiliate id
+    referral code
+    enrollment id
+    campaign authority
+    reward authority
+    settlement authority
+    JWT
+    authentication state
+
+The raw journey reference exists in browser transport only.
+
+The server persists only its digest.
+
+
+======================================================================
+4. MODULE DEPENDENCY BOUNDARY
+======================================================================
+
+journey_cookie_authority.py MUST NOT import:
+
+    database.py
+    Session
+    SessionLocal
+    SQLAlchemy models
+    AttributionContext
+    User
+    CampaignEnrollment
+    Reward
+    Commission
+    settlement authority
+
+The module MUST NOT perform database queries.
+
+The module MUST NOT commit.
+
+The module MUST NOT flush.
+
+The module MUST NOT refresh database rows.
+
+The module MUST NOT create database rows.
+
+The module MUST NOT delete database rows.
+
+The helper is pure HTTP transport.
+
+
+======================================================================
+5. FASTAPI / STARLETTE BOUNDARY
+======================================================================
+
+The implementation may use the repository's installed FastAPI /
+Starlette request and response interfaces.
+
+Canonical transport objects:
+
+    Request
+    Response
+
+The helper should operate on those HTTP objects rather than inventing
+a second transport abstraction.
+
+
+======================================================================
+6. READ HELPER
+======================================================================
+
+Canonical helper:
+
+    read_journey_cookie(request)
+
+Responsibility:
+
+    read pp_journey from request cookies
+
+Return:
+
+    raw cookie string when present
+
+    None when absent
+
+The read helper does not establish whether the reference resolves to
+an active Attribution Context.
+
+The read helper does not classify:
+
+    UNKNOWN_REFERENCE
+    EXPIRED
+    ACTIVE
+    INTEGRITY_FAILURE
+
+Those classifications belong to Journey-Reference Resolver Authority.
+
+Therefore:
+
+    cookie presence != valid journey
+
+    cookie absence != database absence
+
+    cookie value != authentication
+
+
+======================================================================
+7. READ VALIDATION BOUNDARY
+======================================================================
+
+read_journey_cookie() is transport retrieval.
+
+It MUST NOT silently transform malformed input into trusted provenance.
+
+The canonical journey-reference validator remains owned by:
+
+    journey_reference_authority.py
+
+Transport may return the raw browser-carried value.
+
+Validation occurs before authoritative resolution.
+
+This separation prevents duplicate reference grammars from emerging.
+
+journey_cookie_authority.py MUST NOT implement a competing ppj1_
+validator.
+
+
+======================================================================
+8. SET HELPER
+======================================================================
+
+Canonical helper:
+
+    set_journey_cookie(response, journey_reference, ...)
+
+Responsibility:
+
+    attach pp_journey to the HTTP response
+
+The caller MUST supply server-issued / already-authorized journey
+reference material.
+
+The helper MUST NOT generate a journey reference.
+
+The helper MUST NOT create an Attribution Context.
+
+The helper MUST NOT resolve a reference.
+
+The helper MUST NOT rotate a reference.
+
+The helper MUST NOT bind a participant.
+
+Generator Authority owns generation.
+
+Creation Authority owns Attribution Context creation.
+
+Rotation Authority owns rotation.
+
+Participant Binding Authority owns participant binding.
+
+
+======================================================================
+9. SET COOKIE SECURITY CONTRACT
+======================================================================
+
+The canonical journey cookie attributes are:
+
+    key = "pp_journey"
+
+    httponly = True
+
+    secure = True
+
+    samesite = "lax"
+
+    path = "/"
+
+Production journey continuity requires HTTPS.
+
+The implementation MUST NOT weaken Secure based merely on arbitrary
+request headers.
+
+The implementation MUST NOT treat X-Forwarded-Proto as independent
+security authority.
+
+The implementation MUST NOT introduce an undocumented environment
+switch that silently disables Secure.
+
+If local non-HTTPS development support is ever required, that must be
+defined as a separate explicit authority decision.
+
+v1 remains:
+
+    Secure = True
+
+
+======================================================================
+10. COOKIE LIFETIME
+======================================================================
+
+AttributionContext.expires_at remains the canonical lifecycle boundary.
+
+Cookie lifetime is transport lifetime.
+
+Cookie lifetime MUST NOT extend the authority of an expired
+Attribution Context.
+
+A still-present cookie pointing to an expired context remains expired
+when resolved.
+
+A cookie cannot reactivate provenance.
+
+The exact attribution-window duration remains outside this helper.
+
+The helper MAY accept an explicit expiry / max-age value from an
+authorized caller when implementation requires transport alignment.
+
+The helper MUST NOT invent the attribution window.
+
+The helper MUST NOT independently decide business expiry policy.
+
+
+======================================================================
+11. CLEAR HELPER
+======================================================================
+
+Canonical helper:
+
+    clear_journey_cookie(response)
+
+Responsibility:
+
+    instruct the browser to remove pp_journey
+
+Deletion MUST target the same cookie transport scope.
+
+Canonical deletion path:
+
+    path = "/"
+
+Deletion must not delete an Attribution Context.
+
+Deletion must not mutate Attribution Context status.
+
+Deletion must not erase evidence.
+
+Deletion must not erase historical provenance.
+
+Cookie removal is browser transport removal only.
+
+
+======================================================================
+12. CLEAR / SET SYMMETRY
+======================================================================
+
+The set and clear operations must agree on the cookie identity and
+scope.
+
+At minimum:
+
+    cookie name = pp_journey
+    path = /
+
+The implementation must avoid creating an undeletable sibling cookie
+through mismatched scope.
+
+SameSite policy remains:
+
+    Lax
+
+HttpOnly policy remains:
+
+    True
+
+Secure policy remains:
+
+    True
+
+
+======================================================================
+13. RAW SECRET HANDLING
+======================================================================
+
+The raw journey reference is bearer-like continuity material.
+
+Therefore the helper MUST NOT:
+
+    print the raw value
+    log the raw value by default
+    place the raw value in exception text
+    place the raw value in ordinary URLs
+    place the raw value in query strings
+    persist the raw value
+    return it in unrelated API payloads
+
+Normal cookie transport is authorized.
+
+Server-side hashing for resolution is authorized elsewhere.
+
+
+======================================================================
+14. AUTHENTICATION SEPARATION
+======================================================================
+
+pp_journey is not authentication.
+
+Existing Bearer authentication remains separate.
+
+Possession of pp_journey MUST NOT cause:
+
+    get_current_user()
+    require_roles()
+    require_active_account()
+
+to succeed.
+
+The cookie MUST NOT be accepted as a JWT.
+
+The cookie MUST NOT replace Authorization: Bearer semantics.
+
+Journey continuity and login identity remain separate authorities.
+
+
+======================================================================
+15. ECONOMIC AUTHORITY SEPARATION
+======================================================================
+
+Possession of pp_journey does not prove:
+
+    Campaign Participation
+    Campaign Enrollment
+    reward entitlement
+    commission entitlement
+    settlement entitlement
+    payment authority
+
+Those authorities remain downstream and separately verified.
+
+
+======================================================================
+16. COOKIE LOSS
+======================================================================
+
+Cookie loss means browser-carried continuity may be unavailable.
+
+Cookie loss does not authorize invasive fingerprinting.
+
+Cookie loss does not authorize reconstruction from weak device
+signals.
+
+Cookie loss does not authorize creation of fabricated provenance.
+
+If continuity cannot be proven under defined authority, continuity is
+not assumed.
+
+
+======================================================================
+17. COOKIE THEFT
+======================================================================
+
+A stolen journey cookie may expose continuity resolution within the
+bounded attribution lifetime.
+
+It does not grant:
+
+    authentication
+    account access
+    membership
+    participant identity
+    campaign enrollment
+    reward authority
+    commission authority
+    settlement authority
+
+This limited authority is deliberate.
+
+
+======================================================================
+18. ROUTE INTEGRATION
+======================================================================
+
+This helper contract does not select the first route that will use
+journey cookies.
+
+Route integration is a separate implementation step.
+
+No existing route is modified by this contract.
+
+No middleware is introduced by this contract.
+
+No global automatic cookie issuance is authorized by this contract.
+
+
+======================================================================
+19. CREATION SEPARATION
+======================================================================
+
+Cookie Transport MUST NOT create Attribution Context rows.
+
+The future creation flow is conceptually:
+
+    receive legitimate journey-entry event
+        ↓
+    Creation Authority creates Attribution Context
+        ↓
+    Generator Authority produces server-issued raw reference + digest
+        ↓
+    database stores digest
+        ↓
+    Cookie Transport carries raw reference to browser
+
+The exact orchestration remains separately governed.
+
+
+======================================================================
+20. RESOLUTION SEPARATION
+======================================================================
+
+A later request is conceptually:
+
+    Request
+        ↓
+    read_journey_cookie()
+        ↓
+    canonical journey-reference validation
+        ↓
+    read-only resolver
+        ↓
+    database lookup by journey_reference_hash
+        ↓
+    explicit resolver classification
+
+Cookie Transport does not collapse these layers.
+
+
+======================================================================
+21. ROTATION SEPARATION
+======================================================================
+
+Cookie Transport does not decide when rotation occurs.
+
+When Rotation Authority later authorizes a new reference:
+
+    old raw browser reference
+        ↓
+    rotation authority
+        ↓
+    new server-issued raw reference
+        ↓
+    same Attribution Context
+        ↓
+    stored digest replaced under rotation rules
+        ↓
+    Cookie Transport sets new raw reference
+
+The transport helper merely carries the authorized new value.
+
+
+======================================================================
+22. FAILURE BEHAVIOR
+======================================================================
+
+Cookie read failure must not fabricate provenance.
+
+Cookie set failure must not fabricate database success.
+
+Cookie clear failure must not delete database evidence.
+
+Transport failure and database authority remain separate.
+
+The helper must fail narrowly.
+
+
+======================================================================
+23. IMPLEMENTATION SHAPE
+======================================================================
+
+The intended module is narrow.
+
+Expected constants may include:
+
+    JOURNEY_COOKIE_NAME = "pp_journey"
+
+    JOURNEY_COOKIE_PATH = "/"
+
+    JOURNEY_COOKIE_HTTPONLY = True
+
+    JOURNEY_COOKIE_SECURE = True
+
+    JOURNEY_COOKIE_SAMESITE = "lax"
+
+Expected functions:
+
+    read_journey_cookie(request)
+
+    set_journey_cookie(response, journey_reference, ...)
+
+    clear_journey_cookie(response)
+
+No class hierarchy is required.
+
+No database repository is required.
+
+No middleware is required.
+
+No route is required.
+
+No global mutable state is required.
+
+
+======================================================================
+24. NON-GOALS
+======================================================================
+
+This module does not:
+
+    generate references
+    hash references
+    validate reference grammar independently
+    resolve Attribution Context
+    create Attribution Context
+    rotate references
+    bind participants
+    authenticate users
+    authorize campaigns
+    calculate rewards
+    calculate commissions
+    settle value
+    fingerprint devices
+    alter schema
+    migrate database
+    mutate existing routes
+
+
+======================================================================
+25. SECURITY INVARIANTS
+======================================================================
+
+The implementation must preserve:
+
+    SERVER STORES HASH — NOT RAW REFERENCE
+
+    COOKIE CARRIES RAW REFERENCE
+
+    Secure
+
+    HttpOnly
+
+    SameSite=Lax
+
+    Path=/
+
+    DATABASE REMAINS CANONICAL
+
+    COOKIE IS TRANSPORT
+
+    JOURNEY REFERENCE IS NOT AUTHENTICATION
+
+    JOURNEY REFERENCE IS NOT PARTICIPANT IDENTITY
+
+    JOURNEY REFERENCE IS NOT ECONOMIC AUTHORITY
+
+    COOKIE LOSS DOES NOT AUTHORIZE FINGERPRINTING
+
+    COOKIE TRANSPORT DOES NOT CREATE PROVENANCE
+
+    COOKIE TRANSPORT DOES NOT ROTATE AUTHORITY
+
+    COOKIE TRANSPORT DOES NOT BIND PARTICIPANT
+
+
+======================================================================
+26. JOHNNY DROP TABLES
+======================================================================
+
+Johnny Drop Tables has no jurisdiction here.
+
+This helper requires:
+
+    no ALTER TABLE
+    no DROP TABLE
+    no CREATE TABLE
+    no database migration
+    no database mutation
+
+Any attempt to turn HTTP cookie transport into schema surgery is a
+category error.
+
+Johnny remains outside.
+
+
+======================================================================
+27. IMPLEMENTATION GATE
+======================================================================
+
+Before implementation:
+
+    verify this contract
+
+    lock this contract
+
+    commit this contract
+
+    push this contract
+
+Then:
+
+    implement only journey_cookie_authority.py
+
+Initial implementation must remain narrow.
+
+No route integration in the same step unless separately authorized.
+
+No database writes in helper implementation.
+
+No schema changes.
+
+No ad hoc ALTER TABLE.
+
+No destructive recreation.
+
+
+======================================================================
+28. FINAL AUTHORITY
+======================================================================
+
+Journey Cookie Helper Shape v1 defines:
+
+    one cookie
+    one read helper
+    one set helper
+    one clear helper
+    fixed security attributes
+    no database authority
+    no authentication authority
+    no economic authority
+
+Cookie Transport carries continuity.
+
+It does not own continuity.
+
+Database-backed Attribution Context remains canonical.
+
+END OF JOURNEY COOKIE HELPER SHAPE v1

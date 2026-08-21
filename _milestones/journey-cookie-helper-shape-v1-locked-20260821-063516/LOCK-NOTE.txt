@@ -1,0 +1,91 @@
+PURPAWS
+JOURNEY COOKIE HELPER SHAPE v1
+
+STATUS
+LOCKED
+
+LOCKED UTC
+2026-08-21T06:35:16.961153+00:00
+
+PARENT CHECKPOINT
+0a22107fe7bc013dd5bbaba004a5eea9b4adbf00
+
+CONTRACT
+_notes/journey-cookie-helper-shape-v1.txt
+
+CONTRACT SHA256
+428421c56470060b1f0014b729110dda4c9974d9cb5df29ca6cf92162fbd1f61
+
+TARGET MODULE
+
+backend/app/journey_cookie_authority.py
+
+IMPLEMENTATION SHAPE
+
+read_journey_cookie(request)
+
+set_journey_cookie(
+    response,
+    journey_reference,
+    ...
+)
+
+clear_journey_cookie(response)
+
+COOKIE
+
+Name:
+pp_journey
+
+Secure:
+YES
+
+HttpOnly:
+YES
+
+SameSite:
+Lax
+
+Path:
+/
+
+DATABASE AUTHORITY
+NO
+
+AUTHENTICATION AUTHORITY
+NO
+
+ECONOMIC AUTHORITY
+NO
+
+REFERENCE GENERATION AUTHORITY
+NO
+
+REFERENCE RESOLUTION AUTHORITY
+NO
+
+ROTATION AUTHORITY
+NO
+
+PARTICIPANT BINDING AUTHORITY
+NO
+
+ROUTE INTEGRATION
+NOT AUTHORIZED BY THIS LOCK
+
+GLOBAL COOKIE ISSUANCE
+NO
+
+SCHEMA CHANGE
+NO
+
+DATABASE MUTATION
+NO
+
+NEXT
+
+IMPLEMENT NARROW journey_cookie_authority.py ONLY
+
+Then verify before any route integration.
+
+Johnny Drop Tables remains outside.
