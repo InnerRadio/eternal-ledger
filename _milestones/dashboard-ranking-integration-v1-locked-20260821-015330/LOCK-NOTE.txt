@@ -1,0 +1,96 @@
+PURPAWS — CREATOR / RESCUE / PARTNER DASHBOARD RANKING INTEGRATION v1
+
+STATUS
+LOCKED
+
+UTC
+2026-08-21T01:53:30.198239+00:00
+
+PARENT CHECKPOINT
+ddebc02d16c274fa323f5e5cecdc9a6ee08ccfd5
+
+ACCOUNT.PY SHA256
+2edf9f49a725c1a92a6ccfe02c3dbf6f8605e824e782c3cccf48ead5917bb4d8
+
+DASHBOARD RANKING CONSUMER SHA256
+ef63a0dd188386fd6276b430615d7b59522e14b2a200f64ff2f9952606bb3519
+
+PLATFORM RANKING AGGREGATION SHA256
+dbdbe902d4aa77e133e5c3f96a6f963b3effbc2335c8befcb90fe3bdca6c6066
+
+CANONICAL AUTHORITY
+
+Platform Ranking Aggregation
+    calculates:
+    - score
+    - rank
+    - ranking components
+
+Dashboard Ranking Consumer Seam
+    selects canonical ranking records.
+
+Dashboards
+    present canonical ranking truth.
+
+LOCAL DASHBOARD SCORING
+
+Creator:
+REMOVED
+
+Rescue:
+REMOVED
+
+Partner:
+REMOVED
+
+CREATOR IDENTITY PRINCIPLE
+
+Creator identity is participant-scoped by user_id.
+
+A Creator may be:
+- a single individual,
+- an individual affiliated with one or more organizations,
+- an individual with no organization affiliation.
+
+Organization affiliation is optional context.
+
+Creator identity
+!= organization identity
+
+Creator participation
+!= organization membership
+
+Creator ranking eligibility is not established by organization membership.
+
+PARTNER IDENTITY PRINCIPLE
+
+Partner ranking is organization-scoped by organization_id.
+
+Organization visibility is determined by the locked organization visibility
+architecture before Partner organization IDs are supplied to the ranking
+consumer seam.
+
+RANKING
+!= ACCESS
+
+RANKING
+!= MEMBERSHIP
+
+RANKING
+!= ORGANIZATION VISIBILITY
+
+PRESERVED
+
+- dashboard access states
+- organization visibility authority
+- Platform Leaderboard behavior
+- Dashboard Ranking Consumer Seam
+- Platform Ranking Aggregation
+- database state
+
+DATABASE WRITES
+NONE
+
+NEXT
+
+Continue Dashboard Intelligence Consumer Map from the new protected checkpoint.
