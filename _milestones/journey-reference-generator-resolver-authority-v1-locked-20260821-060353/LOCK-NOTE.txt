@@ -1,0 +1,171 @@
+PURPAWS
+JOURNEY-REFERENCE GENERATOR / RESOLVER AUTHORITY v1
+
+STATUS
+LOCKED
+
+LOCKED UTC
+2026-08-21T06:03:53.329542+00:00
+
+PARENT CHECKPOINT
+e0b9264798170432689f506eb4774061beea2713
+
+CONTRACT
+_notes/journey-reference-generator-resolver-authority-v1.txt
+
+CONTRACT SHA256
+9f9819e3e52835171ff196e99e739f534af0d836cdd83881559198aeb64673d4
+
+PIPELINE
+
+GENERATE
+VALIDATE
+HASH
+RESOLVE
+CLASSIFY
+
+GENERATOR
+
+Uses:
+cryptographically secure randomness
+
+External prefix:
+ppj1_
+
+Canonical randomness:
+secrets.token_urlsafe(32)
+
+Generator persists:
+NO
+
+Generator sets cookie:
+NO
+
+Generator creates Attribution Context:
+NO
+
+HASH
+
+Algorithm:
+SHA-256
+
+Input:
+exact raw UTF-8 journey-reference bytes
+
+Output:
+64-character lowercase hexadecimal digest
+
+VALIDATOR
+
+Structural validation occurs before resolver lookup.
+
+Malformed:
+explicit classification
+
+Unsupported version:
+explicit classification
+
+Input length:
+BOUNDED
+
+RESOLVER
+
+Read-only:
+YES
+
+Database reads:
+YES
+
+Database writes:
+NO
+
+Participant mutation:
+NO
+
+Reference rotation:
+NO
+
+Cookie mutation:
+NO
+
+Creation authority:
+NO
+
+CARDINALITY
+
+Expected digest matches:
+0 OR 1
+
+Multiple matches:
+INTEGRITY FAILURE
+
+Silent first() masking:
+NO
+
+CLASSIFICATIONS
+
+UNKNOWN_REFERENCE
+MALFORMED_REFERENCE
+UNSUPPORTED_VERSION
+ACTIVE
+EXPIRED
+PARTICIPANT_CONFLICT
+PROVENANCE_CONFLICT
+INVALID_CONTEXT
+
+RAW SECRET
+
+Persisted:
+NO
+
+Logged by default:
+NO
+
+Publicly echoed:
+NO
+
+SEPARATE AUTHORITIES
+
+Rotation:
+LATER
+
+Cookie Transport:
+LATER
+
+Attribution Context Creation:
+LATER
+
+Registration Continuity:
+LATER
+
+Economic Authority:
+DOWNSTREAM
+
+IMPLEMENTATION STATE
+
+Generator:
+NOT IMPLEMENTED
+
+Validator:
+NOT IMPLEMENTED
+
+Hash helper:
+NOT IMPLEMENTED
+
+Resolver:
+NOT IMPLEMENTED
+
+Cookie transport:
+NOT IMPLEMENTED
+
+Rotation:
+NOT IMPLEMENTED
+
+Creation Authority:
+NOT IMPLEMENTED
+
+NEXT
+
+IMPLEMENT GENERATOR / VALIDATOR / HASHER / READ-ONLY RESOLVER
+
+No layer impersonates another.

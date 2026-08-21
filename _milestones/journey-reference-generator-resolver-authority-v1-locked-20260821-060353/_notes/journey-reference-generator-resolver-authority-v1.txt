@@ -1,0 +1,1269 @@
+PURPAWS
+JOURNEY-REFERENCE GENERATOR / RESOLVER AUTHORITY v1
+
+STATUS
+DEFINED
+VERIFIED
+NOT YET LOCKED
+
+
+======================================================================
+1. PURPOSE
+======================================================================
+
+This contract defines the authority boundary for generation,
+validation, hashing, resolution, and classification of PurPaws
+journey references.
+
+It sits between:
+
+    locked journey-reference persistence
+
+and:
+
+    future cookie transport
+    future Attribution Context creation
+    future participant resolution
+    future reference rotation
+
+This contract defines behavior only.
+
+It does NOT implement the module.
+
+
+======================================================================
+2. AUTHORITY PIPELINE
+======================================================================
+
+The canonical behavioral sequence is:
+
+    GENERATE
+        ↓
+    VALIDATE
+        ↓
+    HASH
+        ↓
+    RESOLVE
+        ↓
+    CLASSIFY
+
+Each stage has a distinct responsibility.
+
+No stage may silently impersonate another authority.
+
+
+======================================================================
+3. GENERATOR RESPONSIBILITY
+======================================================================
+
+The Generator creates a new raw opaque journey reference.
+
+The Generator must:
+
+    use cryptographically secure randomness
+    use the locked ppj1_ external format
+    return the raw reference
+    derive or return the canonical SHA-256 digest
+
+The Generator must NOT:
+
+    persist AttributionContext
+    query Campaign
+    query Affiliate identity
+    create AffiliateClick
+    set cookies
+    resolve participants
+    create Campaign Enrollment
+    create Conversion
+    create Reward
+    create Commission
+    create token value
+    settle value
+
+
+======================================================================
+4. GENERATOR RANDOMNESS
+======================================================================
+
+v1 generation authority uses:
+
+    Python secrets module
+
+Conceptual generation:
+
+    random_part = secrets.token_urlsafe(32)
+
+External reference:
+
+    ppj1_<random_part>
+
+The random source must not be:
+
+    random.random()
+    timestamp
+    database sequence
+    Campaign ID
+    Affiliate ID
+    referral code
+    user ID
+    IP address
+    user agent
+
+
+======================================================================
+5. REFERENCE VERSION
+======================================================================
+
+v1 references use the prefix:
+
+    ppj1_
+
+The prefix identifies reference format/version only.
+
+It does not contain:
+
+    Campaign identity
+    referrer identity
+    participant identity
+    reward information
+    settlement information
+
+
+======================================================================
+6. GENERATOR OUTPUT
+======================================================================
+
+The Generator should conceptually return:
+
+    raw_reference
+    reference_hash
+
+where:
+
+    raw_reference
+        =
+        ppj1_<opaque-random-value>
+
+and:
+
+    reference_hash
+        =
+        SHA-256(raw_reference)
+
+The exact Python return type is not locked by this contract.
+
+It may later be:
+
+    tuple
+    dataclass
+    typed object
+    another explicit internal representation
+
+Semantic outputs are authoritative.
+
+
+======================================================================
+7. HASH AUTHORITY
+======================================================================
+
+The canonical hash algorithm is:
+
+    SHA-256
+
+Canonical input:
+
+    exact raw journey reference bytes encoded as UTF-8
+
+Canonical output:
+
+    lowercase hexadecimal digest
+
+Expected digest length:
+
+    64 characters
+
+The hashing helper must be deterministic.
+
+The same raw reference must always produce the same digest.
+
+
+======================================================================
+8. HASHING IS NOT TOKEN VALIDATION
+======================================================================
+
+A string can be hashed even if it is malformed.
+
+Therefore:
+
+    hashable != valid
+
+Validation must occur before a presented reference is accepted as
+journey continuity authority.
+
+The Resolver must not treat mere successful hashing as proof of a
+valid journey reference.
+
+
+======================================================================
+9. VALIDATOR RESPONSIBILITY
+======================================================================
+
+The Validator determines whether a presented raw reference is
+structurally acceptable for v1 resolution.
+
+Validation must occur before database lookup authority is granted.
+
+The Validator does NOT determine:
+
+    whether the reference exists
+    whether its context is active
+    whether its context is expired
+    whether participant identity conflicts
+    whether provenance conflicts
+
+Those are Resolver / Classification concerns.
+
+
+======================================================================
+10. V1 FORMAT VALIDATION
+======================================================================
+
+A v1 presented reference must:
+
+    be a string
+    begin with ppj1_
+    contain a non-empty opaque random portion
+    remain within a strict maximum length
+    use only the expected URL-safe token alphabet
+
+The exact maximum accepted string length must be defined in
+implementation before release.
+
+Validation must reject obviously malformed or oversized input before
+database lookup.
+
+
+======================================================================
+11. NO LENIENT PREFIX ACCEPTANCE
+======================================================================
+
+The Validator must NOT silently accept:
+
+    ppj0_
+    ppj2_
+    PPJ1_
+    missing prefix
+    arbitrary token version
+
+Unknown versions must be classified explicitly.
+
+Version mismatch is not proof of a valid v1 journey.
+
+
+======================================================================
+12. RAW REFERENCE IS SENSITIVE
+======================================================================
+
+The raw journey reference is bearer continuity material.
+
+Generator / Resolver code must not unnecessarily:
+
+    log raw references
+    include raw references in exceptions
+    include raw references in analytics
+    include raw references in audit prose
+    persist raw references
+    echo raw references in public API responses
+
+Diagnostics should use:
+
+    safe classification
+    context ID where authorized
+    truncated digest if truly necessary
+
+not the raw bearer secret.
+
+
+======================================================================
+13. RESOLVER RESPONSIBILITY
+======================================================================
+
+The Resolver accepts a presented raw journey reference and determines
+whether it maps to a canonical Attribution Context.
+
+Conceptually:
+
+    raw reference
+        ↓
+    structural validation
+        ↓
+    SHA-256 digest
+        ↓
+    lookup AttributionContext.journey_reference_hash
+        ↓
+    inspect canonical context
+        ↓
+    classify result
+
+The Resolver itself is read-only in v1.
+
+
+======================================================================
+14. RESOLVER IS READ-ONLY
+======================================================================
+
+Resolver authority MUST NOT:
+
+    create Attribution Context
+    update Attribution Context
+    rotate journey reference
+    bind participant
+    attach Enrollment
+    modify Campaign
+    modify Referrer
+    create Conversion
+    create Reward
+    create Commission
+    perform settlement
+    set cookies
+
+Resolution answers:
+
+    "What canonical journey state does this presented reference
+     currently resolve to?"
+
+It does not mutate that state.
+
+
+======================================================================
+15. DATABASE LOOKUP
+======================================================================
+
+The Resolver looks up:
+
+    AttributionContext.journey_reference_hash
+
+using the canonical SHA-256 digest.
+
+Expected cardinality:
+
+    zero matching contexts
+
+or:
+
+    exactly one matching context
+
+The database unique index is the persistence authority that prevents
+multiple canonical rows from sharing one digest.
+
+
+======================================================================
+16. UNKNOWN REFERENCE
+======================================================================
+
+If a validly formatted reference produces no matching
+AttributionContext:
+
+Classification:
+
+    UNKNOWN_REFERENCE
+
+Meaning:
+
+    no canonical continuity was found
+
+The Resolver MUST NOT:
+
+    create a new context
+    invent Campaign provenance
+    invent Referrer provenance
+    bind a participant
+
+Unknown continuity is not Creation Authority.
+
+
+======================================================================
+17. MALFORMED REFERENCE
+======================================================================
+
+If structural validation fails:
+
+Classification:
+
+    MALFORMED_REFERENCE
+
+The Resolver should not perform the canonical database lookup.
+
+Malformed input must not become stronger provenance merely because it
+can be hashed.
+
+
+======================================================================
+18. UNSUPPORTED VERSION
+======================================================================
+
+If a reference is syntactically token-like but does not use the
+supported v1 version:
+
+Classification:
+
+    UNSUPPORTED_VERSION
+
+The Resolver must not silently reinterpret it as ppj1.
+
+
+======================================================================
+19. ACTIVE REFERENCE
+======================================================================
+
+If the reference:
+
+    validates
+    resolves exactly one Attribution Context
+    context status permits continuity
+    context is not expired
+
+then the base classification may be:
+
+    ACTIVE
+
+ACTIVE means:
+
+    canonical journey continuity exists
+
+ACTIVE does NOT mean:
+
+    authenticated
+    enrolled
+    converted
+    rewarded
+    settled
+
+
+======================================================================
+20. EXPIRED REFERENCE
+======================================================================
+
+If the resolved Attribution Context has:
+
+    expires_at
+
+and current authority time is after expires_at:
+
+Classification:
+
+    EXPIRED
+
+The Resolver must return the expired classification.
+
+It must not:
+
+    renew expiry
+    create replacement context
+    rotate reference
+    extend campaign attribution
+
+Those belong to later authorities.
+
+
+======================================================================
+21. STATUS AUTHORITY
+======================================================================
+
+AttributionContext.status may affect resolution eligibility.
+
+The exact allowed status set for journey continuity must be inspected
+before implementation.
+
+The Resolver must not assume every persisted status is active.
+
+Implementation must define an explicit status policy before production
+use.
+
+
+======================================================================
+22. INVALID / REVOKED CONTEXT
+======================================================================
+
+If future context status represents invalid or revoked provenance:
+
+Classification should distinguish that state from UNKNOWN.
+
+Conceptually:
+
+    INVALID_CONTEXT
+
+or:
+
+    REVOKED_CONTEXT
+
+Exact status vocabulary must follow the eventual canonical
+AttributionContext lifecycle contract.
+
+The Resolver must not treat invalid provenance as active continuity.
+
+
+======================================================================
+23. PARTICIPANT-BINDING COMPATIBILITY
+======================================================================
+
+The Resolver may inspect participant binding.
+
+It must not modify it.
+
+If the Resolver is given trusted authenticated participant context in
+a future integration:
+
+    unresolved context
+        may remain resolvable
+
+    context bound to same participant
+        may remain compatible
+
+    context bound to different participant
+        must classify conflict
+
+Conceptual conflict:
+
+    PARTICIPANT_CONFLICT
+
+The Resolver MUST NOT rebind participant identity.
+
+
+======================================================================
+24. AUTHENTICATION INPUT IS SERVER-SIDE ONLY
+======================================================================
+
+Any participant identity used for compatibility checks must come from
+trusted authentication/account authority.
+
+The Resolver must NOT trust client-submitted:
+
+    participant_user_id
+    participant_affiliate_id
+    email
+    account ID
+
+for identity compatibility decisions.
+
+
+======================================================================
+25. PROVENANCE COMPATIBILITY
+======================================================================
+
+A future resolver integration may compare canonical origin against
+validated incoming Campaign/referrer provenance.
+
+If an existing context is bound to:
+
+    Campaign X
+    Referrer A
+
+and incoming trusted provenance claims:
+
+    Campaign Y
+    or
+    Referrer Z
+
+the Resolver may classify:
+
+    PROVENANCE_CONFLICT
+
+It MUST NOT rewrite the canonical context.
+
+
+======================================================================
+26. CLASSIFICATION IS NOT MUTATION
+======================================================================
+
+Classification communicates observed authority state.
+
+Examples:
+
+    ACTIVE
+    UNKNOWN_REFERENCE
+    MALFORMED_REFERENCE
+    UNSUPPORTED_VERSION
+    EXPIRED
+    PARTICIPANT_CONFLICT
+    PROVENANCE_CONFLICT
+    INVALID_CONTEXT
+
+Classification itself must not:
+
+    change rows
+    set cookies
+    create contexts
+    issue rewards
+    enroll members
+
+
+======================================================================
+27. STRUCTURED RESOLUTION RESULT
+======================================================================
+
+The Resolver SHOULD return a structured internal result rather than
+forcing callers to infer meaning from:
+
+    None
+    exception text
+    truthiness
+
+Conceptual result fields may include:
+
+    classification
+    allowed
+    context
+    reference_hash
+    reason
+
+The exact Python class is not locked yet.
+
+The semantic requirement is:
+
+    callers receive explicit classification.
+
+
+======================================================================
+28. CONTEXT DISCLOSURE
+======================================================================
+
+A Resolver may return the internal AttributionContext object to trusted
+server-side callers.
+
+That does NOT authorize public disclosure of all context fields.
+
+Public API serialization is a separate authority.
+
+The Resolver is an internal authority seam.
+
+
+======================================================================
+29. REFERENCE HASH DISCLOSURE
+======================================================================
+
+The canonical digest is less sensitive than the raw bearer reference,
+but it still links to internal continuity state.
+
+The Resolver should not expose the full digest publicly without a
+specific reason.
+
+Internal structured results may contain it when useful.
+
+
+======================================================================
+30. CONSTANT-TIME COMPARISON
+======================================================================
+
+The primary resolver lookup uses indexed digest equality in the
+database.
+
+It does not require application-level comparison of two bearer
+secrets.
+
+If future logic compares sensitive raw references directly, use an
+appropriate constant-time comparison.
+
+v1 should avoid raw-secret comparison entirely where digest lookup is
+sufficient.
+
+
+======================================================================
+31. DATABASE ERRORS
+======================================================================
+
+Database failure must not be misclassified as:
+
+    UNKNOWN_REFERENCE
+
+Operational failure is distinct from valid negative resolution.
+
+A Resolver should surface or classify an internal resolution error
+without inventing semantic absence.
+
+
+======================================================================
+32. MULTIPLE MATCH DEFENSE
+======================================================================
+
+Database uniqueness should make multiple matching contexts impossible.
+
+If implementation ever detects multiple matches for one digest:
+
+    treat as integrity failure
+
+not:
+
+    choose first()
+
+The Resolver must not silently select arbitrary authority from an
+impossible cardinality state.
+
+
+======================================================================
+33. NO first() AS INTEGRITY MASK
+======================================================================
+
+A query pattern that silently uses:
+
+    .first()
+
+without preserving the unique-cardinality assumption can hide data
+integrity failure.
+
+The implementation should use a lookup pattern consistent with:
+
+    zero or one canonical match
+
+and fail loudly if integrity is violated.
+
+
+======================================================================
+34. GENERATOR DOES NOT CHECK DATABASE UNIQUENESS BY ITSELF
+======================================================================
+
+The Generator may produce a cryptographically random reference and
+digest.
+
+It does not need to query the database merely to prove random
+uniqueness before returning a candidate.
+
+Database uniqueness remains the final atomic authority during future
+persistence.
+
+If a negligible random collision causes a uniqueness failure, the
+future creation authority may generate another reference according to
+an explicit retry policy.
+
+
+======================================================================
+35. GENERATOR IS PURE WITH RESPECT TO PERSISTENCE
+======================================================================
+
+Generator v1 is conceptually pure with respect to database state.
+
+Input:
+
+    none or explicit configuration
+
+Output:
+
+    raw_reference
+    reference_hash
+
+Database writes:
+
+    none
+
+Database reads:
+
+    none
+
+Cookie writes:
+
+    none
+
+
+======================================================================
+36. RESOLVER IS PURE WITH RESPECT TO MUTATION
+======================================================================
+
+Resolver v1 may read the database.
+
+It does not write.
+
+Database reads:
+
+    yes
+
+Database writes:
+
+    no
+
+Cookie writes:
+
+    no
+
+Participant mutation:
+
+    no
+
+Reference rotation:
+
+    no
+
+
+======================================================================
+37. ROTATION IS A LATER AUTHORITY
+======================================================================
+
+Reference rotation requires:
+
+    generate new reference
+    atomically update journey_reference_hash
+    invalidate old reference
+    preserve same Attribution Context
+    potentially update cookie
+
+That is not Resolver authority.
+
+A later Journey Reference Rotation Authority must own that behavior.
+
+
+======================================================================
+38. COOKIE TRANSPORT IS A LATER AUTHORITY
+======================================================================
+
+The Generator may produce a raw reference.
+
+It does NOT decide how HTTP response cookies are configured.
+
+Cookie transport remains separately governed by the locked reference
+authority:
+
+    Secure
+    HttpOnly
+    SameSite=Lax
+    Path=/
+
+The future Cookie Transport Authority owns actual HTTP mechanics.
+
+
+======================================================================
+39. CREATION AUTHORITY IS A LATER CONSUMER
+======================================================================
+
+Future Attribution Context Creation Authority will consume:
+
+    Generator
+    hash semantics
+    persistence uniqueness
+
+It may:
+
+    validate provenance
+    generate new journey reference
+    create Attribution Context
+    persist journey_reference_hash
+
+Those behaviors do not belong in the Generator itself.
+
+
+======================================================================
+40. REGISTRATION CONTINUITY IS A LATER CONSUMER
+======================================================================
+
+Future registration continuity may consume:
+
+    Resolver
+    authenticated identity
+    Rotation Authority
+
+to preserve:
+
+    anonymous journey
+        ↓
+    authenticated participant
+        ↓
+    same Attribution Context
+
+This contract does not implement registration integration.
+
+
+======================================================================
+41. LOGGING / REDACTION
+======================================================================
+
+Raw reference logging:
+
+    PROHIBITED by default
+
+Recommended logs may include:
+
+    classification
+    AttributionContext.id
+    Campaign ID where authorized
+    participant conflict flag
+    safe operational error code
+
+If a digest must be logged for diagnosis:
+
+    prefer truncation
+    avoid public logs
+    avoid analytics export
+
+Logging is observational, not authority.
+
+
+======================================================================
+42. EXCEPTION BOUNDARY
+======================================================================
+
+Malformed client input should normally become structured classification,
+not an uncontrolled server traceback.
+
+Integrity failure or database failure may raise internal exceptions.
+
+Callers must distinguish:
+
+    invalid client reference
+
+from:
+
+    server failure
+
+
+======================================================================
+43. DOS / INPUT BOUNDARY
+======================================================================
+
+The Validator must bound raw input length before hashing / lookup.
+
+This prevents arbitrarily large attacker-controlled strings from being
+treated as normal journey references.
+
+The exact maximum length must be locked at implementation design time.
+
+Expected legitimate ppj1_ references are short and bounded.
+
+
+======================================================================
+44. NO REGEX CATASTROPHE
+======================================================================
+
+If regex is used for v1 validation, it must be simple and bounded.
+
+Validation must not introduce catastrophic backtracking or expensive
+parsing on attacker-controlled input.
+
+Simple prefix + length + URL-safe alphabet checks are sufficient.
+
+
+======================================================================
+45. URL-SAFE ALPHABET
+======================================================================
+
+Because secrets.token_urlsafe() uses URL-safe Base64-derived output,
+the v1 opaque portion should be restricted to the expected URL-safe
+alphabet.
+
+Conceptually allowed opaque characters:
+
+    A-Z
+    a-z
+    0-9
+    -
+    _
+
+Padding is not required.
+
+Exact validator implementation remains separate.
+
+
+======================================================================
+46. TEST VECTORS
+======================================================================
+
+Implementation verification must include:
+
+VALID
+
+    correctly formed ppj1_ reference
+
+MALFORMED
+
+    empty string
+    None / non-string
+    missing opaque portion
+    wrong characters
+    excessive length
+
+UNSUPPORTED VERSION
+
+    ppj0_
+    ppj2_
+    PPJ1_
+
+UNKNOWN
+
+    validly formed but nonexistent digest
+
+ACTIVE
+
+    valid context
+    matching digest
+    acceptable status
+    unexpired
+
+EXPIRED
+
+    valid context
+    matching digest
+    expires_at in past
+
+INTEGRITY FAILURE
+
+    impossible duplicate digest condition
+
+
+======================================================================
+47. TESTS MUST NOT USE PRODUCTION BEARER MATERIAL
+======================================================================
+
+Test references must be synthetic.
+
+Production journey references must not be copied into:
+
+    source code
+    fixtures
+    notes
+    logs
+    milestone artifacts
+
+
+======================================================================
+48. SECURITY INVARIANTS
+======================================================================
+
+1.
+Generator uses cryptographically secure randomness.
+
+2.
+Generator emits ppj1_ opaque references.
+
+3.
+Generator derives canonical SHA-256 lowercase hex digest.
+
+4.
+Generator does not persist.
+
+5.
+Generator does not set cookies.
+
+6.
+Generator does not create Attribution Context.
+
+7.
+Validator checks structure before resolution.
+
+8.
+Malformed reference is not looked up as canonical continuity.
+
+9.
+Unsupported versions are not silently accepted as v1.
+
+10.
+Resolver is read-only.
+
+11.
+Resolver looks up journey_reference_hash.
+
+12.
+Resolver expects zero or one canonical context.
+
+13.
+Multiple matching contexts are integrity failure.
+
+14.
+Unknown reference does not create continuity.
+
+15.
+Expired context does not become active continuity.
+
+16.
+Resolver does not extend expiry.
+
+17.
+Resolver does not bind participant.
+
+18.
+Resolver does not rewrite Campaign provenance.
+
+19.
+Resolver does not rewrite Referrer provenance.
+
+20.
+Authentication identity used for compatibility comes only from trusted
+server authority.
+
+21.
+Raw journey reference is not logged by default.
+
+22.
+Raw journey reference is not persisted.
+
+23.
+Resolver classification is explicit.
+
+24.
+Database failure is not UNKNOWN_REFERENCE.
+
+25.
+Input length is bounded.
+
+26.
+Validation avoids expensive attacker-controlled parsing.
+
+27.
+Rotation remains separate authority.
+
+28.
+Cookie transport remains separate authority.
+
+29.
+Creation remains separate authority.
+
+30.
+Economic authority remains downstream.
+
+
+======================================================================
+49. IMPLEMENTATION TARGET
+======================================================================
+
+After this contract is locked, implementation should introduce one
+small self-contained module.
+
+Conceptual path:
+
+    backend/app/journey_reference_authority.py
+
+Expected responsibility:
+
+    generate_journey_reference()
+    validate_journey_reference()
+    hash_journey_reference()
+    resolve_journey_reference()
+
+Possible structured result:
+
+    JourneyReferenceDecision
+
+Exact names may be refined during implementation inspection.
+
+The authority boundaries may not.
+
+
+======================================================================
+50. IMPLEMENTATION ORDER
+======================================================================
+
+After lock:
+
+1. inspect project module conventions
+
+2. define exact validator maximum length
+
+3. define structured decision class
+
+4. implement pure generator
+
+5. implement validator
+
+6. implement canonical hash helper
+
+7. implement read-only resolver
+
+8. compile
+
+9. run fresh-process tests
+
+10. test synthetic valid / malformed / unknown references
+
+11. test temporary synthetic ACTIVE / EXPIRED records safely
+
+12. remove synthetic records
+
+13. verify database returns to zero Attribution Context rows
+
+14. verify zero raw-secret persistence
+
+15. verify exact Git boundary
+
+16. lock implementation
+
+Only after that:
+
+    define Cookie Transport Authority
+
+
+======================================================================
+51. CURRENT STATE
+======================================================================
+
+AttributionContext persistence:
+    LOCKED
+
+journey_reference_hash:
+    IMPLEMENTED
+    NON-NULL
+    UNIQUE
+    INDEXED
+
+Server-Issued Journey Reference Authority:
+    LOCKED
+
+Generator / Resolver Authority:
+    DEFINED BY THIS CONTRACT
+    NOT YET LOCKED
+
+Generator implementation:
+    NOT IMPLEMENTED
+
+Validator implementation:
+    NOT IMPLEMENTED
+
+Hash helper implementation:
+    NOT IMPLEMENTED
+
+Resolver implementation:
+    NOT IMPLEMENTED
+
+Cookie transport:
+    NOT IMPLEMENTED
+
+Reference rotation:
+    NOT IMPLEMENTED
+
+Creation Authority:
+    NOT IMPLEMENTED
+
+Registration continuity:
+    NOT IMPLEMENTED
+
+
+======================================================================
+52. FINAL AUTHORITY STATEMENT
+======================================================================
+
+The Generator creates opaque continuity material.
+
+The Validator determines whether presented material is structurally
+eligible for v1 resolution.
+
+The Hash helper deterministically derives the canonical lookup digest.
+
+The Resolver observes canonical Attribution Context state.
+
+The Resolver classifies.
+
+The Resolver does not mutate.
+
+The Generator does not persist.
+
+The browser secret remains separate from database authority.
+
+Authentication remains identity authority.
+
+Campaign Participation remains Enrollment authority.
+
+Reward Policy remains economic authority.
+
+Settlement remains settlement authority.
+
+No layer impersonates another.
+
+
+======================================================================
+END
+======================================================================
