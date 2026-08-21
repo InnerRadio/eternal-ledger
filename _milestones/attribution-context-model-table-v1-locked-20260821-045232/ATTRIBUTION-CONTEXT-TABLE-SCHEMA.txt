@@ -1,0 +1,21 @@
+CREATE TABLE attribution_contexts (
+	id INTEGER NOT NULL, 
+	status VARCHAR NOT NULL, 
+	campaign_id VARCHAR, 
+	referring_user_id INTEGER, 
+	referring_affiliate_id VARCHAR, 
+	referring_referral_code VARCHAR, 
+	participant_user_id INTEGER, 
+	participant_affiliate_id VARCHAR, 
+	participant_referral_code VARCHAR, 
+	enrollment_id INTEGER, 
+	evidence_source_type VARCHAR, 
+	evidence_source_id INTEGER, 
+	evidence_reference TEXT, 
+	created_at DATETIME NOT NULL, 
+	updated_at DATETIME, 
+	identified_at DATETIME, 
+	participated_at DATETIME, 
+	expires_at DATETIME, 
+	PRIMARY KEY (id)
+)

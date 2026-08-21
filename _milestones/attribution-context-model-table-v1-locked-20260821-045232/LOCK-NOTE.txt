@@ -1,0 +1,102 @@
+PURPAWS
+ATTRIBUTION CONTEXT MODEL / TABLE v1
+
+STATUS
+LOCKED
+
+LOCKED UTC
+2026-08-21T04:52:32.532436+00:00
+
+PARENT CHECKPOINT
+0e5867da6502b0cf72a29d811aeb87b8216e3eb5
+
+MODELS.PY SHA256
+d1036a0602bdb1f30010a1b3b90909516987c3a731aafd8fd1da0433f786ac4f
+
+MODEL
+AttributionContext
+
+TABLE
+attribution_contexts
+
+LIVE COLUMN CONTRACT
+id
+status
+campaign_id
+referring_user_id
+referring_affiliate_id
+referring_referral_code
+participant_user_id
+participant_affiliate_id
+participant_referral_code
+enrollment_id
+evidence_source_type
+evidence_source_id
+evidence_reference
+created_at
+updated_at
+identified_at
+participated_at
+expires_at
+
+LIVE ROW COUNT AT LOCK
+0
+
+AUTHORITY CLASSIFICATION
+
+Attribution Context is now a first-class persistence record.
+
+It may exist before membership.
+
+Participant identity may resolve later.
+
+Referrer identity remains distinct from participant identity.
+
+Campaign provenance is preserved independently.
+
+Evidence is generic.
+
+Click is optional evidence.
+
+The model contains no:
+
+- payout policy
+- reward value
+- commission authority
+- token value
+- settlement state
+- singular conversion_id
+- mandatory click_id
+
+IMPLEMENTATION BOUNDARY
+
+Registration integrated: NO
+AffiliateClick integrated: NO
+Campaign Enrollment integrated: NO
+AffiliateConversion integrated: NO
+AffiliateCommission integrated: NO
+Reward logic integrated: NO
+Token logic integrated: NO
+
+Existing legacy data modified: NO
+Existing legacy attribution schemas modified: NO
+
+DATABASE NOTE
+
+The live attribution_contexts table exists in eternal_ledger.db.
+
+The database file is NOT part of this Git lock boundary.
+
+The Git lock contains:
+
+- verified models.py
+- exact live CREATE TABLE schema snapshot
+- this lock note
+
+NEXT AUTHORITY
+
+Attribution Context Creation Authority.
+
+Before connecting registration or conversions, define who may create
+Attribution Context, what provenance is sufficient, and which fields
+must be server-resolved rather than trusted from the client.
