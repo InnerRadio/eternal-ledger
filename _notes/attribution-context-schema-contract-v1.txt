@@ -1,0 +1,782 @@
+PURPAWS
+ATTRIBUTION CONTEXT SCHEMA CONTRACT v1
+
+STATUS
+DEFINED — NOT YET LOCKED
+
+CREATED UTC
+2026-08-21T04:43:17.898667+00:00
+
+PARENT CHECKPOINT
+2ee20d0fc719098a938bbf6b58a26e86a3d5f988
+
+AUTHORITY PARENT
+Attribution Context Authority Contract v1
+
+======================================================================
+1. PURPOSE
+======================================================================
+
+This contract defines the minimal native persistence shape for the
+first-class PurPaws Attribution Context authority.
+
+It defines schema semantics only.
+
+It does NOT:
+
+- implement the SQLAlchemy model
+- create a database table
+- migrate existing data
+- alter AffiliateClick
+- alter AffiliateCampaignEnrollment
+- alter AffiliateConversion
+- alter AffiliateCommission
+- implement registration handoff
+- implement Reward Policy
+- implement settlement
+- implement PurPaws token
+
+======================================================================
+2. CORE AUTHORITY
+======================================================================
+
+Attribution Context preserves historical provenance.
+
+It may begin before the attributed person is a PurPaws member.
+
+It may later resolve:
+
+    anonymous
+        ↓
+    identified member
+        ↓
+    Campaign participant
+        ↓
+    converted
+
+Historical origin must survive those resolutions.
+
+Attribution Context records WHAT HAPPENED and WHERE IT CAME FROM.
+
+It does not itself decide:
+
+    what the activity earns
+    whether the reward is payable
+    how the reward is settled
+
+======================================================================
+3. MEMBERSHIP / SETTLEMENT INVARIANT
+======================================================================
+
+ATTRIBUTION may precede membership.
+
+CAMPAIGN PARTICIPATION requires membership.
+
+REWARD may be determined from attributable activity.
+
+SETTLEMENT requires membership.
+
+A non-member may therefore create legitimate attribution evidence.
+
+A non-member may potentially create provenance relevant to a later
+Reward Decision.
+
+But a non-member is NOT eligible to receive a participant-specific
+payout or personally assigned network benefit.
+
+Participant-specific reward settlement requires a resolved PurPaws
+member identity.
+
+This applies to participant-specific:
+
+- cash
+- commission
+- PurPaws token
+- network credit
+- retailer discount entitlement
+- organization benefit
+- campaign perk
+- other economic or utility benefit
+
+Membership establishes WHO may receive the benefit.
+
+Membership does NOT determine reward value.
+
+Campaign Reward Policy determines treatment and value.
+
+======================================================================
+4. REFERRER / PARTICIPANT SEPARATION
+======================================================================
+
+The schema must preserve separately:
+
+REFERRER
+
+    referring_user_id
+    referring_affiliate_id
+    referring_referral_code
+
+PARTICIPANT
+
+    participant_user_id
+    participant_affiliate_id
+    participant_referral_code
+
+These identities are not interchangeable.
+
+Example:
+
+Member A refers Person B.
+
+Before registration:
+
+    referring identity = A
+    participant identity = unresolved
+
+After B registers:
+
+    referring identity = A
+    participant identity = B
+
+B receives B's own Affiliate ID.
+
+A's Affiliate ID remains historical referral provenance.
+
+B's Affiliate ID represents B's own participant identity.
+
+Participant resolution MUST NOT overwrite referrer provenance.
+
+======================================================================
+5. CAMPAIGN IDENTITY
+======================================================================
+
+Field:
+
+    campaign_id
+
+Native type:
+
+    String
+
+Reason:
+
+Existing PurPaws Campaign, Enrollment, and Click architecture already
+uses the semantic string campaign_id.
+
+Attribution Context must preserve the original Campaign identity.
+
+Campaign identity MUST NOT later be reconstructed from Affiliate ID
+alone.
+
+campaign_id may be nullable at the persistence level in v1 so the
+authority can remain extensible beyond Campaign-only attribution.
+
+However:
+
+a Campaign-specific Attribution Context MUST possess a proven
+campaign_id before it can establish Campaign Participation or
+Campaign-specific Reward provenance.
+
+======================================================================
+6. MINIMAL ATTRIBUTION CONTEXT FIELD CONTRACT
+======================================================================
+
+TABLE CONCEPT
+
+    attribution_contexts
+
+MODEL CONCEPT
+
+    AttributionContext
+
+
+PRIMARY IDENTITY
+
+    id
+        Integer
+        primary key
+        indexed according to native repository convention
+
+
+LIFECYCLE STATUS
+
+    status
+        String
+        non-null
+        default = "inbound"
+
+
+CAMPAIGN PROVENANCE
+
+    campaign_id
+        String
+        nullable
+
+
+ORIGINAL REFERRER PROVENANCE
+
+    referring_user_id
+        Integer
+        nullable
+
+    referring_affiliate_id
+        String
+        nullable
+
+    referring_referral_code
+        String
+        nullable
+
+
+LATER PARTICIPANT RESOLUTION
+
+    participant_user_id
+        Integer
+        nullable
+
+    participant_affiliate_id
+        String
+        nullable
+
+    participant_referral_code
+        String
+        nullable
+
+
+CAMPAIGN PARTICIPATION RESOLUTION
+
+    enrollment_id
+        Integer
+        nullable
+
+
+EVIDENCE
+
+    evidence_source_type
+        String
+        nullable
+
+    evidence_source_id
+        Integer
+        nullable
+
+    evidence_reference
+        Text
+        nullable
+
+
+LIFECYCLE TIMESTAMPS
+
+    created_at
+        DateTime
+        non-null
+        default = datetime.utcnow
+
+    updated_at
+        DateTime
+        nullable
+
+    identified_at
+        DateTime
+        nullable
+
+    participated_at
+        DateTime
+        nullable
+
+    expires_at
+        DateTime
+        nullable
+
+======================================================================
+7. STATUS SEMANTICS
+======================================================================
+
+v1 conceptual lifecycle statuses:
+
+    inbound
+    identified
+    participant
+    converted
+    expired
+    invalid
+
+The persistence field remains a String following existing repository
+convention.
+
+Status represents lifecycle classification.
+
+Status does NOT establish:
+
+- reward eligibility
+- payout eligibility
+- commission status
+- payment status
+- token settlement status
+
+Those belong to later authorities.
+
+======================================================================
+8. EVIDENCE SEMANTICS
+======================================================================
+
+Attribution Context must not be structurally dependent on Click.
+
+Therefore evidence is represented generically:
+
+    evidence_source_type
+    evidence_source_id
+    evidence_reference
+
+Possible evidence_source_type values may later include:
+
+    affiliate_click
+    referral_link
+    qr_code
+    event_checkin
+    invitation
+    referral_code
+    partner_referral
+    admin_verified
+
+This list is illustrative, not an enum lock.
+
+AffiliateClick may therefore be referenced as evidence without
+becoming Attribution Context itself.
+
+Click remains optional evidence.
+
+======================================================================
+9. CARDINALITY
+======================================================================
+
+REFERRER
+
+One Attribution Context may identify zero or one original referrer.
+
+PARTICIPANT
+
+One Attribution Context may resolve to zero or one participant.
+
+CAMPAIGN PARTICIPATION
+
+One Attribution Context may resolve to zero or one Campaign Enrollment
+in this v1 authority model.
+
+CONVERSIONS
+
+One Attribution Context may eventually support zero, one, or multiple
+Conversions.
+
+Therefore Attribution Context MUST NOT contain a singular
+conversion_id field in v1.
+
+Future Conversion linkage should point FROM Conversion TO the proven
+Attribution Context, or use another explicit linkage authority if
+later inspection proves that necessary.
+
+REWARDS
+
+One Attribution Context does not directly own Reward records.
+
+Reward cardinality belongs to future Reward authority.
+
+======================================================================
+10. CONVERSION BOUNDARY
+======================================================================
+
+DO NOT add:
+
+    conversion_id
+
+to AttributionContext v1.
+
+Reason:
+
+A single attributable journey may legitimately produce multiple
+qualifying events.
+
+Conceptually:
+
+    Attribution Context
+        ↓
+    Conversion A
+    Conversion B
+    Conversion C
+
+Therefore the eventual direction is expected to be:
+
+    AffiliateConversion
+        attribution_context_id
+
+rather than:
+
+    AttributionContext
+        conversion_id
+
+This is an architectural direction only.
+
+AffiliateConversion is NOT modified by this schema contract.
+
+======================================================================
+11. CLICK BOUNDARY
+======================================================================
+
+DO NOT require:
+
+    click_id
+
+as a dedicated mandatory Attribution Context field.
+
+Click is one evidence source.
+
+The generic evidence fields preserve extensibility.
+
+If later performance or integrity inspection proves a dedicated
+click_id useful, it may be considered separately.
+
+======================================================================
+12. REWARD / SETTLEMENT BOUNDARY
+======================================================================
+
+AttributionContext MUST NOT contain:
+
+- payout_type
+- payout_amount_cents
+- payout_percent
+- reward_type
+- reward_amount
+- commission_id
+- commission_status
+- token_amount
+- token_balance
+- settlement_status
+- payment_method
+
+Attribution is historical provenance.
+
+Reward Policy determines what attributable activity earns.
+
+Reward Decision applies that policy.
+
+Settlement determines whether and how the resulting benefit is
+delivered.
+
+======================================================================
+13. MEMBERSHIP ELIGIBILITY BOUNDARY
+======================================================================
+
+Attribution Context may exist with:
+
+    participant_user_id = NULL
+
+That is valid.
+
+It represents unresolved or pre-membership attribution.
+
+However:
+
+participant-specific settlement MUST NOT occur while the receiving
+participant identity remains unresolved.
+
+For settlement purposes:
+
+    participant_user_id
+
+must resolve to a valid PurPaws member identity through the future
+settlement authority.
+
+Attribution Context itself does not perform that eligibility check.
+
+======================================================================
+14. RESOLUTION RULES
+======================================================================
+
+The following fields represent historical origin and must not silently
+change meaning after creation:
+
+    campaign_id
+    referring_user_id
+    referring_affiliate_id
+    referring_referral_code
+    evidence_source_type
+    evidence_source_id
+    evidence_reference
+    created_at
+
+The following fields may legitimately begin NULL and later resolve:
+
+    participant_user_id
+    participant_affiliate_id
+    participant_referral_code
+    enrollment_id
+    identified_at
+    participated_at
+
+updated_at may record legitimate lifecycle mutation.
+
+expires_at may later establish validity limits.
+
+Resolution adds knowledge.
+
+Resolution does not rewrite provenance.
+
+======================================================================
+15. NULLABILITY PRINCIPLE
+======================================================================
+
+Nullable participant fields are intentional.
+
+They are not incomplete schema design.
+
+They represent a real lifecycle:
+
+    attribution exists
+        BEFORE
+    participant identity exists
+
+Likewise:
+
+    enrollment_id
+
+must remain nullable because Attribution Context may exist before
+Campaign Participation.
+
+Evidence fields remain nullable because the exact evidence authority
+may vary by source and because this v1 schema must not prematurely
+force every attribution path through AffiliateClick.
+
+======================================================================
+16. FOREIGN KEY STYLE
+======================================================================
+
+The current repository does not use explicit SQLAlchemy ForeignKey
+declarations in models.py.
+
+AttributionContext v1 should follow the existing repository style
+unless a later integrity migration deliberately changes the broader
+persistence convention.
+
+Therefore these fields are semantic references in v1:
+
+    campaign_id
+    referring_user_id
+    participant_user_id
+    enrollment_id
+    evidence_source_id
+
+This does NOT weaken their authority meaning.
+
+Application authority must still validate references before
+resolution.
+
+======================================================================
+17. INDEXING PRINCIPLE
+======================================================================
+
+Do not over-index v1.
+
+Required native primary-key indexing:
+
+    id
+
+Likely lookup candidates to evaluate during implementation inspection:
+
+    campaign_id
+    referring_affiliate_id
+    referring_referral_code
+    participant_user_id
+    participant_affiliate_id
+    enrollment_id
+    evidence_source_type + evidence_source_id
+    status
+
+No additional index is locked by this contract except the normal
+primary identity convention.
+
+Index decisions should follow demonstrated query paths.
+
+======================================================================
+18. UNIQUENESS PRINCIPLE
+======================================================================
+
+No broad uniqueness constraint is established in this v1 contract.
+
+In particular:
+
+    campaign_id
+    referring_affiliate_id
+    referring_referral_code
+    participant_user_id
+    participant_affiliate_id
+
+are NOT individually unique within Attribution Context.
+
+The same person or Affiliate may participate in many attributable
+journeys.
+
+Evidence uniqueness / idempotency requires separate authority design.
+
+Do not invent uniqueness merely to prevent duplicates.
+
+======================================================================
+19. CREATE-ALL COMPATIBILITY
+======================================================================
+
+The repository currently uses SQLAlchemy metadata create_all.
+
+A new attribution_contexts table can therefore be introduced as a new
+first-class table without requiring an ALTER of an existing table.
+
+This contract intentionally does NOT modify AffiliateConversion yet.
+
+That separation allows:
+
+PHASE 1
+    Create AttributionContext model/table.
+
+PHASE 2
+    Verify persistence independently.
+
+PHASE 3
+    Add Attribution Context creation authority.
+
+PHASE 4
+    Add context handoff / membership resolution.
+
+PHASE 5
+    Add Campaign Participation resolution.
+
+PHASE 6
+    Only after proven attribution:
+    design Conversion linkage.
+
+======================================================================
+20. MINIMUM VALIDITY
+======================================================================
+
+An Attribution Context must not be created as meaningless empty state.
+
+Creation authority must eventually require sufficient provenance to
+justify the record.
+
+Examples may include:
+
+    Campaign + referrer
+
+    Campaign + referral code
+
+    Campaign + evidence source
+
+    explicit non-Campaign provenance
+
+The exact creation-validation rule is NOT locked here.
+
+It belongs to Attribution Context Creation Authority design.
+
+======================================================================
+21. SECURITY / TRUST
+======================================================================
+
+Client-provided attribution data is evidence input.
+
+It is not automatically trusted authority.
+
+Future creation and resolution authorities must determine:
+
+- which fields may come from the client
+- which fields must be server-resolved
+- which identifiers must be verified
+- whether context has expired
+- whether context has already been consumed
+- whether conflicting provenance exists
+
+The schema stores authority state.
+
+The schema itself does not establish trust.
+
+======================================================================
+22. HARD INVARIANTS
+======================================================================
+
+1.
+Attribution may precede membership.
+
+2.
+Campaign Participation requires membership.
+
+3.
+Participant-specific settlement requires membership.
+
+4.
+Pre-membership attribution must not be discarded merely because
+settlement is not yet permitted.
+
+5.
+Referrer identity and participant identity remain separate.
+
+6.
+Historical provenance survives participant resolution.
+
+7.
+Attribution Context remains reward-neutral.
+
+8.
+Reward value does not belong in Attribution Context.
+
+9.
+Settlement status does not belong in Attribution Context.
+
+10.
+A singular conversion_id does not belong in AttributionContext v1.
+
+11.
+Click is optional evidence.
+
+12.
+Nullable participant fields are intentional lifecycle state.
+
+13.
+Resolution adds knowledge without rewriting origin.
+
+14.
+Campaign identity must not be reconstructed later from Affiliate ID
+alone.
+
+15.
+Membership establishes settlement identity, not reward value.
+
+16.
+Campaign Reward Policy determines economic or utility treatment.
+
+======================================================================
+23. IMPLEMENTATION BOUNDARY
+======================================================================
+
+The FIRST implementation after this contract is locked should be:
+
+    AttributionContext SQLAlchemy model
+        +
+    attribution_contexts table creation
+
+ONLY.
+
+That first implementation should NOT:
+
+- alter existing attribution behavior
+- alter registration
+- alter Campaign Enrollment
+- alter Conversion
+- alter Commission
+- calculate rewards
+- settle rewards
+- issue token
+- backfill historical attribution
+
+The new citizen should first exist safely and natively.
+
+Then each authority connection can be added and verified separately.
+
+======================================================================
+END
+======================================================================

@@ -1,0 +1,117 @@
+PURPAWS
+ATTRIBUTION CONTEXT SCHEMA CONTRACT v1
+
+STATUS
+LOCKED
+
+LOCKED UTC
+2026-08-21T04:44:52.563870+00:00
+
+PARENT CHECKPOINT
+2ee20d0fc719098a938bbf6b58a26e86a3d5f988
+
+CONTRACT
+_notes/attribution-context-schema-contract-v1.txt
+
+CONTRACT SHA256
+543062aa7468ae3a6beed2fb9832a3379f00368f5711b35ee0c2f12c49b2a5e4
+
+FIRST-CLASS RECORD
+
+MODEL
+AttributionContext
+
+TABLE
+attribution_contexts
+
+FOUNDATIONAL BOUNDARIES
+
+Attribution may precede membership.
+
+Campaign Participation requires membership.
+
+Reward may be determined from attributable activity.
+
+Settlement requires membership.
+
+Participant-specific settlement requires a resolved PurPaws member.
+
+Membership establishes WHO may receive value.
+
+Campaign Reward Policy determines WHAT that activity earns.
+
+REFERRER / PARTICIPANT
+
+Referrer identity remains distinct from participant identity.
+
+Referring Affiliate ID remains distinct from participant Affiliate ID.
+
+Participant resolution must not overwrite historical referrer provenance.
+
+CAMPAIGN
+
+campaign_id uses the existing semantic String campaign identity.
+
+Campaign attribution must not later be reconstructed from Affiliate ID alone.
+
+EVIDENCE
+
+Evidence remains generic.
+
+Click is optional evidence.
+
+Attribution Context is not an AffiliateClick wrapper.
+
+CONVERSION
+
+AttributionContext does not contain a singular conversion_id.
+
+One Attribution Context may eventually support zero, one, or multiple Conversions.
+
+Future Conversion linkage is expected to point from Conversion toward
+the proven Attribution Context, subject to later implementation inspection.
+
+REWARD NEUTRALITY
+
+AttributionContext contains no payout, commission, reward, token,
+settlement, or payment fields.
+
+NULLABILITY
+
+Participant and Enrollment references may begin NULL intentionally.
+
+This represents genuine pre-membership lifecycle state.
+
+FOREIGN KEY STYLE
+
+No explicit SQLAlchemy ForeignKey declarations are introduced in this
+schema contract.
+
+Existing repository persistence convention is preserved.
+
+IMPLEMENTATION ORDER
+
+FIRST IMPLEMENTATION:
+
+AttributionContext SQLAlchemy model
++
+attribution_contexts table
+
+ONLY.
+
+DO NOT YET:
+
+- alter registration
+- alter AffiliateClick
+- alter AffiliateCampaignEnrollment
+- alter AffiliateConversion
+- alter AffiliateCommission
+- calculate rewards
+- settle rewards
+- issue token
+- backfill historical attribution
+
+NEXT
+
+Implement and verify the first-class Attribution Context model/table
+as an isolated persistence addition.
