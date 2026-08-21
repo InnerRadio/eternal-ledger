@@ -1,0 +1,125 @@
+PURPAWS
+CAMPAIGN / PARTICIPATION / ATTRIBUTION / REWARD AUTHORITY CONTRACT v1
+
+STATUS
+LOCKED
+
+LOCKED UTC
+2026-08-21T03:49:03.295280+00:00
+
+PARENT CHECKPOINT
+093c97eb8166f6752e22cea577311c0b44b7d5db
+
+CONTRACT
+_notes/campaign-participation-attribution-reward-authority-v1.txt
+
+CONTRACT SHA256
+02ba256ce12b9785d5e5b94522a1636308ab130a0d37d15072d68b00364c5795
+
+AUTHORITY BOUNDARY
+
+CAMPAIGN
+= WHAT IS HAPPENING
+
+CAMPAIGN PARTICIPATION
+= WHO JOINED / WHERE + WHY
+
+ATTRIBUTION
+= WHO CAUSED WHAT ACTIVITY THROUGH WHICH PARTICIPATION FOR WHICH CAMPAIGN
+
+CONVERSION
+= WHAT QUALIFYING EVENT OCCURRED
+
+REWARD POLICY
+= WHAT THAT SPECIFIC CAMPAIGN EVENT CAN EARN
+
+REWARD DECISION
+= WHAT IT DID EARN
+
+REWARD LEDGER
+= WHAT VALUE ACTUALLY MOVED
+
+FOUNDATIONAL INVARIANTS
+
+Affiliate ID = WHO
+
+Affiliate ID != Campaign
+
+Affiliate ID != Campaign ownership
+
+Affiliate ID != reward policy
+
+Campaign != Partner
+
+Campaign Creator != Organization
+
+Campaign Participation != Campaign Management
+
+Sponsor != Beneficiary
+
+Sponsor != Campaign Creator
+
+Organization affiliation != Campaign ownership
+
+Participant attribution != Campaign attribution
+
+Campaign-specific reward treatment MUST NOT be derived from Affiliate ID alone.
+
+CURRENT FIRST REPAIR BOUNDARY
+
+Enrollment
+    Campaign lineage: PRESENT
+
+Click
+    Campaign lineage: PRESENT
+
+Conversion
+    Campaign lineage: ABSENT
+
+Commission
+    Conversion identity: PRESENT
+    Campaign lineage: ABSENT
+    Current creation boundary: privileged but unverified
+
+Therefore implementation begins upstream at:
+
+CONVERSION ATTRIBUTION
+
+and proceeds through:
+
+Campaign Participation Linkage
+→ Canonical Attribution Context
+→ Reward Policy
+→ Reward Decision
+→ Reward Persistence
+→ Idempotency
+
+TOKEN
+
+PurPaws token is one possible future reward / utility instrument.
+
+This lock does NOT implement:
+
+- token economics
+- token issuance
+- token transferability
+- token redemption
+- Reward Ledger schema
+- Reward Policy schema
+- Campaign schema migration
+- Conversion schema repair
+- Commission repair
+
+ARCHITECTURE ONLY.
+
+PRE-EXISTING UNTRACKED BACKUPS
+
+Preserved.
+Not staged.
+Not deleted.
+Not moved.
+Not committed.
+
+NEXT
+
+Begin Conversion Attribution implementation from this protected authority contract.

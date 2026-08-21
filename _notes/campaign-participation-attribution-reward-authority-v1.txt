@@ -1,0 +1,762 @@
+PURPAWS
+CAMPAIGN / PARTICIPATION / ATTRIBUTION / REWARD AUTHORITY CONTRACT v1
+
+STATUS
+DEFINED — NOT YET LOCKED
+
+CREATED UTC
+2026-08-21T03:45:24.630412+00:00
+
+PARENT CHECKPOINT
+093c97eb8166f6752e22cea577311c0b44b7d5db
+
+======================================================================
+PURPOSE
+======================================================================
+
+This contract defines the canonical authority boundaries for:
+
+- Campaign
+- Campaign Participation
+- Attribution
+- Conversion
+- Reward Policy
+- Reward Decision
+- Reward Ledger
+
+It is based on inspection of the existing PurPaws affiliate,
+campaign, organization, relationship, publication, conversion,
+and commission architecture.
+
+This contract is architecture only.
+
+It does NOT:
+
+- modify database schema
+- migrate existing records
+- replace existing campaign models
+- create token economics
+- alter existing commissions
+- alter Affiliate IDs
+- change organization authority
+- change public publication
+- change dashboard access
+- create a new campaign implementation
+
+======================================================================
+FOUNDATIONAL PRINCIPLE
+======================================================================
+
+Affiliate ID identifies WHO.
+
+Campaign Participation identifies WHERE and WHY.
+
+Attribution establishes WHAT happened in that context.
+
+Reward Policy determines WHAT IT EARNS.
+
+These authorities MUST remain distinct.
+
+Affiliate identity MUST NOT, by itself, determine:
+
+- Campaign identity
+- Campaign ownership
+- Campaign management authority
+- Campaign participation
+- payout policy
+- reward type
+- reward amount
+- beneficiary
+- sponsor
+- organizer
+
+======================================================================
+1. CAMPAIGN AUTHORITY
+======================================================================
+
+Campaign is the first-class network object representing:
+
+WHAT IS HAPPENING?
+
+Examples:
+
+- fundraiser
+- event
+- promotion
+- community initiative
+- sponsorship opportunity
+- rescue support campaign
+- adoption campaign
+- volunteer campaign
+- retail promotion
+- awareness campaign
+
+A Campaign exists independently of:
+
+- Affiliate ID
+- Partner status
+- organization membership
+- reward type
+- cash commission
+- sponsor identity
+
+A network member may create a Campaign.
+
+Campaign creation is participant-scoped.
+
+Organization membership is NOT required merely to create a Campaign.
+
+CAMPAIGN CREATOR / STEWARD
+
+The creating member is the initial Campaign steward.
+
+Creator / steward identity is distinct from:
+
+- beneficiary
+- sponsor
+- organizer
+- host
+- supporting partner
+- participant
+- affiliate
+- organization owner
+
+A Campaign creator may be:
+
+- an individual
+- an individual affiliated with an organization
+- an individual with no organization affiliation
+
+CAMPAIGN != ORGANIZATION
+
+CAMPAIGN CREATOR != ORGANIZATION
+
+======================================================================
+2. CAMPAIGN RELATIONSHIP AUTHORITY
+======================================================================
+
+Organizations and participants may relate to a Campaign through
+explicit relationships.
+
+Possible relationship types include:
+
+- beneficiary
+- sponsor
+- organizer
+- host
+- supporting_partner
+- steward
+- collaborator
+
+These relationships do NOT automatically establish Campaign ownership.
+
+Examples:
+
+Campaign
+    → beneficiary → Dog Rescue X
+
+Campaign
+    → sponsor → Bank A
+
+Campaign
+    → sponsor → Pet Food Company Y
+
+Campaign
+    → organizer → Member or Organization
+
+Campaign
+    → host → Venue / Event Organization
+
+Partner is therefore best treated as:
+
+- a relationship context
+- a sponsorship context
+- an organization-management context
+
+Partner is NOT the universal Campaign owner.
+
+Existing PartnerCampaign machinery may remain as a specialized
+organization / sponsorship / commercial layer.
+
+It MUST NOT define the universal Campaign object.
+
+======================================================================
+3. CAMPAIGN PARTICIPATION AUTHORITY
+======================================================================
+
+Campaign Participation answers:
+
+WHO CHOSE TO PARTICIPATE IN WHICH CAMPAIGN?
+
+Participation may include:
+
+- user_id
+- Affiliate ID
+- referral code
+- Campaign identity
+- participation status
+- joined_at
+
+Participation is separate from Campaign creation.
+
+Participation is separate from Campaign management.
+
+Participation is separate from organization authority.
+
+A member may participate in many Campaigns using the same Affiliate ID.
+
+Example:
+
+Affiliate ID A123
+
+    → Campaign A
+    → Campaign B
+    → Campaign C
+    → Campaign D
+
+Therefore:
+
+Affiliate ID
+    = participant identity / attribution identity
+
+Affiliate ID
+    != Campaign identity
+
+Affiliate ID
+    != reward policy
+
+Affiliate ID
+    != payout rule
+
+Existing AffiliateCampaignEnrollment is a strong basis for future
+Campaign Participation semantics.
+
+======================================================================
+4. ATTRIBUTION AUTHORITY
+======================================================================
+
+Attribution answers:
+
+WHO caused WHAT activity,
+through WHICH participation,
+for WHICH Campaign?
+
+Canonical attribution MUST preserve independently:
+
+- participant identity
+- Campaign identity
+- Campaign Participation identity
+- attribution event identity
+- conversion identity
+- evidence / provenance
+
+Attribution MUST NOT infer Campaign identity from Affiliate ID alone.
+
+Attribution MUST NOT infer Campaign identity from referral code alone
+when the same participant may participate in multiple Campaigns.
+
+Participant attribution
+!=
+Campaign attribution
+
+Both MUST be independently provable.
+
+CURRENT INSPECTED CONDITION
+
+Existing Enrollment:
+    participant identity: present
+    Campaign identity: present
+
+Existing Click:
+    participant identity: present
+    Campaign identity: present
+
+Existing Conversion:
+    participant identity: present
+    Campaign identity: absent
+
+Existing Commission:
+    conversion identity: present
+    participant identity: present
+    Campaign identity: absent
+
+Therefore Campaign lineage currently weakens at:
+
+Click
+    ↓
+Conversion
+
+This is the first canonical attribution repair boundary.
+
+======================================================================
+5. CONVERSION AUTHORITY
+======================================================================
+
+Conversion answers:
+
+WHAT QUALIFYING EVENT OCCURRED?
+
+A Conversion may represent:
+
+- signup
+- purchase
+- inquiry
+- donation
+- registration
+- referral action
+- campaign-defined qualifying event
+
+A canonical Conversion MUST be able to retain or prove:
+
+- participant
+- Campaign
+- Campaign Participation
+- qualifying event
+- target
+- conversion status
+- attribution evidence
+
+target_type / target_id identify WHAT converted.
+
+They MUST NOT be treated as a substitute for Campaign identity.
+
+======================================================================
+6. REWARD POLICY AUTHORITY
+======================================================================
+
+Reward Policy answers:
+
+WHAT CAN AN ELIGIBLE ATTRIBUTED EVENT EARN?
+
+Reward Policy is Campaign-specific.
+
+The same Affiliate ID may participate in multiple Campaigns with
+different reward policies.
+
+Example:
+
+Affiliate ID A123
+
+Campaign A
+    → fixed cash
+
+Campaign B
+    → percentage reward
+
+Campaign C
+    → PurPaws token
+
+Campaign D
+    → retailer discount
+
+Campaign E
+    → organization benefit
+
+Campaign F
+    → no reward / voluntary participation
+
+Therefore:
+
+Affiliate ID cannot determine reward treatment.
+
+Campaign attribution determines which Reward Policy applies.
+
+Reward Policy may eventually support:
+
+- cash
+- fixed amount
+- percentage
+- PurPaws token
+- network credit
+- retailer discount
+- organization benefit
+- campaign perk
+- mixed reward
+- no reward
+
+TOKEN
+
+PurPaws token is one possible reward / utility instrument.
+
+Token is NOT:
+
+- Campaign identity
+- Affiliate identity
+- Campaign ownership
+- Campaign Participation
+- attribution authority
+
+Token economics, transferability, redemption, valuation, and issuance
+rules are OUTSIDE this v1 authority contract.
+
+======================================================================
+7. REWARD DECISION AUTHORITY
+======================================================================
+
+Reward Decision answers:
+
+DOES THIS ATTRIBUTED EVENT QUALIFY,
+AND WHAT EXACTLY SHOULD IT EARN?
+
+Reward Decision MUST consume proven:
+
+- Campaign
+- Campaign Participation
+- Attribution Context
+- Conversion
+- Reward Policy
+
+Reward Decision MUST NOT accept arbitrary caller-supplied value as
+canonical economic truth.
+
+A canonical Reward Decision should determine:
+
+- reward eligibility
+- reward type
+- reward amount / quantity / entitlement
+- currency or unit where relevant
+- beneficiary / recipient where relevant
+- policy source
+- attribution source
+- idempotency key / qualifying event identity
+
+======================================================================
+8. REWARD LEDGER AUTHORITY
+======================================================================
+
+Reward Ledger answers:
+
+WHAT VALUE WAS ACTUALLY:
+
+- earned
+- issued
+- pending
+- approved
+- payable
+- redeemed
+- directed
+- reversed
+- voided
+- expired
+
+The Reward Ledger may eventually project specialized reward records.
+
+Examples:
+
+Reward Event
+    → cash
+        → AffiliateCommission
+
+Reward Event
+    → PurPaws token
+        → Token Ledger Entry
+
+Reward Event
+    → network credit
+        → Credit Ledger Entry
+
+Reward Event
+    → retailer discount
+        → Discount Entitlement
+
+Reward Event
+    → organization benefit
+        → Organization Benefit Entry
+
+Existing AffiliateCommission may survive as a cash-specific projection
+of a broader Reward system.
+
+======================================================================
+9. COMMISSION AUTHORITY — CURRENT CLASSIFICATION
+======================================================================
+
+Current create_affiliate_commission behavior is classified as:
+
+PRIVILEGED
+YES
+
+Available to:
+- super_admin
+- admin
+- developer
+
+Ordinary member economic write:
+NO
+
+Single known AffiliateCommission creation writer:
+YES
+
+Conversion verified:
+NO
+
+Affiliate derived from Conversion:
+NO
+
+Referral derived from Conversion:
+NO
+
+Campaign identified:
+NO
+
+Campaign Participation identified:
+NO
+
+Campaign payout policy consulted:
+NO
+
+Reward amount calculated:
+NO
+
+Duplicate Commission prevention:
+NO
+
+Therefore current Commission creation is:
+
+PRIVILEGED
+BUT
+UNVERIFIED ECONOMIC WRITE BOUNDARY
+
+This does NOT mean existing Commission status lifecycle is invalid.
+
+It means Commission creation currently stores supplied economic values
+without proving the full Campaign-specific attribution and reward chain.
+
+======================================================================
+10. EXISTING ARCHITECTURE TO PRESERVE
+======================================================================
+
+The following inspected architecture is useful and should not be
+discarded without cause.
+
+AffiliateCampaignEnrollment
+
+Useful as basis for:
+Campaign Participation
+
+AffiliateClick
+
+Useful because it already preserves:
+participant attribution + Campaign identity
+
+AffiliateCommission
+
+Useful as:
+cash-specific reward projection
+
+PartnerCampaign
+
+Useful as:
+specialized organization / sponsor / commercial campaign layer
+
+CanonicalRelationship
+
+Structurally capable of representing:
+
+Campaign
+    → beneficiary
+    → sponsor
+    → organizer
+    → host
+    → supporting partner
+    → collaborator
+
+Campaign-specific relationship vocabulary is NOT yet implemented.
+
+CanonicalPublication
+
+Structurally capable of making Campaign a publication target.
+
+Campaign-specific publication semantics are NOT yet implemented.
+
+======================================================================
+11. IMPLEMENTATION ORDER
+======================================================================
+
+Implementation MUST proceed upstream to downstream.
+
+PHASE 1
+Conversion Attribution
+
+Preserve / prove Campaign identity at Conversion.
+
+PHASE 2
+Campaign Participation Linkage
+
+Ensure Conversion can be tied to the specific Campaign Participation
+that produced it.
+
+PHASE 3
+Canonical Attribution Context
+
+Establish:
+
+participant
++
+Campaign
++
+participation
++
+event
++
+conversion
++
+evidence
+
+PHASE 4
+Reward Policy
+
+Separate reward policy from Campaign identity.
+
+PHASE 5
+Reward Decision
+
+Calculate reward from:
+
+proven attribution
++
+Campaign-specific policy
+
+PHASE 6
+Reward Persistence
+
+Persist the already-proven Reward Decision.
+
+PHASE 7
+Idempotency
+
+Prevent duplicate rewards for the same qualifying event unless a
+Campaign policy explicitly permits repeated rewards.
+
+PHASE 8
+Legacy Projection / Compatibility
+
+Preserve appropriate existing:
+
+- AffiliateCommission
+- AffiliateCampaign
+- AffiliateCampaignEnrollment
+- PartnerCampaign
+
+during migration or compatibility transition.
+
+======================================================================
+12. HARD INVARIANTS
+======================================================================
+
+1.
+Campaign
+!=
+Affiliate ID
+
+2.
+Campaign
+!=
+Partner
+
+3.
+Campaign Creator
+!=
+Organization
+
+4.
+Campaign Participation
+!=
+Campaign Management
+
+5.
+Sponsor
+!=
+Beneficiary
+
+6.
+Sponsor
+!=
+Campaign Creator
+
+7.
+Organization affiliation
+!=
+Campaign ownership
+
+8.
+Affiliate ID
+= WHO
+
+9.
+Campaign Participation
+= WHERE / WHY
+
+10.
+Conversion
+= WHAT HAPPENED
+
+11.
+Reward Policy
+= WHAT IT CAN EARN
+
+12.
+Reward Decision
+= WHAT IT DID EARN
+
+13.
+Reward Ledger
+= WHAT VALUE ACTUALLY MOVED
+
+14.
+Participant attribution
+!=
+Campaign attribution
+
+15.
+Campaign-specific reward treatment MUST NOT be derived from
+Affiliate ID alone.
+
+16.
+Economic write authority MUST consume proven attribution before
+producing canonical reward truth.
+
+======================================================================
+13. NOT YET DECIDED
+======================================================================
+
+This v1 contract intentionally does NOT decide:
+
+- final Campaign table schema
+- whether AffiliateCampaign is renamed or migrated
+- whether Campaign gets a new first-class table
+- exact Campaign relationship vocabulary implementation
+- token valuation
+- token transferability
+- token redemption rules
+- token issuance limits
+- token accounting model
+- reward ledger table schema
+- reward policy table schema
+- conversion migration strategy
+- historical attribution backfill strategy
+- commission migration strategy
+- public Campaign projection schema
+
+These require later Observe → Inspect → Understand work where needed.
+
+======================================================================
+14. GOVERNANCE
+======================================================================
+
+Future Campaign, Participation, Attribution, Conversion, Reward,
+Commission, token, discount, credit, or organization-benefit work
+must respect this authority separation.
+
+No downstream reward consumer may recreate Campaign attribution
+independently.
+
+No reward writer may use Affiliate ID alone as payout authority.
+
+No organization relationship may silently become Campaign ownership.
+
+No Partner-specific implementation may redefine universal Campaign
+semantics.
+
+======================================================================
+END
+======================================================================
