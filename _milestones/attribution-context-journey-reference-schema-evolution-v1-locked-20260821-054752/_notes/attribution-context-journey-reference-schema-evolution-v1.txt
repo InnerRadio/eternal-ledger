@@ -1,0 +1,798 @@
+PURPAWS
+ATTRIBUTION CONTEXT JOURNEY-REFERENCE SCHEMA EVOLUTION v1
+
+STATUS
+DEFINED
+VERIFIED
+NOT YET LOCKED
+
+
+======================================================================
+1. PURPOSE
+======================================================================
+
+This contract defines the persistence evolution required by the locked
+Server-Issued Journey Reference Authority v1.
+
+It defines:
+
+    model field semantics
+    live SQLite column semantics
+    uniqueness requirement
+    index requirement
+    migration method
+    preconditions
+    postconditions
+    rollback boundary
+    verification requirements
+
+It does NOT perform the migration.
+
+
+======================================================================
+2. REQUIRED FIELD
+======================================================================
+
+AttributionContext requires:
+
+    journey_reference_hash
+
+Semantic type:
+
+    String
+
+Canonical contents:
+
+    lowercase hexadecimal SHA-256 digest
+
+Expected length:
+
+    64 characters
+
+It represents:
+
+    SHA-256(raw server-issued journey reference)
+
+
+======================================================================
+3. RAW REFERENCE MUST NOT BE STORED
+======================================================================
+
+The database must store only:
+
+    journey_reference_hash
+
+The database must NOT store:
+
+    raw journey reference
+    plaintext bearer secret
+    reversible encrypted journey reference
+
+The browser may carry the raw opaque reference.
+
+The database stores the digest only.
+
+
+======================================================================
+4. NULLABILITY
+======================================================================
+
+The target steady-state model semantics are:
+
+    journey_reference_hash
+        non-null
+        for journey-enabled Attribution Context records
+
+Because the attribution_contexts table is currently empty, the schema
+may be evolved directly to a NOT NULL column without requiring legacy
+row backfill.
+
+This assumption is valid ONLY while row count remains zero.
+
+If rows appear before implementation, STOP and redesign the migration.
+
+
+======================================================================
+5. UNIQUENESS
+======================================================================
+
+journey_reference_hash must be unique.
+
+Reason:
+
+The same active journey reference must resolve to at most one canonical
+Attribution Context.
+
+Database uniqueness is required to protect:
+
+    accidental duplicates
+    concurrent creation races
+    application-level logic failure
+
+Random collision probability alone is not sufficient integrity
+authority.
+
+
+======================================================================
+6. INDEXING
+======================================================================
+
+journey_reference_hash must be indexed.
+
+Reason:
+
+The canonical continuation lookup is:
+
+    presented raw reference
+        ↓
+    SHA-256
+        ↓
+    lookup Attribution Context by journey_reference_hash
+
+This is a direct lookup path and requires an index.
+
+
+======================================================================
+7. MODEL TARGET
+======================================================================
+
+Expected SQLAlchemy model semantics:
+
+    journey_reference_hash = Column(
+        String,
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+
+The exact formatting of models.py is not authoritative.
+
+The semantics are.
+
+
+======================================================================
+8. SQLITE TARGET
+======================================================================
+
+The live attribution_contexts table must contain:
+
+    journey_reference_hash VARCHAR NOT NULL
+
+and database-enforced uniqueness.
+
+A unique index or SQLite UNIQUE constraint may satisfy the uniqueness
+requirement.
+
+The implementation must verify the actual live SQLite result rather
+than assume SQLAlchemy metadata changed the existing table.
+
+
+======================================================================
+9. CREATE_ALL IS NOT THE MIGRATION
+======================================================================
+
+SQLAlchemy Base.metadata.create_all() does not alter an existing table
+to add missing columns.
+
+Therefore:
+
+    editing models.py
+    +
+    running create_all()
+
+is NOT sufficient schema evolution.
+
+The live SQLite schema must be changed explicitly.
+
+
+======================================================================
+10. CURRENT EMPTY-TABLE ADVANTAGE
+======================================================================
+
+The current attribution_contexts table contains zero rows.
+
+This provides a clean schema-evolution window.
+
+There is no legacy Attribution Context data requiring:
+
+    backfill
+    default fake hashes
+    temporary NULL values
+    per-row migration
+
+The migration must preserve this zero-row state.
+
+
+======================================================================
+11. NO FAKE BACKFILL
+======================================================================
+
+The implementation MUST NOT invent placeholder values such as:
+
+    ""
+    "unknown"
+    "legacy"
+    sequential hashes
+    shared default hash
+
+No fake journey identity may be created merely to satisfy NOT NULL.
+
+
+======================================================================
+12. MIGRATION STRATEGY
+======================================================================
+
+Because SQLite ALTER TABLE support is limited and the target includes:
+
+    new NOT NULL field
+    uniqueness
+    indexing
+
+the implementation should use an explicit transactional table-rebuild
+migration for attribution_contexts.
+
+Conceptual procedure:
+
+    BEGIN IMMEDIATE
+
+    verify attribution_contexts row count == 0
+
+    verify expected current schema
+
+    create attribution_contexts_new
+        with full target schema
+
+    create required indexes / uniqueness
+
+    verify new schema
+
+    drop old attribution_contexts
+
+    rename attribution_contexts_new
+        to attribution_contexts
+
+    verify final schema
+
+    COMMIT
+
+If any required step fails:
+
+    ROLLBACK
+
+
+======================================================================
+13. NO DESTRUCTIVE RECREATION WITHOUT GUARDS
+======================================================================
+
+The table-rebuild migration is permitted only because:
+
+    current row count == 0
+    expected source schema is known
+    target schema is known
+    transaction guards the operation
+
+The implementation MUST NOT blindly:
+
+    DROP TABLE attribution_contexts
+
+and recreate it without precondition checks.
+
+
+======================================================================
+14. TRANSACTIONAL AUTHORITY
+======================================================================
+
+The migration must occur inside an explicit SQLite transaction.
+
+Preferred acquisition:
+
+    BEGIN IMMEDIATE
+
+Reason:
+
+Schema evolution must not race with another writer.
+
+The migration should either:
+
+    complete fully
+
+or:
+
+    leave the original schema intact through rollback.
+
+
+======================================================================
+15. PRECONDITIONS
+======================================================================
+
+Before migration, verify:
+
+1. repository protected checkpoint
+
+2. models.py exact expected pre-migration hash
+
+3. attribution_contexts exists
+
+4. attribution_contexts row count == 0
+
+5. journey_reference_hash absent
+
+6. expected existing 18-column contract present
+
+7. no unexpected indexes
+
+8. database backup created
+
+9. tracked Git boundary known
+
+If any precondition fails:
+
+    STOP
+
+
+======================================================================
+16. DATABASE BACKUP
+======================================================================
+
+Before live schema evolution:
+
+    create a timestamped byte-for-byte backup of eternal_ledger.db
+
+Verify:
+
+    SHA256(original) == SHA256(backup)
+
+The backup must occur before the first database write.
+
+
+======================================================================
+17. MODEL / DATABASE COORDINATION
+======================================================================
+
+models.py and the live database schema must land together in one
+verified implementation milestone.
+
+The system must not be left intentionally in a state where:
+
+    model expects journey_reference_hash
+    but live table lacks it
+
+or:
+
+    live table contains journey_reference_hash
+    but committed model lacks it
+
+
+======================================================================
+18. FINAL TARGET COLUMN ORDER
+======================================================================
+
+Target attribution_contexts columns:
+
+    id
+    status
+    campaign_id
+    referring_user_id
+    referring_affiliate_id
+    referring_referral_code
+    participant_user_id
+    participant_affiliate_id
+    participant_referral_code
+    enrollment_id
+    evidence_source_type
+    evidence_source_id
+    evidence_reference
+    journey_reference_hash
+    created_at
+    updated_at
+    identified_at
+    participated_at
+    expires_at
+
+journey_reference_hash is intentionally placed adjacent to evidence /
+continuity state before lifecycle timestamps.
+
+
+======================================================================
+19. FINAL TARGET ROW STATE
+======================================================================
+
+After schema evolution:
+
+    attribution_contexts row count == 0
+
+No Attribution Context may be created as part of migration.
+
+
+======================================================================
+20. FINAL TARGET INDEX STATE
+======================================================================
+
+The live table must expose a database-enforced unique lookup path for:
+
+    journey_reference_hash
+
+Verification must inspect:
+
+    PRAGMA index_list(attribution_contexts)
+
+and:
+
+    PRAGMA index_info(<index>)
+
+The implementation must prove the indexed column is exactly:
+
+    journey_reference_hash
+
+
+======================================================================
+21. UNIQUE NULL SEMANTICS DO NOT MATTER IN TARGET STATE
+======================================================================
+
+The target field is NOT NULL.
+
+Therefore SQLite's behavior allowing multiple NULL values in UNIQUE
+indexes is not relevant to the steady-state authority.
+
+No journey-enabled Attribution Context should exist without a digest.
+
+
+======================================================================
+22. DIGEST LENGTH VALIDATION
+======================================================================
+
+Database VARCHAR does not itself enforce a 64-character digest length
+in SQLite.
+
+Therefore application creation authority must later validate:
+
+    exactly 64 lowercase hexadecimal characters
+
+before persistence.
+
+This schema contract does not add a CHECK constraint in v1.
+
+A future stricter integrity migration may do so.
+
+
+======================================================================
+23. DIGEST CONTENT VALIDATION
+======================================================================
+
+The live schema guarantees:
+
+    non-null
+    uniqueness
+    lookup indexing
+
+It does not alone prove:
+
+    lowercase
+    hexadecimal
+    SHA-256 origin
+
+Those are Creation / Journey Reference Authority responsibilities.
+
+
+======================================================================
+24. ROTATION SEMANTICS
+======================================================================
+
+Reference rotation later updates:
+
+    journey_reference_hash
+
+on the SAME Attribution Context.
+
+Uniqueness continues to apply to the replacement digest.
+
+Rotation must not create a second Attribution Context merely to change
+the reference.
+
+
+======================================================================
+25. OLD HASH AFTER ROTATION
+======================================================================
+
+The v1 schema stores only the currently active journey_reference_hash.
+
+It does NOT preserve previous active hashes in the Attribution Context
+row.
+
+Therefore after successful rotation:
+
+    old hash is no longer current authority
+
+Historical rotation auditing may later require a separate audit or
+provenance record.
+
+That is outside this schema evolution.
+
+
+======================================================================
+26. NO AUTHENTICATION FIELDS
+======================================================================
+
+This schema evolution MUST NOT add:
+
+    session token
+    auth token
+    login token
+    password token
+    participant secret
+
+journey_reference_hash remains attribution continuity only.
+
+
+======================================================================
+27. NO ECONOMIC FIELDS
+======================================================================
+
+This schema evolution MUST NOT add:
+
+    reward fields
+    payout fields
+    commission fields
+    token balance
+    settlement status
+
+Journey continuity remains economically neutral.
+
+
+======================================================================
+28. NO SHARE-LINK FIELD
+======================================================================
+
+The schema evolution MUST NOT add the raw share URL as journey
+authority.
+
+Reusable share links remain provenance transport.
+
+Journey reference hash remains individual continuity authority.
+
+
+======================================================================
+29. ROLLBACK BOUNDARY
+======================================================================
+
+Before commit of the SQLite transaction:
+
+    any failure → ROLLBACK
+
+After successful migration commit:
+
+    rollback is not performed automatically by ad hoc reverse ALTER
+
+If post-migration verification exposes a defect, restore from the
+verified pre-migration database backup and restore the pre-migration
+models.py backup.
+
+Rollback must be explicit and byte-verified.
+
+
+======================================================================
+30. ZERO LEGACY MUTATION
+======================================================================
+
+No existing non-attribution table may change.
+
+Critical legacy tables must retain:
+
+    exact row counts
+    exact schemas
+
+The migration authority is scoped only to:
+
+    attribution_contexts
+    models.py
+
+
+======================================================================
+31. GIT BOUNDARY
+======================================================================
+
+The implementation milestone should commit only the intended source and
+lock artifacts.
+
+The live SQLite database file is not part of the Git commit boundary.
+
+Expected tracked source mutation:
+
+    backend/app/models.py
+
+plus:
+
+    milestone / lock artifacts
+
+No unrelated tracked source should change.
+
+
+======================================================================
+32. IMPLEMENTATION ORDER
+======================================================================
+
+After this contract is locked:
+
+1. verify exact pre-migration model / database state
+
+2. backup models.py
+
+3. backup eternal_ledger.db
+
+4. update AttributionContext model
+
+5. compile models.py
+
+6. perform guarded transactional SQLite schema rebuild
+
+7. verify final 19-column schema
+
+8. verify unique/indexed journey_reference_hash
+
+9. verify row count remains zero
+
+10. verify legacy tables unchanged
+
+11. verify fresh-process SQLAlchemy import
+
+12. verify exact Git boundary
+
+13. lock implementation milestone
+
+14. commit + push
+
+
+======================================================================
+33. IMPLEMENTATION DOES NOT YET INCLUDE
+======================================================================
+
+Schema evolution does NOT yet implement:
+
+    raw reference generator
+    SHA-256 helper
+    cookie setter
+    cookie reader
+    context resolver
+    reference rotation
+    Attribution Context Creation Authority
+    registration continuity
+    Campaign Enrollment continuity
+    Conversion integration
+    Reward integration
+    Commission integration
+    token implementation
+
+
+======================================================================
+34. SECURITY INVARIANTS
+======================================================================
+
+1.
+Only the digest is persisted.
+
+2.
+The digest field is non-null.
+
+3.
+The digest field is unique.
+
+4.
+The digest field is indexed.
+
+5.
+No raw journey reference is persisted.
+
+6.
+No placeholder journey digest is invented.
+
+7.
+Migration is guarded by row count == 0.
+
+8.
+Migration verifies the exact current schema first.
+
+9.
+Migration is transactional.
+
+10.
+Database backup precedes database mutation.
+
+11.
+models.py and live schema are verified together.
+
+12.
+create_all() is not treated as schema migration.
+
+13.
+No Attribution Context row is created by migration.
+
+14.
+No legacy table is modified.
+
+15.
+No reward / payout / authentication authority is added.
+
+16.
+Rotation later updates the same canonical context.
+
+17.
+Old reference hash is not current authority after rotation.
+
+18.
+Failure before commit rolls back.
+
+19.
+Post-commit recovery uses the verified backup.
+
+20.
+No destructive recreation occurs without guards.
+
+
+======================================================================
+35. CURRENT STATE
+======================================================================
+
+AttributionContext model:
+    LOCKED
+    18 fields
+    journey_reference_hash ABSENT
+
+Live attribution_contexts table:
+    VERIFIED
+    18 columns
+    0 rows
+    journey_reference_hash ABSENT
+
+Server-Issued Journey Reference Authority:
+    LOCKED
+
+Journey-Reference Schema Evolution:
+    DEFINED BY THIS CONTRACT
+    NOT YET LOCKED
+
+Database migration:
+    NOT PERFORMED
+
+models.py migration:
+    NOT PERFORMED
+
+Journey-reference generator:
+    NOT IMPLEMENTED
+
+Cookie transport:
+    NOT IMPLEMENTED
+
+Creation Authority:
+    NOT IMPLEMENTED
+
+
+======================================================================
+36. FINAL AUTHORITY STATEMENT
+======================================================================
+
+The next persistence evolution adds exactly one new continuity
+authority field:
+
+    journey_reference_hash
+
+It stores only the SHA-256 digest of the server-issued opaque journey
+reference.
+
+It is:
+
+    non-null
+    unique
+    indexed
+
+The migration occurs only while attribution_contexts remains empty.
+
+The migration is guarded, transactional, backed up, and verified.
+
+No Attribution Context is created during migration.
+
+No other authority is introduced.
+
+
+======================================================================
+END
+======================================================================
