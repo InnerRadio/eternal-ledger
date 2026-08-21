@@ -1,0 +1,120 @@
+PURPAWS
+ATTRIBUTION CONTEXT JOURNEY-REFERENCE PERSISTENCE v1
+
+STATUS
+LOCKED
+
+LOCKED UTC
+2026-08-21T05:54:35.203030+00:00
+
+PARENT CHECKPOINT
+3cee28469999e5e404170eb5148d27bad31996d7
+
+MODELS.PY SHA256 BEFORE
+d1036a0602bdb1f30010a1b3b90909516987c3a731aafd8fd1da0433f786ac4f
+
+MODELS.PY SHA256 AFTER
+7e80d40d403d8eaaae01775966aeaec5514b76164c105e82979b2e6e1f76117a
+
+PRE-MIGRATION DATABASE BACKUP SHA256
+332b1f20e7ea605eb5c5c776536d8d3b513c2351e74bb24847db555fd96eb8cd
+
+TARGET MODEL
+AttributionContext
+
+TARGET TABLE
+attribution_contexts
+
+FIELD
+journey_reference_hash
+
+TYPE
+String / VARCHAR
+
+NULLABLE
+NO
+
+UNIQUE
+YES
+
+INDEXED
+YES
+
+RAW REFERENCE PERSISTED
+NO
+
+LIVE ROW COUNT AT LOCK
+0
+
+MIGRATION METHOD
+
+Guarded transactional SQLite table rebuild.
+
+Verified sequence:
+
+- exact protected checkpoint
+- exact pre-migration models.py
+- exact 18-column source schema
+- source row count == 0
+- byte-identical models.py backup
+- byte-identical database backup
+- complete AttributionContext model replacement
+- compile
+- fresh-process model verification
+- BEGIN IMMEDIATE
+- source schema re-verification inside transaction
+- replacement table created
+- replacement table inspected before swap
+- guarded transactional DROP of verified empty old table
+- rename replacement table
+- recreate exact indexes
+- verify unique journey-reference index
+- verify 19-column live schema
+- verify zero rows
+- COMMIT
+- PRAGMA integrity_check == ok
+- legacy tables unchanged
+- SQLAlchemy model ↔ database parity
+
+AD HOC ALTER TABLE
+NO
+
+CREATE_ALL USED AS MIGRATION
+NO
+
+BLIND DROP TABLE
+NO
+
+UNGUARDED DESTRUCTIVE RECREATION
+NO
+
+LEGACY TABLES CHANGED
+NO
+
+ATTRIBUTION CONTEXT ROWS CREATED
+0
+
+JOURNEY GENERATOR IMPLEMENTED
+NO
+
+COOKIE IMPLEMENTED
+NO
+
+REFERENCE RESOLVER IMPLEMENTED
+NO
+
+REFERENCE ROTATION IMPLEMENTED
+NO
+
+CREATION AUTHORITY IMPLEMENTED
+NO
+
+REGISTRATION CONTINUITY IMPLEMENTED
+NO
+
+NEXT AUTHORITY
+
+JOURNEY-REFERENCE GENERATOR / RESOLVER
+
+No ad hoc ALTER TABLE.
+Johnny Drop Tables privileges remain revoked.

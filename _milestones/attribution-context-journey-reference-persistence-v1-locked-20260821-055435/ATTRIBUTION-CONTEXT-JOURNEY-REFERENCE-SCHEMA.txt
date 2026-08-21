@@ -1,0 +1,49 @@
+CREATE TABLE "attribution_contexts" (
+            id INTEGER NOT NULL,
+            status VARCHAR NOT NULL,
+            campaign_id VARCHAR,
+            referring_user_id INTEGER,
+            referring_affiliate_id VARCHAR,
+            referring_referral_code VARCHAR,
+            participant_user_id INTEGER,
+            participant_affiliate_id VARCHAR,
+            participant_referral_code VARCHAR,
+            enrollment_id INTEGER,
+            evidence_source_type VARCHAR,
+            evidence_source_id INTEGER,
+            evidence_reference TEXT,
+            journey_reference_hash VARCHAR NOT NULL,
+            created_at DATETIME NOT NULL,
+            updated_at DATETIME,
+            identified_at DATETIME,
+            participated_at DATETIME,
+            expires_at DATETIME,
+            PRIMARY KEY (id)
+        )
+
+COLUMNS
+id
+status
+campaign_id
+referring_user_id
+referring_affiliate_id
+referring_referral_code
+participant_user_id
+participant_affiliate_id
+participant_referral_code
+enrollment_id
+evidence_source_type
+evidence_source_id
+evidence_reference
+journey_reference_hash
+created_at
+updated_at
+identified_at
+participated_at
+expires_at
+
+INDEXES
+ix_attribution_contexts_id: {'unique': 0, 'columns': ['id']}
+ix_attribution_contexts_journey_reference_hash: {'unique': 1, 'columns': ['journey_reference_hash']}
+
+ROWS: 0
