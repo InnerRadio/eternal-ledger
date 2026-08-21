@@ -1,0 +1,131 @@
+PURPAWS
+JOURNEY-REFERENCE GENERATOR / VALIDATOR / HASHER / READ-ONLY RESOLVER v1
+
+STATUS
+LOCKED
+
+LOCKED UTC
+2026-08-21T06:16:19.673849+00:00
+
+PARENT CHECKPOINT
+a6e2455539bd68ec461d00fee404c3b3a5671134
+
+MODULE
+backend/app/journey_reference_authority.py
+
+MODULE SHA256
+c393c9be0001f5ccc9b45c968896a7b458634d2d1d2302d3857a804cd298e70b
+
+REFERENCE FORMAT
+
+Prefix:
+ppj1_
+
+Random source:
+secrets.token_urlsafe(32)
+
+Canonical generated length:
+48
+
+Maximum accepted length:
+48
+
+HASH
+
+Algorithm:
+SHA-256
+
+Output:
+64-character lowercase hexadecimal digest
+
+DECISION MODEL
+
+JourneyReferenceMaterial:
+frozen dataclass
+
+JourneyReferenceDecision:
+frozen dataclass
+
+CLASSIFICATIONS
+
+MALFORMED_REFERENCE
+UNSUPPORTED_VERSION
+UNKNOWN_REFERENCE
+ACTIVE
+EXPIRED
+INVALID_CONTEXT
+
+ACTIVE STATUS v1
+
+inbound
+
+RESOLVER
+
+Caller-supplied SQLAlchemy Session:
+YES
+
+Read-only:
+YES
+
+Cardinality protection:
+limit(2).all()
+
+Silent first() integrity masking:
+NO
+
+DATABASE MUTATION
+
+Writes:
+NO
+
+Attribution Context creation:
+NO
+
+Cookie mutation:
+NO
+
+Participant binding:
+NO
+
+Reference rotation:
+NO
+
+Campaign Enrollment:
+NO
+
+Conversion:
+NO
+
+Reward:
+NO
+
+Commission:
+NO
+
+Settlement:
+NO
+
+RAW REFERENCE
+
+Persisted:
+NO
+
+Logged:
+NO
+
+DATABASE STATE AT LOCK
+
+Integrity:
+PASS
+
+Attribution Context rows:
+0
+
+NEXT AUTHORITY
+
+COOKIE TRANSPORT AUTHORITY
+
+Before implementation:
+DEFINE → VERIFY → LOCK
+
+No layer impersonates another.
