@@ -1,0 +1,138 @@
+PURPAWS
+ATTRIBUTION CONTEXT DUPLICATE / REPLAY SEMANTICS v1
+
+STATUS
+LOCKED
+
+LOCKED UTC
+2026-08-21T05:31:05.869720+00:00
+
+PARENT CHECKPOINT
+54a221d86190dad78622adecbbfc8a80b848e19f
+
+CONTRACT
+_notes/attribution-context-duplicate-replay-semantics-v1.txt
+
+CONTRACT SHA256
+1f292880baa485702a6566af3a91d656b5d3d3a66b965ed710cd41e5b98525b5
+
+CORE SEMANTICS
+
+TRANSPORT EVENT != JOURNEY IDENTITY
+
+CLICK != ATTRIBUTION CONTEXT
+
+ONE REUSABLE SHARE LINK MAY SUPPORT MANY DISTINCT JOURNEYS.
+
+ONE JOURNEY MAY CONTAIN MANY TRANSPORT EVENTS.
+
+REPEATED TRANSPORT WITHIN THE SAME SERVER-RECOGNIZED JOURNEY
+MUST NOT MANUFACTURE NEW CANONICAL ATTRIBUTION CONTEXT.
+
+AffiliateClick.id is evidence identity only.
+
+campaign_id + referral_code is NOT a globally unique journey key.
+
+campaign_id + affiliate_id is NOT a globally unique journey key.
+
+IP address is NOT canonical journey identity.
+
+User agent is NOT canonical journey identity.
+
+JOURNEY AUTHORITY
+
+Canonical journey identity must be server-controlled.
+
+The browser may carry a server-issued reference.
+
+The browser must not choose canonical journey identity.
+
+REPRESENTATION
+
+Physical journey-reference representation:
+NOT YET LOCKED
+
+This milestone does NOT select:
+
+- database column name
+- token format
+- cookie format
+- signing scheme
+- expiry duration
+- uniqueness mechanism
+- concurrency implementation
+
+REPLAY
+
+Replay protection must prevent:
+
+- one journey becoming many canonical contexts
+- one resolved participant becoming another participant
+- expired authority being treated as current
+- repeated transport manufacturing economic provenance
+
+Replay protection must NOT destroy legitimate revisit continuity.
+
+ORIGIN IMMUTABILITY
+
+Original referrer provenance:
+PROTECTED
+
+Original Campaign provenance:
+PROTECTED
+
+Historical origin is not last-write-wins.
+
+PRIVACY
+
+Journey identity must not depend on invasive browser fingerprinting.
+
+IP / user-agent may be evidence but not canonical journey identity.
+
+CONCURRENCY
+
+Concurrent requests must not manufacture duplicate canonical contexts.
+
+CURRENT IMPLEMENTATION
+
+Creation implementation:
+NO
+
+Journey-reference implementation:
+NO
+
+Schema change:
+NO
+
+Registration continuity:
+NO
+
+Conversion integration:
+NO
+
+Reward integration:
+NO
+
+Commission integration:
+NO
+
+Token integration:
+NO
+
+NEXT AUTHORITY
+
+CONCRETE SERVER-ISSUED JOURNEY REFERENCE AUTHORITY
+
+First define:
+
+- reference representation
+- validation
+- expiry
+- continuation
+- conflict behavior
+- concurrency / atomicity
+- browser handoff through registration
+
+Semantics first.
+Representation second.
+Implementation third.

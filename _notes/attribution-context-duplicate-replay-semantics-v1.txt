@@ -1,0 +1,1091 @@
+PURPAWS
+ATTRIBUTION CONTEXT DUPLICATE / REPLAY SEMANTICS v1
+
+STATUS
+DEFINED
+VERIFIED
+NOT YET LOCKED
+
+
+======================================================================
+1. PURPOSE
+======================================================================
+
+This contract defines duplicate and replay semantics for first-class
+PurPaws Attribution Context.
+
+It exists because Attribution Context Creation Authority requires an
+explicit duplicate / idempotency policy before implementation.
+
+This contract does NOT:
+
+- implement Attribution Context creation
+- add a journey_id column
+- add a token column
+- add a cookie
+- add browser storage
+- create a signed token
+- create a nonce
+- change AffiliateClick
+- change Campaign Enrollment
+- change registration
+- change Conversion
+- change Reward
+- change Commission
+- change settlement
+- change token economics
+
+This contract defines semantic identity first.
+
+
+======================================================================
+2. OBSERVED LEGACY REALITY
+======================================================================
+
+AffiliateClick currently represents a recorded interaction.
+
+Its existing writer creates a new AffiliateClick from supplied
+affiliate / referral / Campaign transport values plus request evidence.
+
+The existing click writer does not establish:
+
+- idempotency
+- duplicate suppression
+- journey identity
+- replay protection
+- signed attribution continuity
+
+AffiliateClick therefore MUST NOT be treated as synonymous with
+Attribution Context.
+
+Existing Campaign Enrollment also does not provide the anonymous
+journey identity required by Attribution Context.
+
+No observed legacy uniqueness constraint is sufficient to define
+Attribution Context identity.
+
+
+======================================================================
+3. FUNDAMENTAL DISTINCTIONS
+======================================================================
+
+TRANSPORT EVENT != JOURNEY IDENTITY
+
+CLICK != ATTRIBUTION CONTEXT
+
+SHARED LINK != PARTICIPANT
+
+SHARED LINK != JOURNEY
+
+IP ADDRESS != PARTICIPANT IDENTITY
+
+USER AGENT != PARTICIPANT IDENTITY
+
+REFERRAL CODE != JOURNEY IDENTITY
+
+AFFILIATE ID != JOURNEY IDENTITY
+
+CAMPAIGN ID != JOURNEY IDENTITY
+
+
+======================================================================
+4. SHARE-LINK CARDINALITY
+======================================================================
+
+One valid Campaign / referral link may legitimately be shared with:
+
+    one person
+    ten people
+    one hundred people
+    thousands of people
+
+Therefore:
+
+    campaign_id + referral_code
+
+MUST NOT uniquely identify Attribution Context.
+
+Likewise:
+
+    campaign_id + affiliate_id
+
+MUST NOT uniquely identify Attribution Context.
+
+A reusable referral/share link identifies referral provenance.
+
+It does not identify the individual journey that follows it.
+
+
+======================================================================
+5. JOURNEY CARDINALITY
+======================================================================
+
+One attributable journey may contain multiple transport events.
+
+Example:
+
+    Person B follows Member A's Campaign X link
+        ↓
+    Attribution Context exists
+        ↓
+    B browses another page
+        ↓
+    B returns later
+        ↓
+    B follows the same link again
+        ↓
+    B registers
+        ↓
+    B joins Campaign X
+
+These repeated interactions MAY belong to the same Attribution Context.
+
+Therefore:
+
+    repeat click != automatically new Attribution Context
+
+and:
+
+    repeat request != automatically new economic provenance
+
+
+======================================================================
+6. DISTINCT PEOPLE USING SAME LINK
+======================================================================
+
+Two different people may legitimately use exactly the same reusable
+share link.
+
+Example:
+
+    Member A shares Campaign X on Facebook.
+
+    Person B follows it.
+    Person C follows it.
+    Person D follows it.
+
+All three may share:
+
+    campaign_id
+    referring Affiliate ID
+    referring referral code
+    destination
+
+But B, C, and D are separate journeys.
+
+Therefore reusable referral provenance alone cannot deduplicate
+Attribution Context.
+
+
+======================================================================
+7. SERVER-ISSUED JOURNEY IDENTITY
+======================================================================
+
+Attribution Context requires a server-controlled concept of JOURNEY
+IDENTITY.
+
+Journey identity must distinguish:
+
+    repeated transport within one journey
+
+from:
+
+    a genuinely separate person's or browser journey
+
+The journey identity MUST be established by PurPaws authority.
+
+The browser may carry a server-issued reference.
+
+The browser MUST NOT be permitted to choose arbitrary canonical journey
+identity.
+
+
+======================================================================
+8. PERSISTENCE REPRESENTATION NOT YET LOCKED
+======================================================================
+
+This contract defines the semantic requirement:
+
+    SERVER-ISSUED JOURNEY IDENTITY
+
+It does NOT yet lock its physical representation.
+
+Possible future representations may include:
+
+    opaque random journey reference
+    signed journey token
+    server-side session reference
+    dedicated persisted journey key
+    another cryptographically strong server-issued identifier
+
+No specific representation is selected by this contract.
+
+Before implementation, the chosen representation must be inspected for:
+
+    unpredictability
+    forgery resistance
+    replay behavior
+    expiry
+    continuity
+    privacy
+    safe browser transport
+
+
+======================================================================
+9. JOURNEY IDENTITY MUST NOT BE DERIVED FROM PII
+======================================================================
+
+Journey identity MUST NOT be derived solely from:
+
+    IP address
+    user agent
+    email
+    device fingerprint
+    browser fingerprint
+
+IP address and user agent may be evidence.
+
+They are not durable participant identity.
+
+Shared networks, changing addresses, proxies, carrier NAT, privacy
+tools, shared computers, and browser changes make those values
+unsuitable as canonical journey identity.
+
+PurPaws must not require invasive fingerprinting merely to preserve
+attribution continuity.
+
+
+======================================================================
+10. CLICK SEMANTICS
+======================================================================
+
+AffiliateClick remains an interaction event.
+
+One Attribution Context may be supported by:
+
+    zero clicks
+    one click
+    multiple clicks
+
+Click may be evidence for context.
+
+A new click does NOT necessarily mean a new Attribution Context.
+
+Attribution Context creation MUST NOT automatically follow:
+
+    one click
+        =
+    one new context
+
+
+======================================================================
+11. CLICK ID SEMANTICS
+======================================================================
+
+AffiliateClick.id uniquely identifies that click record.
+
+It does NOT prove that the click represents a unique person or unique
+attribution journey.
+
+Therefore:
+
+    AffiliateClick.id != Journey Identity
+
+A click ID may be referenced as evidence.
+
+It must not become the canonical deduplication key merely because it is
+unique in the click table.
+
+
+======================================================================
+12. ATTRIBUTION CONTEXT IDEMPOTENCY
+======================================================================
+
+When the same validated journey is presented repeatedly, creation
+authority must return or continue the same canonical Attribution
+Context rather than manufacture another economically meaningful
+context.
+
+Conceptually:
+
+    same server-recognized journey
+        +
+    compatible provenance
+        ↓
+    same Attribution Context
+
+not:
+
+    same journey
+        ↓
+    Context 1
+    Context 2
+    Context 3
+    Context 4
+
+
+======================================================================
+13. IDEMPOTENCY DOES NOT MEAN GLOBAL LINK UNIQUENESS
+======================================================================
+
+Idempotency applies to the JOURNEY.
+
+It does not apply globally to the reusable share link.
+
+Therefore:
+
+    Member A + Campaign X
+
+may legitimately produce many Attribution Context records,
+
+provided those records represent genuinely distinct journeys.
+
+This is necessary for ordinary sharing behavior.
+
+
+======================================================================
+14. REPLAY DEFINITION
+======================================================================
+
+Replay occurs when a previously valid journey reference or transport
+artifact is presented again in a context where accepting it as new
+canonical provenance would improperly duplicate or transfer authority.
+
+Replay risk includes attempts to:
+
+    manufacture multiple contexts from one journey
+    transfer one person's context to another person
+    bind one resolved context to a second participant
+    reuse expired authority as current authority
+    generate duplicate reward provenance
+    manufacture repeated Campaign Participation lineage
+
+
+======================================================================
+15. REPLAY DOES NOT MEAN NORMAL REVISIT
+======================================================================
+
+A legitimate revisit is not necessarily malicious replay.
+
+Example:
+
+    B follows Campaign X
+        ↓
+    B receives server-recognized journey continuity
+        ↓
+    B closes browser page
+        ↓
+    B returns through the same valid journey
+        ↓
+    same Attribution Context continues
+
+That is legitimate continuity.
+
+The purpose of replay protection is not to destroy continuity.
+
+It is to prevent repeated transport from becoming repeated canonical
+economic provenance.
+
+
+======================================================================
+16. PARTICIPANT RESOLUTION LOCK
+======================================================================
+
+An Attribution Context may begin with:
+
+    participant_user_id = NULL
+
+Later, trusted membership/account authority may resolve:
+
+    participant_user_id = B
+
+Once a context has been authoritatively resolved to participant B,
+the same journey MUST NOT later resolve to participant C.
+
+Conceptually:
+
+    unresolved
+        ↓
+    resolved to B
+        ↓
+    B remains participant
+
+not:
+
+    resolved to B
+        ↓
+    replayed token
+        ↓
+    rewritten to C
+
+Participant resolution is additive and identity-binding.
+
+
+======================================================================
+17. REFERRER IMMUTABILITY
+======================================================================
+
+Replay or revisit MUST NOT replace original referrer provenance.
+
+Example:
+
+Original:
+
+    Campaign X
+    Referrer A
+
+Later transport claims:
+
+    Campaign X
+    Referrer Z
+
+If the existing journey is already canonically bound to Referrer A,
+the later conflicting claim MUST NOT silently rewrite it to Z.
+
+Conflicting provenance must fail safely or follow a future explicit
+review authority.
+
+Historical origin is not last-write-wins.
+
+
+======================================================================
+18. CAMPAIGN IMMUTABILITY
+======================================================================
+
+A journey canonically established for Campaign X MUST NOT silently
+become Campaign Y because a later request supplies another Campaign.
+
+Later navigation to another Campaign may represent:
+
+    another journey
+    another context
+    another interaction
+
+It does not rewrite the original Attribution Context.
+
+
+======================================================================
+19. ENROLLMENT BOUNDARY
+======================================================================
+
+Attribution journey identity and Campaign Enrollment identity remain
+separate.
+
+Anonymous journey:
+
+    Attribution Context
+    participant unresolved
+    enrollment unresolved
+
+After membership:
+
+    participant resolves
+
+After explicit Campaign participation:
+
+    enrollment may resolve
+
+Repeated journey transport MUST NOT manufacture multiple Campaign
+Enrollments.
+
+Campaign Participation Authority must separately enforce its own
+membership / Campaign participation semantics.
+
+
+======================================================================
+20. ECONOMIC DUPLICATION BOUNDARY
+======================================================================
+
+Duplicate transport must never be sufficient by itself to duplicate:
+
+    Conversion
+    Reward
+    Commission
+    token entitlement
+    discount entitlement
+    settlement
+
+Attribution Context is upstream provenance.
+
+Downstream authorities must still independently validate their own
+idempotency and eligibility.
+
+Therefore:
+
+    context idempotency is necessary
+
+but:
+
+    context idempotency alone is not the entire economic fraud defense.
+
+
+======================================================================
+21. EXPIRY
+======================================================================
+
+A server-issued journey may have a bounded validity period.
+
+AttributionContext already permits:
+
+    expires_at
+
+Future journey continuity may use that lifecycle.
+
+Expiry means the journey is no longer eligible for whichever future
+resolution requires live attribution authority.
+
+Expiry does NOT erase historical provenance.
+
+A later visit after expiry may require:
+
+    a new journey
+    new validation
+    new Attribution Context
+
+according to future creation policy.
+
+
+======================================================================
+22. INVALID CONTEXTS
+======================================================================
+
+If a journey is discovered to be:
+
+    forged
+    inconsistent
+    fraudulent
+    malformed
+    otherwise invalid
+
+its context may be marked invalid through future authority.
+
+The system should preserve the fact that the invalid context existed.
+
+Invalidation MUST NOT cause the system to manufacture replacement
+provenance automatically.
+
+
+======================================================================
+23. CLIENT STORAGE
+======================================================================
+
+A future journey reference may need to survive ordinary browser
+navigation or registration continuity.
+
+Potential transport could include:
+
+    secure cookie
+    opaque browser-carried token
+    server-side session reference
+    explicit continuation token
+
+This contract does NOT select the mechanism.
+
+Any chosen client-carried representation must be treated as:
+
+    a reference to server authority
+
+not:
+
+    authority merely because the browser presented it.
+
+
+======================================================================
+24. CLIENT CANNOT SELECT CANONICAL JOURNEY IDENTITY
+======================================================================
+
+A client may present a server-issued journey reference.
+
+A client MUST NOT be able to submit:
+
+    journey_id = arbitrary_value
+
+and cause that value to become canonical journey identity.
+
+Canonical journey identity must be:
+
+    server-created
+    sufficiently unpredictable
+    scope-aware
+    validated before use
+
+
+======================================================================
+25. SIGNED TOKEN SEMANTICS
+======================================================================
+
+If PurPaws later uses a signed token:
+
+A valid signature means only:
+
+    PurPaws signed these claims.
+
+It does not automatically mean:
+
+    claims are still current
+    token is unexpired
+    token is unused where single-use matters
+    token belongs to this participant
+    token may create another context
+    Campaign remains eligible
+    referrer remains valid
+
+Signature verification is one trust check.
+
+It is not the entire replay policy.
+
+
+======================================================================
+26. ANONYMOUS → MEMBER CONTINUITY
+======================================================================
+
+The desired journey remains:
+
+    Member A shares Campaign X
+        ↓
+    B follows valid link
+        ↓
+    server validates provenance
+        ↓
+    server establishes Journey J
+        ↓
+    Attribution Context AC1
+        ↓
+    B revisits
+        ↓
+    Journey J continues AC1
+        ↓
+    B creates free account
+        ↓
+    B receives B's own Affiliate identity
+        ↓
+    AC1 resolves participant = B
+        ↓
+    B explicitly joins Campaign X
+        ↓
+    AC1 may resolve trusted Enrollment
+        ↓
+    future qualifying activity may create Conversion
+
+At no point does B inherit A's Affiliate identity.
+
+At no point does a revisit manufacture another participant reward
+lineage.
+
+
+======================================================================
+27. MANY-PER-LINK EXAMPLE
+======================================================================
+
+Member A posts:
+
+    Support Campaign X on PurPaws
+
+The same reusable share URL is followed by:
+
+    B
+    C
+    D
+
+The correct semantic result may be:
+
+    Journey JB → Attribution Context AB
+    Journey JC → Attribution Context AC
+    Journey JD → Attribution Context AD
+
+All preserve:
+
+    Campaign X
+    Referrer A
+
+But they are distinct journeys.
+
+Therefore:
+
+    referral link identity != Attribution Context identity
+
+
+======================================================================
+28. MANY-CLICKS-PER-JOURNEY EXAMPLE
+======================================================================
+
+B:
+
+    clicks link Monday
+    returns Tuesday
+    clicks again Wednesday
+    registers Thursday
+
+The correct semantic result may be:
+
+    Click 1
+       \
+        \
+         Attribution Context AB
+        /
+    Click 2
+
+plus other transport evidence.
+
+Therefore:
+
+    interaction count != context count
+
+
+======================================================================
+29. AUTHENTICATED JOURNEY
+======================================================================
+
+When the participant is already authenticated, PurPaws may have
+stronger server-side identity.
+
+That does not eliminate journey semantics.
+
+An authenticated member can still:
+
+    enter Campaign X through Referrer A
+    revisit
+    navigate
+    join later
+
+Participant identity can be server-resolved from authentication.
+
+Referrer provenance still remains separate.
+
+
+======================================================================
+30. ACCOUNT LOGIN / REGISTRATION BOUNDARY
+======================================================================
+
+Authentication owns participant identity.
+
+Attribution journey continuity may survive across:
+
+    anonymous
+        ↓
+    registration
+        ↓
+    authenticated
+
+The continuity mechanism MUST NOT permit a client to substitute another
+user_id.
+
+After authentication, server-side account authority determines the
+participant.
+
+
+======================================================================
+31. DUPLICATE POLICY CLASSIFICATION
+======================================================================
+
+The canonical duplicate question is:
+
+    "Is this request continuation of an already recognized journey?"
+
+It is NOT merely:
+
+    "Does this Campaign / Affiliate / referral combination already
+    exist?"
+
+Those are different questions.
+
+
+======================================================================
+32. CONTEXT CREATION RESULT CLASSES
+======================================================================
+
+Future Creation Authority should be able to classify a request as one
+of at least these semantic outcomes:
+
+A. NEW JOURNEY
+
+    Valid provenance.
+    No existing journey continuity.
+    Create new Attribution Context.
+
+
+B. CONTINUING JOURNEY
+
+    Valid existing server-recognized journey.
+    Provenance compatible.
+    Return / continue existing Attribution Context.
+
+
+C. CONFLICTING JOURNEY CLAIM
+
+    Existing journey found.
+    Incoming provenance conflicts with canonical origin.
+    Do not silently overwrite.
+
+
+D. EXPIRED JOURNEY
+
+    Existing journey reference found.
+    Authority expired.
+    Do not treat as automatically current.
+
+
+E. INVALID / FORGED JOURNEY
+
+    Reference cannot be validated.
+    Do not create stronger provenance from it.
+
+
+======================================================================
+33. CREATION MUST BE IDEMPOTENT FOR CONTINUATION
+======================================================================
+
+For a CONTINUING JOURNEY:
+
+Repeated creation requests should not create additional canonical
+Attribution Context rows merely because:
+
+    page refreshed
+    request retried
+    network retransmitted
+    user revisited
+    browser sent the same continuation reference again
+
+Creation must recognize continuation.
+
+
+======================================================================
+34. CONCURRENCY
+======================================================================
+
+Future implementation must consider concurrent duplicate requests.
+
+Example:
+
+    browser sends request
+    network retries
+    two server workers process simultaneously
+
+Both must not independently manufacture two canonical contexts for the
+same server-recognized journey.
+
+The exact persistence / locking mechanism is NOT defined here.
+
+Concurrency safety IS required before production authority is trusted.
+
+
+======================================================================
+35. JOURNEY REFERENCE DISCLOSURE
+======================================================================
+
+A journey reference must not disclose unnecessary private identity.
+
+It should not need to expose:
+
+    participant email
+    participant user ID
+    referrer email
+    private organization membership
+    reward balances
+    payout information
+
+Opaque references are preferred conceptually where practical.
+
+Exact representation remains undecided.
+
+
+======================================================================
+36. SECURITY INVARIANTS
+======================================================================
+
+1.
+AffiliateClick is an interaction event, not canonical journey identity.
+
+2.
+One click does not automatically equal one Attribution Context.
+
+3.
+One Attribution Context may have multiple interaction events.
+
+4.
+One reusable share link may create many legitimate Attribution
+Contexts for distinct journeys.
+
+5.
+campaign_id + referral_code is not a unique journey key.
+
+6.
+campaign_id + affiliate_id is not a unique journey key.
+
+7.
+IP address is not canonical journey identity.
+
+8.
+User agent is not canonical journey identity.
+
+9.
+AffiliateClick.id is not canonical journey identity.
+
+10.
+Canonical journey identity must be server-controlled.
+
+11.
+Client transport may carry a journey reference but cannot choose
+canonical journey identity.
+
+12.
+Same validated journey must not manufacture repeated canonical
+Attribution Contexts.
+
+13.
+Repeated transport must not manufacture repeated economic provenance.
+
+14.
+A resolved participant must not be replaced by another participant
+through replay.
+
+15.
+Original referrer provenance must not be silently rewritten.
+
+16.
+Original Campaign provenance must not be silently rewritten.
+
+17.
+Expired authority is not automatically current authority.
+
+18.
+A signed token, if later used, still requires validity and replay
+checks.
+
+19.
+Journey continuity must survive ordinary legitimate revisits.
+
+20.
+Duplicate defense must not collapse distinct people using the same
+share link into one Attribution Context.
+
+21.
+Creation concurrency must not manufacture duplicate canonical
+contexts.
+
+22.
+Journey identity must not depend on invasive browser fingerprinting.
+
+
+======================================================================
+37. WHAT REMAINS UNDECIDED
+======================================================================
+
+This contract intentionally does NOT yet decide:
+
+    database column name for journey identity
+    token format
+    cookie format
+    token signing scheme
+    token expiry duration
+    whether references are single-use or reusable
+    server-side session storage
+    database uniqueness mechanism
+    concurrency locking implementation
+    exact evidence association model
+    exact attribution window
+
+These require further design / implementation inspection.
+
+Semantic authority is defined first.
+
+
+======================================================================
+38. NEXT IMPLEMENTATION PRECONDITIONS
+======================================================================
+
+Before Attribution Context Creation Authority is implemented, PurPaws
+must define:
+
+1. concrete server-issued journey-reference representation
+
+2. validation rules
+
+3. expiry policy
+
+4. continuation rules
+
+5. conflict handling
+
+6. concurrency / atomic duplicate defense
+
+7. secure browser handoff through registration
+
+8. whether a schema addition is required
+
+Only after these are understood should implementation begin.
+
+
+======================================================================
+39. CURRENT STATE
+======================================================================
+
+AttributionContext model:
+    LOCKED
+
+attribution_contexts table:
+    VERIFIED
+
+Creation Authority Contract:
+    LOCKED
+
+Duplicate / Replay Semantics:
+    DEFINED BY THIS CONTRACT
+    NOT YET LOCKED
+
+Creation implementation:
+    NOT IMPLEMENTED
+
+Journey-reference implementation:
+    NOT IMPLEMENTED
+
+Registration continuity:
+    NOT IMPLEMENTED
+
+Conversion integration:
+    NOT IMPLEMENTED
+
+Reward integration:
+    NOT IMPLEMENTED
+
+Commission integration:
+    NOT IMPLEMENTED
+
+Token integration:
+    NOT IMPLEMENTED
+
+
+======================================================================
+40. FINAL AUTHORITY STATEMENT
+======================================================================
+
+PurPaws must distinguish a reusable referral link from the individual
+journeys that use it.
+
+PurPaws must distinguish transport events from canonical attribution.
+
+A click is evidence.
+
+A share link is provenance transport.
+
+A server-recognized journey identifies continuity.
+
+Attribution Context preserves canonical provenance for that journey.
+
+Repeated transport may continue an existing journey.
+
+It must not manufacture new economic truth.
+
+Distinct people using the same valid share link must remain capable of
+having distinct Attribution Contexts.
+
+SERVER-ISSUED JOURNEY IDENTITY
+        +
+SERVER-VALIDATED PROVENANCE
+        =
+DUPLICATE / REPLAY AUTHORITY BOUNDARY
+
+
+======================================================================
+END
+======================================================================
